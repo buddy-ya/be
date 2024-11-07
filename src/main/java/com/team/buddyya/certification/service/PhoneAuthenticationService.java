@@ -6,7 +6,7 @@ import com.team.buddyya.certification.exception.PhoneAuthenticationException;
 import com.team.buddyya.certification.repository.RegisteredPhoneRepository;
 import com.team.buddyya.certification.dto.response.SendCodeResponse;
 import com.team.buddyya.common.exception.ErrorCode;
-import com.team.buddyya.student.repository.StudentRepository;
+import com.team.buddyya.student.repository.AvatarRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import net.nurigo.sdk.NurigoApp;
@@ -37,7 +37,7 @@ public class PhoneAuthenticationService {
 
     private DefaultMessageService messageService;
     private final RegisteredPhoneRepository registeredPhoneRepository;
-    private final StudentRepository studentRepository;
+    private final AvatarRepository avatarRepository;
 
     @PostConstruct
     private void initMessageService() {
@@ -93,7 +93,7 @@ public class PhoneAuthenticationService {
     }
 
     public VerifyCodeResponse checkMembership(String phoneNumber) {
-        boolean isExistingMember = studentRepository.findByPhoneNumber(phoneNumber).isPresent();
+        boolean isExistingMember = avatarRepository.findByPhoneNumber(phoneNumber).isPresent();
         String status = isExistingMember ? EXISTING_MEMBER : NEW_MEMBER;
         return new VerifyCodeResponse(phoneNumber, status);
     }
