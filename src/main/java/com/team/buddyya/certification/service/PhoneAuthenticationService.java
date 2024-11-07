@@ -76,11 +76,7 @@ public class PhoneAuthenticationService {
 
     private String generateRandomNumber() {
         Random rand = new Random();
-        StringBuilder numStr = new StringBuilder();
-        for (int i = 0; i < 6; i++) {
-            numStr.append(rand.nextInt(10));
-        }
-        return numStr.toString();
+        return String.format("%06d", rand.nextInt(1_000_000));
     }
 
     public void verifyCode(String phoneNumber, String inputCode) {
