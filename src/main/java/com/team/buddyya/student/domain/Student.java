@@ -26,6 +26,9 @@ public class Student {
     @Column(length = 64, nullable = false)
     private String country;
 
+    @Column(length = 11, nullable = false)
+    private String phoneNumber;
+
     @Column(nullable = false)
     private Boolean certificated;
 
