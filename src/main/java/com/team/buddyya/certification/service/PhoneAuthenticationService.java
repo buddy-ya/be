@@ -1,7 +1,10 @@
 package com.team.buddyya.certification.service;
 
+import com.team.buddyya.certification.domain.RegisteredPhone;
+import com.team.buddyya.certification.dto.response.VerifyCodeResponse;
 import com.team.buddyya.certification.exception.PhoneAuthenticationException;
 import com.team.buddyya.certification.repository.RegisteredPhoneRepository;
+import com.team.buddyya.certification.dto.response.SendCodeResponse;
 import com.team.buddyya.common.exception.ErrorCode;
 import com.team.buddyya.student.repository.StudentRepository;
 import jakarta.annotation.PostConstruct;
@@ -13,7 +16,6 @@ import net.nurigo.sdk.message.response.SingleMessageSentResponse;
 import net.nurigo.sdk.message.service.DefaultMessageService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import java.util.Random;
 
 @Service
@@ -30,6 +32,7 @@ public class PhoneAuthenticationService {
     private String fromPhoneNumber;
 
     private DefaultMessageService messageService;
+    private final RegisteredPhoneRepository registeredPhoneRepository;
 
     @PostConstruct
     private void initMessageService() {
@@ -46,11 +49,24 @@ public class PhoneAuthenticationService {
 
         SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
         String statusCode = response.getStatusCode();
-        if (!statusCode.equals("2000")) {
+        if (!"2000".equals(statusCode)) {
             throw new PhoneAuthenticationException(ErrorCode.SMS_SEND_FAILED);
         }
 
         return numStr;
+    }
+
+    public SendCodeResponse saveCode(String phoneNumber, String generatedCode) {
+        RegisteredPhone registeredPhone = registeredPhoneRepository.findByPhoneNumber(phoneNumber)
+                .orElseGet(() -> new RegisteredPhone(phoneNumber, generatedCode));
+
+        if (registeredPhone.getId() != null) {
+            registeredPhone.setAuthenticationCode(generatedCode);
+        }
+
+        registeredPhoneRepository.save(registeredPhone);
+
+        return new SendCodeResponse(phoneNumber);
     }
 
     private String generateRandomNumber() {
@@ -61,4 +77,6 @@ public class PhoneAuthenticationService {
         }
         return numStr.toString();
     }
+
+
 }
