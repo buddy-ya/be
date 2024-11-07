@@ -17,7 +17,41 @@ import org.springframework.stereotype.Service;
 import java.util.Random;
 
 @Service
+@RequiredArgsConstructor
 public class PhoneAuthenticationService {
+
+    @Value("${solapi.api.key}")
+    private String apiKey;
+
+    @Value("${solapi.api.secret}")
+    private String apiSecret;
+
+    @Value("${solapi.api.number}")
+    private String fromPhoneNumber;
+
+    private DefaultMessageService messageService;
+
+    @PostConstruct
+    private void initMessageService() {
+        this.messageService = NurigoApp.INSTANCE.initialize(apiKey, apiSecret, "https://api.solapi.com");
+    }
+
+    public String sendSms(String to) {
+        String numStr = generateRandomNumber();
+
+        Message message = new Message();
+        message.setFrom(fromPhoneNumber);
+        message.setTo(to);
+        message.setText("[버디야] 본인 확인 인증번호[" + numStr + "]를 화면에 입력해주세요");
+
+        SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
+        String statusCode = response.getStatusCode();
+        if (!statusCode.equals("2000")) {
+            throw new PhoneAuthenticationException(ErrorCode.SMS_SEND_FAILED);
+        }
+
+        return numStr;
+    }
 
     private String generateRandomNumber() {
         Random rand = new Random();
