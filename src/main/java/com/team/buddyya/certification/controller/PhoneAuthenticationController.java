@@ -19,13 +19,21 @@ public class PhoneAuthenticationController {
 
     private final PhoneAuthenticationService phoneAuthenticationService;
 
-        @PostMapping("/send-code")
-        public ResponseEntity<SendCodeResponse> sendOne(@RequestBody SendCodeRequest sendCodeRequest) {
+    @PostMapping("/send-code")
+    public ResponseEntity<SendCodeResponse> sendOne(@RequestBody SendCodeRequest sendCodeRequest) {
 
-            String generatedCode = phoneAuthenticationService.sendSms(sendCodeRequest.phoneNumber());
-            SendCodeResponse response = phoneAuthenticationService.saveCode(sendCodeRequest.phoneNumber(), generatedCode);
+        String generatedCode = phoneAuthenticationService.sendSms(sendCodeRequest.phoneNumber());
+        SendCodeResponse response = phoneAuthenticationService.saveCode(sendCodeRequest.phoneNumber(), generatedCode);
 
-            return ResponseEntity.ok(response);
-        }
+        return ResponseEntity.ok(response);
+    }
 
+    @PostMapping("/verify-code")
+    public ResponseEntity<VerifyCodeResponse> verifyCode(@RequestBody VerifyCodeRequest verifyCodeRequest) {
+
+        phoneAuthenticationService.verifyCode(verifyCodeRequest.phoneNumber(), verifyCodeRequest.code());
+        VerifyCodeResponse response = phoneAuthenticationService.checkMembership(verifyCodeRequest.phoneNumber());
+
+        return ResponseEntity.ok(response);
+    }
 }
