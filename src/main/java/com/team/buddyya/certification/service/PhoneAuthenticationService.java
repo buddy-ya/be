@@ -16,6 +16,7 @@ import net.nurigo.sdk.message.response.SingleMessageSentResponse;
 import net.nurigo.sdk.message.service.DefaultMessageService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
 import java.util.Random;
 
 @Service
@@ -86,5 +87,11 @@ public class PhoneAuthenticationService {
         if (!inputCode.equals(registeredPhone.getAuthenticationCode())) {
             throw new PhoneAuthenticationException(ErrorCode.CODE_MISMATCH);
         }
+    }
+
+    public VerifyCodeResponse checkMembership(String phoneNumber) {
+        boolean isExistingMember = studentRepository.findByPhoneNumber(phoneNumber).isPresent();
+        String status = isExistingMember ? "EXISTING_MEMBER" : "NEW_MEMBER";
+        return new VerifyCodeResponse(phoneNumber, status);
     }
 }
