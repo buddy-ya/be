@@ -33,6 +33,7 @@ public class PhoneAuthenticationService {
 
     private DefaultMessageService messageService;
     private final RegisteredPhoneRepository registeredPhoneRepository;
+    private final StudentRepository studentRepository;
 
     @PostConstruct
     private void initMessageService() {
@@ -49,7 +50,7 @@ public class PhoneAuthenticationService {
 
         SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
         String statusCode = response.getStatusCode();
-        if (!"2000".equals(statusCode)) {
+        if (!statusCode.equals("2000")) {
             throw new PhoneAuthenticationException(ErrorCode.SMS_SEND_FAILED);
         }
 
@@ -78,5 +79,12 @@ public class PhoneAuthenticationService {
         return numStr.toString();
     }
 
+    public void verifyCode(String phoneNumber, String inputCode) {
+        RegisteredPhone registeredPhone = registeredPhoneRepository.findByPhoneNumber(phoneNumber)
+                .orElseThrow(() -> new PhoneAuthenticationException(ErrorCode.CODE_MISMATCH));
 
+        if (!inputCode.equals(registeredPhone.getAuthenticationCode())) {
+            throw new PhoneAuthenticationException(ErrorCode.CODE_MISMATCH);
+        }
+    }
 }
