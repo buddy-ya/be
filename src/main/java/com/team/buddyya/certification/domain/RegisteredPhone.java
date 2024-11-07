@@ -11,15 +11,15 @@ import static lombok.AccessLevel.*;
 @Table(name = "registered_phone_number")
 @NoArgsConstructor(access = PROTECTED)
 @Entity
-public class RegisteredPhoneNumber {
+public class RegisteredPhone {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @Column(length = 11, nullable = false,unique = true)
+    @Column(length = 11, nullable = false, unique = true)
     private String phoneNumber;
 
-    @Column(length = 6, nullable = false,unique = true)
+    @Column(length = 6, nullable = false, unique = true)
     private String authenticationCode;
 
     public RegisteredPhone(String phoneNumber, String authenticationCode) {
