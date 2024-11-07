@@ -1,8 +1,8 @@
 package com.team.buddyya.common.exception;
 
 public enum ErrorCode {
-    SMS_SEND_FAILED("E2001", "Failed to send SMS"),
-    CODE_MISMATCH("E2002", "Authentication code mismatch");
+    SMS_SEND_FAILED("E2001", "SMS 전송 실패"),
+    CODE_MISMATCH("E2002", "Authentication code가 일치하지 않습니다");
 
     private final String code;
     private final String message;
