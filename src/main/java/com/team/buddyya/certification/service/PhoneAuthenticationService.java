@@ -23,6 +23,9 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class PhoneAuthenticationService {
 
+    private static final String EXISTING_MEMBER = "EXISTING_MEMBER";
+    private static final String NEW_MEMBER = "NEW_MEMBER";
+
     @Value("${solapi.api.key}")
     private String apiKey;
 
@@ -91,7 +94,7 @@ public class PhoneAuthenticationService {
 
     public VerifyCodeResponse checkMembership(String phoneNumber) {
         boolean isExistingMember = studentRepository.findByPhoneNumber(phoneNumber).isPresent();
-        String status = isExistingMember ? "EXISTING_MEMBER" : "NEW_MEMBER";
+        String status = isExistingMember ? EXISTING_MEMBER : NEW_MEMBER;
         return new VerifyCodeResponse(phoneNumber, status);
     }
 }
