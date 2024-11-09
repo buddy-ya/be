@@ -6,7 +6,6 @@ import com.team.buddyya.certification.dto.response.SendCodeResponse;
 import com.team.buddyya.certification.dto.response.VerifyCodeResponse;
 import com.team.buddyya.certification.service.MessageSendService;
 import com.team.buddyya.certification.service.PhoneAuthenticationService;
-import com.team.buddyya.certification.service.MessageSenderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

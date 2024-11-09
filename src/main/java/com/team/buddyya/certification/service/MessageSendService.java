@@ -19,6 +19,9 @@ import java.util.Random;
 public class MessageSendService {
 
     private static final String SOLAPI_API_URL = "https://api.solapi.com";
+    private static final String MESSAGE_TEXT_FORMAT = "[버디야] 본인 확인 인증번호[%s]를 화면에 입력해주세요";
+    private static final String MESSAGE_SEND_SUCCESS_STATUS_CODE = "2000";
+    private static final int AUTH_CODE_MAX_RANGE = 1_000_000;
 
     @Value("${solapi.api.key}")
     private String apiKey;
@@ -41,10 +44,10 @@ public class MessageSendService {
         Message message = new Message();
         message.setFrom(fromPhoneNumber);
         message.setTo(to);
-        message.setText("[버디야] 본인 확인 인증번호[" + generatedCode + "]를 화면에 입력해주세요");
+        message.setText(String.format(MESSAGE_TEXT_FORMAT, generatedCode));
 
         SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
-        if (!"2000".equals(response.getStatusCode())) {
+        if (!response.getStatusCode().equals(MESSAGE_SEND_SUCCESS_STATUS_CODE)) {
             throw new PhoneAuthenticationException(ErrorCode.SMS_SEND_FAILED);
         }
         return generatedCode;
@@ -52,6 +55,6 @@ public class MessageSendService {
 
     private String generateRandomNumber() {
         Random rand = new Random();
-        return String.format("%06d", rand.nextInt(1_000_000));
+        return String.format("%06d", rand.nextInt(AUTH_CODE_MAX_RANGE));
     }
 }
