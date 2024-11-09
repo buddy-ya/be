@@ -32,7 +32,6 @@ public class Student {
     @Column(nullable = false)
     private Boolean korean;
 
-
     public Student(String name, String major, String country, Boolean certificated, Boolean korean) {
         this.name = name;
         this.major = major;

@@ -1,7 +1,7 @@
 package com.team.buddyya.certification.service;
 
 import com.team.buddyya.certification.exception.PhoneAuthenticationException;
-import com.team.buddyya.common.exception.ErrorCode;
+import com.team.buddyya.certification.exception.PhoneAuthenticationErrorCode;
 import lombok.RequiredArgsConstructor;
 import net.nurigo.sdk.NurigoApp;
 import net.nurigo.sdk.message.model.Message;
@@ -48,7 +48,7 @@ public class MessageSendService {
 
         SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
         if (!response.getStatusCode().equals(MESSAGE_SEND_SUCCESS_STATUS_CODE)) {
-            throw new PhoneAuthenticationException(ErrorCode.SMS_SEND_FAILED);
+            throw new PhoneAuthenticationException(PhoneAuthenticationErrorCode.SMS_SEND_FAILED);
         }
         return generatedCode;
     }

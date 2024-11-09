@@ -7,5 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 @Repository
 public interface AvatarRepository extends JpaRepository<Avatar, Long> {
+
     Optional<Avatar> findByPhoneNumber(String phoneNumber);
 }

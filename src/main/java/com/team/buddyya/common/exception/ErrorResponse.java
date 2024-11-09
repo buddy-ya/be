@@ -1,6 +1,7 @@
 package com.team.buddyya.common.exception;
 
 public class ErrorResponse {
+
     private String code;
     private String message;
 

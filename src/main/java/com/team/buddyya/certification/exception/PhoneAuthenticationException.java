@@ -1,16 +1,15 @@
 package com.team.buddyya.certification.exception;
 
-import com.team.buddyya.common.exception.ErrorCode;
-
 public class PhoneAuthenticationException extends RuntimeException {
-    private final ErrorCode errorCode;
 
-    public PhoneAuthenticationException(ErrorCode errorCode) {
-        super(errorCode.getMessage());
-        this.errorCode = errorCode;
+    private final PhoneAuthenticationErrorCode phoneAuthenticationErrorCode;
+
+    public PhoneAuthenticationException(PhoneAuthenticationErrorCode phoneAuthenticationErrorCode) {
+        super(phoneAuthenticationErrorCode.getMessage());
+        this.phoneAuthenticationErrorCode = phoneAuthenticationErrorCode;
     }
 
-    public ErrorCode getErrorCode() {
-        return errorCode;
+    public PhoneAuthenticationErrorCode getErrorCode() {
+        return phoneAuthenticationErrorCode;
     }
 }
