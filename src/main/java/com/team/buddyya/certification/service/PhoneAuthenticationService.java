@@ -22,9 +22,9 @@ import java.util.Random;
 @Service
 @RequiredArgsConstructor
 public class PhoneAuthenticationService {
-
     private static final String EXISTING_MEMBER = "EXISTING_MEMBER";
     private static final String NEW_MEMBER = "NEW_MEMBER";
+    private static final String SOLAPI_API_URL = "https://api.solapi.com";
 
     @Value("${solapi.api.key}")
     private String apiKey;
@@ -41,36 +41,30 @@ public class PhoneAuthenticationService {
 
     @PostConstruct
     private void initMessageService() {
-        this.messageService = NurigoApp.INSTANCE.initialize(apiKey, apiSecret, "https://api.solapi.com");
+        this.messageService = NurigoApp.INSTANCE.initialize(apiKey, apiSecret, SOLAPI_API_URL);
     }
 
     public String sendSms(String to) {
         String numStr = generateRandomNumber();
-
         Message message = new Message();
         message.setFrom(fromPhoneNumber);
         message.setTo(to);
         message.setText("[버디야] 본인 확인 인증번호[" + numStr + "]를 화면에 입력해주세요");
-
         SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
         String statusCode = response.getStatusCode();
         if (!statusCode.equals("2000")) {
             throw new PhoneAuthenticationException(ErrorCode.SMS_SEND_FAILED);
         }
-
         return numStr;
     }
 
     public SendCodeResponse saveCode(String phoneNumber, String generatedCode) {
         RegisteredPhone registeredPhone = registeredPhoneRepository.findByPhoneNumber(phoneNumber)
                 .orElseGet(() -> new RegisteredPhone(phoneNumber, generatedCode));
-
         if (registeredPhone.getId() != null) {
             registeredPhone.setAuthenticationCode(generatedCode);
         }
-
         registeredPhoneRepository.save(registeredPhone);
-
         return new SendCodeResponse(phoneNumber);
     }
 
@@ -82,7 +76,6 @@ public class PhoneAuthenticationService {
     public void verifyCode(String phoneNumber, String inputCode) {
         RegisteredPhone registeredPhone = registeredPhoneRepository.findByPhoneNumber(phoneNumber)
                 .orElseThrow(() -> new PhoneAuthenticationException(ErrorCode.CODE_MISMATCH));
-
         if (!inputCode.equals(registeredPhone.getAuthenticationCode())) {
             throw new PhoneAuthenticationException(ErrorCode.CODE_MISMATCH);
         }
