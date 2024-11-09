@@ -62,7 +62,7 @@ public class PhoneAuthenticationService {
         RegisteredPhone registeredPhone = registeredPhoneRepository.findByPhoneNumber(phoneNumber)
                 .orElseGet(() -> new RegisteredPhone(phoneNumber, generatedCode));
         if (registeredPhone.getId() != null) {
-            registeredPhone.setAuthenticationCode(generatedCode);
+            registeredPhone.updateAuthenticationCode(generatedCode);
         }
         registeredPhoneRepository.save(registeredPhone);
         return new SendCodeResponse(phoneNumber);

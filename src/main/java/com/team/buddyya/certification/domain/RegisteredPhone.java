@@ -12,6 +12,7 @@ import static lombok.AccessLevel.*;
 @NoArgsConstructor(access = PROTECTED)
 @Entity
 public class RegisteredPhone {
+
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
@@ -27,7 +28,7 @@ public class RegisteredPhone {
         this.authenticationCode = authenticationCode;
     }
 
-    public void setAuthenticationCode(String authenticationCode) {
+    public void updateAuthenticationCode(String authenticationCode) {
         this.authenticationCode = authenticationCode;
     }
 }
