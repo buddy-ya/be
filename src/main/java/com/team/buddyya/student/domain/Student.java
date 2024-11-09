@@ -3,8 +3,6 @@ package com.team.buddyya.student.domain;
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 import static jakarta.persistence.GenerationType.*;
 import static lombok.AccessLevel.PROTECTED;
 
