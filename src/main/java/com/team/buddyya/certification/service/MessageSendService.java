@@ -41,11 +41,7 @@ public class MessageSendService {
 
     public String sendMessage(String to) {
         String generatedCode = generateRandomNumber();
-        Message message = new Message();
-        message.setFrom(fromPhoneNumber);
-        message.setTo(to);
-        message.setText(String.format(MESSAGE_TEXT_FORMAT, generatedCode));
-
+        Message message = createMessage(to, generatedCode);
         SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
         if (!response.getStatusCode().equals(MESSAGE_SEND_SUCCESS_STATUS_CODE)) {
             throw new PhoneAuthenticationException(PhoneAuthenticationErrorCode.SMS_SEND_FAILED);
@@ -56,5 +52,13 @@ public class MessageSendService {
     private String generateRandomNumber() {
         Random rand = new Random();
         return String.format("%06d", rand.nextInt(AUTH_CODE_MAX_RANGE));
+    }
+
+    private Message createMessage(String to, String generatedCode) {
+        Message message = new Message();
+        message.setFrom(fromPhoneNumber);
+        message.setTo(to);
+        message.setText(String.format(MESSAGE_TEXT_FORMAT, generatedCode));
+        return message;
     }
 }
