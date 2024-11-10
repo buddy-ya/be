@@ -3,8 +3,6 @@ package com.team.buddyya.student.domain;
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 import static jakarta.persistence.GenerationType.*;
 import static lombok.AccessLevel.PROTECTED;
 
@@ -31,7 +29,6 @@ public class Student {
 
     @Column(nullable = false)
     private Boolean korean;
-
 
     public Student(String name, String major, String country, Boolean certificated, Boolean korean) {
         this.name = name;
