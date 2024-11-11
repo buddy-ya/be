@@ -26,7 +26,7 @@ public class StudentService {
                 .korean(request.korean())
                 .role(Role.STUDENT)
                 .university(university)
-                .gender(request.gender())
+                .gender(Gender.fromValue(request.gender()))
                 .build();
         return studentRepository.save(student);
     }
