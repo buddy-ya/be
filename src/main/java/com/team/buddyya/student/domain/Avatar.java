@@ -36,11 +36,11 @@ public class Avatar {
     private Student student;
 
     @Builder
-    public Avatar(String phoneNumber, boolean notificationEnabled,Student student) {
+    public Avatar(String phoneNumber, boolean notificationEnabled, Student student) {
         this.phoneNumber = phoneNumber;
         this.notificationEnabled = notificationEnabled;
+        this.student = student;
         this.active = true;
         this.loggedOut = false;
-        this.student = student;
     }
 }
