@@ -1,4 +1,5 @@
 package com.team.buddyya.student.domain;
 
-public class Gender {
+public enum Gender {
+    MALE, FEMALE, UNKNOWN
 }
