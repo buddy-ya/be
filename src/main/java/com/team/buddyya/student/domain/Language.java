@@ -19,4 +19,8 @@ public class Language {
 
     @Column(length = 255, nullable = false)
     private String languageName;
+
+    public Language(String languageName) {
+        this.languageName = languageName;
+    }
 }
