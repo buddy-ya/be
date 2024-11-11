@@ -7,8 +7,8 @@ public enum OnBoardingExceptionType implements BaseExceptionType {
 
     UNIVERSITY_NOT_FOUND(200, HttpStatus.NOT_FOUND, "해당 대학을 찾지 못하였습니다."),
     LANGUAGE_NOT_FOUND(200, HttpStatus.NOT_FOUND, "해당 언어를 찾지 못하였습니다."),
-    INTEREST_NOT_FOUND(200, HttpStatus.NOT_FOUND, "해당 관심사를 찾지 못하였습니다.");
-
+    INTEREST_NOT_FOUND(200, HttpStatus.NOT_FOUND, "해당 관심사를 찾지 못하였습니다."),
+    INVALID_GENDER_VALUE(200, HttpStatus.BAD_REQUEST, "유효하지 않은 성별 값입니다.");
     private final int errorCode;
     private final HttpStatus httpStatus;
     private final String errorMessage;

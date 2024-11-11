@@ -1,5 +1,7 @@
 package com.team.buddyya.student.domain;
 
+import com.team.buddyya.student.exception.OnBoardingException;
+import com.team.buddyya.student.exception.OnBoardingExceptionType;
 import lombok.Getter;
 
 import java.util.Arrays;
@@ -20,6 +22,6 @@ public enum Gender {
         return Arrays.stream(Gender.values())
                 .filter(gender -> gender.getDisplayName().equals(displayName))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Invalid gender value: " + displayName));
+                .orElseThrow(() -> new OnBoardingException(OnBoardingExceptionType.INVALID_GENDER_VALUE));
     }
 }
