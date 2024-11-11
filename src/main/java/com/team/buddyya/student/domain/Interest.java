@@ -19,4 +19,8 @@ public class Interest {
 
     @Column(length = 255, nullable = false)
     private String interestName;
+
+    public Interest(String interestName) {
+        this.interestName = interestName;
+    }
 }
