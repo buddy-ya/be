@@ -5,7 +5,7 @@ import com.team.buddyya.certification.dto.response.VerifyCodeResponse;
 import com.team.buddyya.certification.exception.PhoneAuthenticationException;
 import com.team.buddyya.certification.repository.RegisteredPhoneRepository;
 import com.team.buddyya.certification.dto.response.SendCodeResponse;
-import com.team.buddyya.certification.exception.PhoneAuthenticationErrorCode;
+import com.team.buddyya.certification.exception.PhoneAuthenticationExceptionType;
 import com.team.buddyya.student.repository.AvatarRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,9 +32,9 @@ public class PhoneAuthenticationService {
 
     public void verifyCode(String phoneNumber, String inputCode) {
         RegisteredPhone registeredPhone = registeredPhoneRepository.findByPhoneNumber(phoneNumber)
-                .orElseThrow(() -> new PhoneAuthenticationException(PhoneAuthenticationErrorCode.CODE_MISMATCH));
+                .orElseThrow(() -> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.CODE_MISMATCH));
         if (!inputCode.equals(registeredPhone.getAuthenticationCode())) {
-            throw new PhoneAuthenticationException(PhoneAuthenticationErrorCode.CODE_MISMATCH);
+            throw new PhoneAuthenticationException(PhoneAuthenticationExceptionType.CODE_MISMATCH);
         }
     }
 
