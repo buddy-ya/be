@@ -11,7 +11,7 @@ public record OnBoardingRequest(
         Boolean korean,
         Boolean notificationEnabled,
         String phoneNumber,
-        Gender gender,
+        String gender,
         String university,
         List<String> languages,
         List<String> interests
