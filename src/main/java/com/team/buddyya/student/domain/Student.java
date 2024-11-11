@@ -36,7 +36,7 @@ public class Student {
     @Column(nullable = false)
     private Boolean korean;
 
-    @OneToOne(mappedBy = "student", fetch = LAZY)
+    @OneToOne(mappedBy = "student", fetch = LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Avatar avatar;
 
     @ManyToOne(fetch = LAZY)
@@ -51,10 +51,10 @@ public class Student {
     @Column(nullable = false)
     private Gender gender;
 
-    @OneToMany(mappedBy = "student")
+    @OneToMany(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<StudentLanguage> languages;
 
-    @OneToMany(mappedBy = "student")
+    @OneToMany(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<StudentInterest> interests;
 
     @Builder
