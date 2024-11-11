@@ -31,14 +31,10 @@ public class Student {
     private String country;
 
     @Column(nullable = false)
-    private Boolean certificated = false;
+    private Boolean certificated;
 
     @Column(nullable = false)
     private Boolean korean;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Role role;
 
     @OneToOne(mappedBy = "student", fetch = LAZY)
     private Avatar avatar;
@@ -46,6 +42,10 @@ public class Student {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "university_id", nullable = false)
     private University university;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -62,10 +62,10 @@ public class Student {
         this.name = name;
         this.major = major;
         this.country = country;
-        this.certificated = false;
         this.korean = korean;
         this.role = role;
         this.university = university;
         this.gender = gender;
+        this.certificated = false;
     }
 }
