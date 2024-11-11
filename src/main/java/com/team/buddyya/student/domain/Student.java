@@ -1,14 +1,20 @@
 package com.team.buddyya.student.domain;
 
 import jakarta.persistence.*;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import static jakarta.persistence.GenerationType.*;
+import java.util.List;
+
+import static jakarta.persistence.FetchType.LAZY;
+import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
-@Table(name = "student")
-@NoArgsConstructor(access = PROTECTED)
 @Entity
+@Table(name = "student")
+@Getter
+@NoArgsConstructor(access = PROTECTED)
 public class Student {
 
     @Id
@@ -25,16 +31,41 @@ public class Student {
     private String country;
 
     @Column(nullable = false)
-    private Boolean certificated;
+    private Boolean certificated = false;
 
     @Column(nullable = false)
     private Boolean korean;
 
-    public Student(String name, String major, String country, Boolean certificated, Boolean korean) {
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
+
+    @OneToOne(mappedBy = "student", fetch = LAZY)
+    private Avatar avatar;
+
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "university_id", nullable = false)
+    private University university;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Gender gender;
+
+    @OneToMany(mappedBy = "student")
+    private List<StudentLanguage> languages;
+
+    @OneToMany(mappedBy = "student")
+    private List<StudentInterest> interests;
+
+    @Builder
+    public Student(String name, String major, String country, Boolean korean, Role role, University university, Gender gender) {
         this.name = name;
         this.major = major;
         this.country = country;
-        this.certificated = certificated;
+        this.certificated = false;
         this.korean = korean;
+        this.role = role;
+        this.university = university;
+        this.gender = gender;
     }
 }
