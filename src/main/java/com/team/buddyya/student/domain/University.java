@@ -22,4 +22,9 @@ public class University {
 
     @Column
     private Long count;
+
+    public University(String universityName, Long count) {
+        this.universityName = universityName;
+        this.count = count;
+    }
 }
