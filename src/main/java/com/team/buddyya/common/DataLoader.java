@@ -38,7 +38,6 @@ public class DataLoader implements CommandLineRunner {
                 "Vietnamese", "Norwegian", "Catalan", "Croatian", "Malay",
                 "Kazakh", "Bulgarian"
         );
-
         languages.forEach(languageName -> {
             if (!languageRepository.findByLanguageName(languageName).isPresent()) {
                 languageRepository.save(new Language(languageName));
@@ -53,7 +52,6 @@ public class DataLoader implements CommandLineRunner {
                 "헬스", "노래", "춤", "공예", "악기 연주", "사진 촬영", "연기", "맛집 투어", "맥주",
                 "베이킹", "요리", "이색 음식 체험"
         );
-
         interests.forEach(interestName -> {
             if (!interestRepository.findByInterestName(interestName).isPresent()) {
                 interestRepository.save(new Interest(interestName));
@@ -67,10 +65,9 @@ public class DataLoader implements CommandLineRunner {
                 "Yonsei University", "Hanyang University", "Sungkyunkwan University",
                 "KAIST", "POSTECH", "GIST", "Konkuk University"
         );
-
         universities.forEach(universityName -> {
             if (!universityRepository.findByUniversityName(universityName).isPresent()) {
-                universityRepository.save(new University(universityName, 0L)); // 초기 count 값을 0으로 설정
+                universityRepository.save(new University(universityName, 0L));
             }
         });
     }

@@ -19,6 +19,7 @@ public enum PhoneAuthenticationExceptionType implements BaseExceptionType {
     private final int errorCode;
     private final HttpStatus httpStatus;
     private final String errorMessage;
+
     PhoneAuthenticationExceptionType(final int errorCode,
                       final HttpStatus httpStatus,
                       final String errorMessage) {
