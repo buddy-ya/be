@@ -1,6 +1,7 @@
 package com.team.buddyya.student.domain;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -20,11 +21,8 @@ public class University {
     @Column(length = 255, nullable = false)
     private String universityName;
 
-    @Column
-    private Long count;
-
+    @Builder
     public University(String universityName, Long count) {
         this.universityName = universityName;
-        this.count = count;
     }
 }
