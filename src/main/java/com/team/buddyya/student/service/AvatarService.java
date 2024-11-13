@@ -17,7 +17,6 @@ public class AvatarService {
 
     public void createAvatar(OnBoardingRequest request, Student student) {
         Avatar avatar = Avatar.builder()
-                .phoneNumber(request.phoneNumber())
                 .isNotificationEnabled(request.notificationEnabled())
                 .student(student)
                 .build();

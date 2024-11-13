@@ -7,6 +7,7 @@ import com.team.buddyya.certification.repository.RegisteredPhoneRepository;
 import com.team.buddyya.certification.dto.response.SendCodeResponse;
 import com.team.buddyya.certification.exception.PhoneAuthenticationExceptionType;
 import com.team.buddyya.student.repository.AvatarRepository;
+import com.team.buddyya.student.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +21,7 @@ public class PhoneAuthenticationService {
     private static final String NEW_MEMBER = "NEW_MEMBER";
 
     private final RegisteredPhoneRepository registeredPhoneRepository;
-    private final AvatarRepository avatarRepository;
+    private final StudentRepository studentRepository;
 
     public SendCodeResponse saveCode(String phoneNumber, String generatedCode) {
         RegisteredPhone registeredPhone = registeredPhoneRepository.findByPhoneNumber(phoneNumber)
@@ -41,7 +42,7 @@ public class PhoneAuthenticationService {
     }
 
     public VerifyCodeResponse checkMembership(String phoneNumber) {
-        boolean isExistingMember = avatarRepository.findByPhoneNumber(phoneNumber).isPresent();
+        boolean isExistingMember = studentRepository.findByPhoneNumber(phoneNumber).isPresent();
         String status = isExistingMember ? EXISTING_MEMBER : NEW_MEMBER;
         return new VerifyCodeResponse(phoneNumber, status);
     }

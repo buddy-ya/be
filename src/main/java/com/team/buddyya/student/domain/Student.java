@@ -21,6 +21,9 @@ public class Student {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
+    @Column(length = 11, nullable = false)
+    private String phoneNumber;
+
     @Column(length = 64, nullable = false)
     private String name;
 
@@ -30,10 +33,10 @@ public class Student {
     @Column(length = 64, nullable = false)
     private String country;
 
-    @Column(name="certificated",nullable = false)
+    @Column(name = "certificated", nullable = false)
     private Boolean isCertificated;
 
-    @Column(name= "korean",nullable = false)
+    @Column(name = "korean", nullable = false)
     private Boolean isKorean;
 
     @OneToOne(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
@@ -58,8 +61,9 @@ public class Student {
     private List<StudentInterest> interests;
 
     @Builder
-    public Student(String name, String major, String country, Boolean isKorean, Role role, University university, Gender gender) {
+    public Student(String name, String phoneNumber, String major, String country, Boolean isKorean, Role role, University university, Gender gender) {
         this.name = name;
+        this.phoneNumber = phoneNumber;
         this.major = major;
         this.country = country;
         this.isKorean = isKorean;

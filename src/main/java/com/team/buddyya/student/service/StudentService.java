@@ -23,6 +23,7 @@ public class StudentService {
                 .orElseThrow(() -> new OnBoardingException(OnBoardingExceptionType.UNIVERSITY_NOT_FOUND));
         Student student = Student.builder()
                 .name(request.name())
+                .phoneNumber(request.phoneNumber())
                 .major(request.major())
                 .country(request.country())
                 .isKorean(request.korean())

@@ -19,9 +19,6 @@ public class Avatar {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @Column(length = 11, nullable = false)
-    private String phoneNumber;
-
     @Column(name="notificationEnabled", nullable = false)
     private Boolean isNotificationEnabled;
 
@@ -37,7 +34,6 @@ public class Avatar {
 
     @Builder
     public Avatar(String phoneNumber, boolean isNotificationEnabled, Student student) {
-        this.phoneNumber = phoneNumber;
         this.isNotificationEnabled = isNotificationEnabled;
         this.student = student;
         this.isActive = true;
