@@ -12,10 +12,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.PostConstruct;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class MessageSendService {
 
     private static final String SOLAPI_API_URL = "https://api.solapi.com";

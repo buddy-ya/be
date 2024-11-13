@@ -9,9 +9,11 @@ import com.team.buddyya.certification.exception.PhoneAuthenticationExceptionType
 import com.team.buddyya.student.repository.AvatarRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class PhoneAuthenticationService {
 
     private static final String EXISTING_MEMBER = "EXISTING_MEMBER";
