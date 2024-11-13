@@ -1,40 +1,42 @@
 package com.team.buddyya.student.domain;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
+import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
-@Getter
-@NoArgsConstructor(access = PROTECTED)
 @Entity
 @Table(name = "avatar")
+@Getter
+@NoArgsConstructor(access = PROTECTED)
 public class Avatar {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private Long version;
+    @Column(name="notificationEnabled", nullable = false)
+    private Boolean isNotificationEnabled;
 
-    @Column(length = 11, nullable = false)
-    private String phoneNumber;
+    @Column(name="active", nullable = false)
+    private Boolean isActive;
 
-    @Column(nullable = false)
-    private Boolean notificationEnabled;
+    @Column(name="loggedOut", nullable = false)
+    private Boolean isLoggedOut;
 
-    @Column(nullable = false)
-    private Boolean active;
+    @OneToOne(fetch = LAZY)
+    @JoinColumn(name = "student_id", nullable = false)
+    private Student student;
 
-    @Column(nullable = false)
-    private Boolean loggedOut;
-
-    private LocalDateTime deactivatedDate;
-
-    private LocalDateTime updatedDate;
+    @Builder
+    public Avatar(String phoneNumber, boolean isNotificationEnabled, Student student) {
+        this.isNotificationEnabled = isNotificationEnabled;
+        this.student = student;
+        this.isActive = true;
+        this.isLoggedOut = false;
+    }
 }

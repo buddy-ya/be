@@ -1,19 +1,28 @@
 package com.team.buddyya.student.domain;
 
 import jakarta.persistence.*;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import static jakarta.persistence.GenerationType.*;
+import java.util.List;
+
+import static jakarta.persistence.FetchType.LAZY;
+import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
-@Table(name = "student")
-@NoArgsConstructor(access = PROTECTED)
 @Entity
+@Table(name = "student")
+@Getter
+@NoArgsConstructor(access = PROTECTED)
 public class Student {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
+
+    @Column(length = 11, nullable = false)
+    private String phoneNumber;
 
     @Column(length = 64, nullable = false)
     private String name;
@@ -24,17 +33,43 @@ public class Student {
     @Column(length = 64, nullable = false)
     private String country;
 
-    @Column(nullable = false)
-    private Boolean certificated;
+    @Column(name = "certificated", nullable = false)
+    private Boolean isCertificated;
 
-    @Column(nullable = false)
-    private Boolean korean;
+    @Column(name = "korean", nullable = false)
+    private Boolean isKorean;
 
-    public Student(String name, String major, String country, Boolean certificated, Boolean korean) {
+    @OneToOne(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Avatar avatar;
+
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "university_id", nullable = false)
+    private University university;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Gender gender;
+
+    @OneToMany(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<StudentLanguage> languages;
+
+    @OneToMany(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<StudentInterest> interests;
+
+    @Builder
+    public Student(String name, String phoneNumber, String major, String country, Boolean isKorean, Role role, University university, Gender gender) {
         this.name = name;
+        this.phoneNumber = phoneNumber;
         this.major = major;
         this.country = country;
-        this.certificated = certificated;
-        this.korean = korean;
+        this.isKorean = isKorean;
+        this.role = role;
+        this.university = university;
+        this.gender = gender;
+        this.isCertificated = false;
     }
 }

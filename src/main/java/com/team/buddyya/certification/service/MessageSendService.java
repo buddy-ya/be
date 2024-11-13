@@ -1,7 +1,7 @@
 package com.team.buddyya.certification.service;
 
 import com.team.buddyya.certification.exception.PhoneAuthenticationException;
-import com.team.buddyya.certification.exception.PhoneAuthenticationErrorCode;
+import com.team.buddyya.certification.exception.PhoneAuthenticationExceptionType;
 import lombok.RequiredArgsConstructor;
 import net.nurigo.sdk.NurigoApp;
 import net.nurigo.sdk.message.model.Message;
@@ -12,10 +12,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.PostConstruct;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class MessageSendService {
 
     private static final String SOLAPI_API_URL = "https://api.solapi.com";
@@ -44,7 +47,7 @@ public class MessageSendService {
         Message message = createMessage(to, generatedCode);
         SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
         if (!response.getStatusCode().equals(MESSAGE_SEND_SUCCESS_STATUS_CODE)) {
-            throw new PhoneAuthenticationException(PhoneAuthenticationErrorCode.SMS_SEND_FAILED);
+            throw new PhoneAuthenticationException(PhoneAuthenticationExceptionType.SMS_SEND_FAILED);
         }
         return generatedCode;
     }
