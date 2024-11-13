@@ -36,7 +36,7 @@ public class Student {
     @Column(name= "korean",nullable = false)
     private Boolean isKorean;
 
-    @OneToOne(mappedBy = "student", fetch = LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToOne(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Avatar avatar;
 
     @ManyToOne(fetch = LAZY)
