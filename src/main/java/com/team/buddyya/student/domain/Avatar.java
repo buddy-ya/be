@@ -19,28 +19,28 @@ public class Avatar {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @Column(length = 15, nullable = false)
+    @Column(length = 11, nullable = false)
     private String phoneNumber;
 
-    @Column(nullable = false)
-    private Boolean notificationEnabled;
+    @Column(name="notificationEnabled", nullable = false)
+    private Boolean isNotificationEnabled;
 
-    @Column(nullable = false)
-    private Boolean active;
+    @Column(name="active", nullable = false)
+    private Boolean isActive;
 
-    @Column(nullable = false)
-    private Boolean loggedOut;
+    @Column(name="loggedOut", nullable = false)
+    private Boolean isLoggedOut;
 
     @OneToOne(fetch = LAZY)
     @JoinColumn(name = "student_id", nullable = false)
     private Student student;
 
     @Builder
-    public Avatar(String phoneNumber, boolean notificationEnabled, Student student) {
+    public Avatar(String phoneNumber, boolean isNotificationEnabled, Student student) {
         this.phoneNumber = phoneNumber;
-        this.notificationEnabled = notificationEnabled;
+        this.isNotificationEnabled = isNotificationEnabled;
         this.student = student;
-        this.active = true;
-        this.loggedOut = false;
+        this.isActive = true;
+        this.isLoggedOut = false;
     }
 }
