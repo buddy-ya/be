@@ -8,9 +8,11 @@ import com.team.buddyya.student.repository.StudentRepository;
 import com.team.buddyya.student.repository.UniversityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class StudentService {
 
     private final StudentRepository studentRepository;
@@ -23,7 +25,7 @@ public class StudentService {
                 .name(request.name())
                 .major(request.major())
                 .country(request.country())
-                .korean(request.korean())
+                .isKorean(request.korean())
                 .role(Role.STUDENT)
                 .university(university)
                 .gender(Gender.fromValue(request.gender()))

@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class OnBoardingService {
 
     private final StudentService studentService;
@@ -17,7 +17,6 @@ public class OnBoardingService {
     private final StudentInterestService studentInterestService;
     private final StudentLanguageService studentLanguageService;
 
-    @Transactional
     public OnBoardingResponse onboard(OnBoardingRequest request) {
         Student student = studentService.createStudent(request);
         avatarService.createAvatar(request, student);

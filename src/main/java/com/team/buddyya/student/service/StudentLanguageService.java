@@ -10,13 +10,16 @@ import com.team.buddyya.student.repository.LanguageRepository;
 import com.team.buddyya.student.repository.StudentLanguageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class StudentLanguageService {
 
     private final StudentLanguageRepository studentLanguageRepository;
     private final LanguageRepository languageRepository;
+
     public void createStudentLanguages(OnBoardingRequest request, Student student) {
         request.languages().forEach(languageName -> {
             Language language = languageRepository.findByLanguageName(languageName)
