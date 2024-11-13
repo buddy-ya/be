@@ -1,6 +1,7 @@
 package com.team.buddyya.student.domain;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -20,6 +21,7 @@ public class Interest {
     @Column(length = 255, nullable = false)
     private String interestName;
 
+    @Builder
     public Interest(String interestName) {
         this.interestName = interestName;
     }

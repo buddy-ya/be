@@ -1,6 +1,7 @@
 package com.team.buddyya.student.domain;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -20,6 +21,7 @@ public class Language {
     @Column(length = 255, nullable = false)
     private String languageName;
 
+    @Builder
     public Language(String languageName) {
         this.languageName = languageName;
     }

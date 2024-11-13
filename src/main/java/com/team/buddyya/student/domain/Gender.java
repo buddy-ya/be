@@ -8,6 +8,7 @@ import java.util.Arrays;
 
 @Getter
 public enum Gender {
+
     MALE("male"),
     FEMALE("female"),
     UNKNOWN("unknown");
