@@ -30,11 +30,11 @@ public class Student {
     @Column(length = 64, nullable = false)
     private String country;
 
-    @Column(nullable = false)
-    private Boolean certificated;
+    @Column(name="certificated",nullable = false)
+    private Boolean isCertificated;
 
-    @Column(nullable = false)
-    private Boolean korean;
+    @Column(name= "korean",nullable = false)
+    private Boolean isKorean;
 
     @OneToOne(mappedBy = "student", fetch = LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Avatar avatar;
@@ -58,14 +58,14 @@ public class Student {
     private List<StudentInterest> interests;
 
     @Builder
-    public Student(String name, String major, String country, Boolean korean, Role role, University university, Gender gender) {
+    public Student(String name, String major, String country, Boolean isKorean, Role role, University university, Gender gender) {
         this.name = name;
         this.major = major;
         this.country = country;
-        this.korean = korean;
+        this.isKorean = isKorean;
         this.role = role;
         this.university = university;
         this.gender = gender;
-        this.certificated = false;
+        this.isCertificated = false;
     }
 }
