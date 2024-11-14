@@ -1,5 +1,6 @@
 package com.team.buddyya.student.domain;
 
+import com.team.buddyya.auth.domain.AuthToken;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -60,6 +61,9 @@ public class Student {
     @OneToMany(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<StudentInterest> interests;
 
+    @OneToOne(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private AuthToken authToken;
+
     @Builder
     public Student(String name, String phoneNumber, String major, String country, Boolean isKorean, Role role, University university, Gender gender) {
         this.name = name;
@@ -71,5 +75,9 @@ public class Student {
         this.university = university;
         this.gender = gender;
         this.isCertificated = false;
+    }
+
+    public void createToken(AuthToken authToken) {
+        this.authToken = authToken;
     }
 }
