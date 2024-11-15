@@ -22,4 +22,16 @@ public class AuthController {
         TokenReissueResponse tokenResponse = authService.reissueToken(request);
         return ResponseEntity.ok(tokenResponse);
     }
+
+    @GetMapping("/success")
+    public ResponseEntity<String> success(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        StudentInfo studentInfo = userDetails.getStudentInfo();
+        return ResponseEntity.ok(studentInfo.toString());
+    }
+
+    @GetMapping("/fail")
+    public ResponseEntity<String> fail(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        StudentInfo studentInfo = userDetails.getStudentInfo();
+        return ResponseEntity.ok(studentInfo.toString());
+    }
 }
