@@ -76,8 +76,4 @@ public class Student {
         this.gender = gender;
         this.isCertificated = false;
     }
-
-    public void createToken(AuthToken authToken) {
-        this.authToken = authToken;
-    }
 }
