@@ -13,12 +13,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
-@RequiredArgsConstructor
 public class CustomUserDetails implements UserDetails {
 
     private static final String ROLE_PREFIX = "ROLE_";
 
     private final LoginStudentInfo user;
+
+    public CustomUserDetails(LoginStudentInfo user) {
+        this.user = user;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
