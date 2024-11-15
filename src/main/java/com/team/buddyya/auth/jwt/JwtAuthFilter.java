@@ -49,6 +49,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             log.info("Security Context에 '{}' 인증 정보를 저장했습니다.", authenticationToken.getName());
+            return;
         }
+        log.warn("유효하지 않은 사용자 정보입니다.");
     }
 }
