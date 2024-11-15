@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 
 public enum OnBoardingExceptionType implements BaseExceptionType {
 
+    STUDENT_NOT_FOUND(200, HttpStatus.NOT_FOUND, "해당 학생을 찾지 못하였습니다."),
     UNIVERSITY_NOT_FOUND(200, HttpStatus.NOT_FOUND, "해당 대학을 찾지 못하였습니다."),
     LANGUAGE_NOT_FOUND(200, HttpStatus.NOT_FOUND, "해당 언어를 찾지 못하였습니다."),
     INTEREST_NOT_FOUND(200, HttpStatus.NOT_FOUND, "해당 관심사를 찾지 못하였습니다."),
