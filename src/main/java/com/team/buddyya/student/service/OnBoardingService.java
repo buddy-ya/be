@@ -40,7 +40,6 @@ public class OnBoardingService {
                 .student(student)
                 .build();
         authTokenRepository.save(authToken);
-        student.createToken(authToken);
         return refreshToken;
     }
 }
