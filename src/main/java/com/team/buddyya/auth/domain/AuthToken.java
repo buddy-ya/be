@@ -22,7 +22,7 @@ public class AuthToken {
     @Column(nullable = false)
     private String refreshToken;
 
-    @OneToOne(fetch = LAZY)
+    @OneToOne
     @JoinColumn(name = "student_id", nullable = false)
     private Student student;
 
