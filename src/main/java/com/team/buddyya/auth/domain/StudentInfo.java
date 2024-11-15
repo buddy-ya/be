@@ -5,15 +5,15 @@ import com.team.buddyya.student.domain.Student;
 
 public record StudentInfo(
         Long id,
-        String name,
-        Role role
+        Role role,
+        Boolean isKorean
 ) {
 
     public static StudentInfo from(Student student) {
         return new StudentInfo(
                 student.getId(),
-                student.getName(),
-                student.getRole()
+                student.getRole(),
+                student.getIsKorean()
         );
     }
 }
