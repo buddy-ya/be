@@ -1,7 +1,7 @@
 package com.team.buddyya.auth.service;
 
 import com.team.buddyya.auth.domain.CustomUserDetails;
-import com.team.buddyya.auth.dto.LoginStudentInfo;
+import com.team.buddyya.auth.domain.StudentInfo;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.exception.OnBoardingException;
 import com.team.buddyya.student.exception.OnBoardingExceptionType;
@@ -23,7 +23,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     public CustomUserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
         Student student = studentRepository.findById(Long.parseLong(id))
                 .orElseThrow(() -> new OnBoardingException(OnBoardingExceptionType.STUDENT_NOT_FOUND));
-        LoginStudentInfo studentInfo = LoginStudentInfo.from(student);
+        StudentInfo studentInfo = StudentInfo.from(student);
         return new CustomUserDetails(studentInfo);
     }
 }

@@ -1,8 +1,6 @@
 package com.team.buddyya.auth.domain;
 
-import com.team.buddyya.auth.dto.LoginStudentInfo;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,16 +15,16 @@ public class CustomUserDetails implements UserDetails {
 
     private static final String ROLE_PREFIX = "ROLE_";
 
-    private final LoginStudentInfo user;
+    private final StudentInfo studentInfo;
 
-    public CustomUserDetails(LoginStudentInfo user) {
-        this.user = user;
+    public CustomUserDetails(StudentInfo studentInfo) {
+        this.studentInfo = studentInfo;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<String> roles = new ArrayList<>();
-        roles.add(ROLE_PREFIX + user.role());
+        roles.add(ROLE_PREFIX + studentInfo.role());
         return roles.stream()
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
