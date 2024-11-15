@@ -6,15 +6,19 @@ public record OnBoardingResponse(
         String name,
         String country,
         String university,
-        String major
+        String major,
+        String accessToken,
+        String refreshToken
 ) {
 
-    public static OnBoardingResponse from(Student student) {
+    public static OnBoardingResponse from(Student student, String accessToken, String refreshToken) {
         return new OnBoardingResponse(
                 student.getName(),
                 student.getCountry(),
                 student.getUniversity().getUniversityName(),
-                student.getMajor()
+                student.getMajor(),
+                accessToken,
+                refreshToken
         );
     }
 }
