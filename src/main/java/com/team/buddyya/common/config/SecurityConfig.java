@@ -39,7 +39,7 @@ public class SecurityConfig {
                         .accessDeniedHandler(accessDeniedHandler))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/onboarding", "/phone-auth/**",
-                                "/auth/token/reissue").permitAll()
+                                "/auth/reissue").permitAll()
                         .requestMatchers("/auth/fail").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/auth/success").hasAuthority("ROLE_STUDENT")
                         .anyRequest().authenticated()
