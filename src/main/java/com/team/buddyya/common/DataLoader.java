@@ -1,13 +1,17 @@
 package com.team.buddyya.common;
 
+import com.team.buddyya.student.controller.OnBoardingController;
 import com.team.buddyya.student.domain.Interest;
 import com.team.buddyya.student.domain.Language;
 import com.team.buddyya.student.domain.University;
+import com.team.buddyya.student.dto.request.OnBoardingRequest;
+import com.team.buddyya.student.dto.response.OnBoardingResponse;
 import com.team.buddyya.student.repository.InterestRepository;
 import com.team.buddyya.student.repository.LanguageRepository;
 import com.team.buddyya.student.repository.UniversityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -19,12 +23,14 @@ public class DataLoader implements CommandLineRunner {
     private final LanguageRepository languageRepository;
     private final InterestRepository interestRepository;
     private final UniversityRepository universityRepository;
+    private final OnBoardingController onBoardingController;
 
     @Override
     public void run(String... args) throws Exception {
         loadLanguages();
         loadInterests();
         loadUniversities();
+        createMockStudents();
     }
 
     private void loadLanguages() {
@@ -69,6 +75,24 @@ public class DataLoader implements CommandLineRunner {
             if (!universityRepository.findByUniversityName(universityName).isPresent()) {
                 universityRepository.save(new University(universityName, 0L));
             }
+        });
+    }
+
+    private void createMockStudents() {
+        List<OnBoardingRequest> mockRequests = List.of(
+                new OnBoardingRequest(
+                        "홍길동", "Computer Science", "Korea", true,
+                        true, "01012345678", "male",
+                         "Sejong University", List.of("Korean", "English"), List.of("영화", "독서")
+                ),
+                new OnBoardingRequest(
+                        "Alice", "Computer Science", "Canada", false,
+                        true, "01087654321", "female",
+                        "Sejong University", List.of("Korean", "English"), List.of("K-POP", "독서")
+                )
+        );
+        mockRequests.forEach(request -> {
+            ResponseEntity<OnBoardingResponse> response = onBoardingController.onboard(request);
         });
     }
 }

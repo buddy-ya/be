@@ -77,4 +77,8 @@ public class Student extends BaseTime {
         this.gender = gender;
         this.isCertificated = false;
     }
+
+    public void checkIsCertificated(boolean isCertificated) {
+        this.isCertificated = isCertificated;
+    }
 }
