@@ -31,7 +31,7 @@ public class CertificationService {
     public EmailCertificationResponse certificateEmail(CustomUserDetails userDetails, EmailCertificationRequest emailRequest) {
         Student student = studentRepository.findById(userDetails.getStudentInfo().id())
                 .orElseThrow(() -> new OnBoardingException(OnBoardingExceptionType.STUDENT_NOT_FOUND));
-        if(student.getIsCertificated()){
+        if (student.getIsCertificated()) {
             throw new EmailAuthException(EmailAuthExceptionType.ALREADY_CERTIFICATED);
         }
         try {
@@ -43,8 +43,20 @@ public class CertificationService {
         }
     }
 
-    public EmailCertificationResponse certificateEmailCode(CustomUserDetails userDetails, EmailCodeRequest codeRequest) throws IOException {
-        Map<String, Object> univCertResponse = UnivCert.certifyCode(API_KEY, codeRequest.email(), codeRequest.univName(), codeRequest.code());
-        return new EmailCertificationResponse((Boolean) univCertResponse.get("success"));
+    public EmailCertificationResponse certificateEmailCode(CustomUserDetails userDetails, EmailCodeRequest codeRequest) {
+        try {
+            Map<String, Object> univCertResponse = UnivCert.certifyCode(API_KEY, codeRequest.email(), codeRequest.univName(), codeRequest.code());
+            Boolean isSuccess = (Boolean) univCertResponse.get("success");
+            if(isSuccess){
+                Student student = studentRepository.findById(userDetails.getStudentInfo().id())
+                        .orElseThrow(() -> new OnBoardingException(OnBoardingExceptionType.STUDENT_NOT_FOUND));
+                student.checkIsCertificated(true);
+                studentRepository.save(student);
+            }
+            UnivCert.clear(API_KEY);
+            return new EmailCertificationResponse(isSuccess);
+        } catch (IOException e) {
+            throw new EmailAuthException(EmailAuthExceptionType.EMAIL_AUTH_FAILED);
+        }
     }
 }
