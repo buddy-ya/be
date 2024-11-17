@@ -41,7 +41,7 @@ public class SecurityConfig {
                         .requestMatchers("/onboarding", "/phone-auth/**",
                                 "/auth/reissue").permitAll()
                         .requestMatchers("/auth/fail").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers("/auth/success").hasAuthority("ROLE_STUDENT")
+                        .requestMatchers("/auth/success", "/certification/**").hasAuthority("ROLE_STUDENT")
                         .anyRequest().authenticated()
                 );
         return http.build();
