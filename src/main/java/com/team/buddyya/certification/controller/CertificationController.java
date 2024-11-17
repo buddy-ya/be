@@ -23,12 +23,12 @@ public class CertificationController {
     private final CertificationService certificationService;
 
     @PostMapping("/email")
-    public ResponseEntity<EmailCertificationResponse> emailCertificate(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody EmailCertificationRequest emailCertificationRequest) throws IOException {
-        return ResponseEntity.ok(certificationService.certificateEmail(userDetails, emailCertificationRequest));
+    public ResponseEntity<EmailCertificationResponse> emailCertificate(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody EmailCertificationRequest emailCertificationRequest) {
+        return ResponseEntity.ok(certificationService.certificateEmail(userDetails.getStudentInfo(), emailCertificationRequest));
     }
 
     @PostMapping("/email/code")
-    public ResponseEntity<EmailCertificationResponse> emailCodeCertificate(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody EmailCodeRequest codeRequest) throws IOException {
-        return ResponseEntity.ok(certificationService.certificateEmailCode(userDetails, codeRequest));
+    public ResponseEntity<EmailCertificationResponse> emailCodeCertificate(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody EmailCodeRequest codeRequest) {
+        return ResponseEntity.ok(certificationService.certificateEmailCode(userDetails.getStudentInfo(), codeRequest));
     }
 }
