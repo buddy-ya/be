@@ -1,5 +1,6 @@
 package com.team.buddyya.auth.domain;
 
+import com.team.buddyya.common.domain.CreatedTime;
 import com.team.buddyya.student.domain.Student;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -13,7 +14,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Table(name = "auth_token")
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-public class AuthToken {
+public class AuthToken extends CreatedTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

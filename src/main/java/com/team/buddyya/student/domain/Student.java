@@ -1,6 +1,7 @@
 package com.team.buddyya.student.domain;
 
 import com.team.buddyya.auth.domain.AuthToken;
+import com.team.buddyya.common.domain.BaseTime;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,7 +17,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Table(name = "student")
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-public class Student {
+public class Student extends BaseTime {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)

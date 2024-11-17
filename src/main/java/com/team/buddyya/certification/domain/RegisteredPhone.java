@@ -1,5 +1,6 @@
 package com.team.buddyya.certification.domain;
 
+import com.team.buddyya.common.domain.CreatedTime;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,7 +12,7 @@ import static lombok.AccessLevel.*;
 @Table(name = "registered_phone_number")
 @NoArgsConstructor(access = PROTECTED)
 @Entity
-public class RegisteredPhone {
+public class RegisteredPhone extends CreatedTime {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
