@@ -23,7 +23,7 @@ public class CertificationController {
     private final CertificationService certificationService;
 
     @PostMapping("/email")
-    public ResponseEntity<EmailCertificationResponse> emailCertificate(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody EmailCertificationRequest emailCertificationRequest) {
+    public ResponseEntity<EmailCertificationResponse> sendEmail(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody EmailCertificationRequest emailCertificationRequest) {
         return ResponseEntity.ok(certificationService.certificateEmail(userDetails.getStudentInfo(), emailCertificationRequest));
     }
 
