@@ -76,4 +76,8 @@ public class Student {
         this.gender = gender;
         this.isCertificated = false;
     }
+
+    public void updateIsCertificated(boolean isCertificated) {
+        this.isCertificated = isCertificated;
+    }
 }
