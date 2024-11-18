@@ -35,14 +35,14 @@ public class DataLoader implements CommandLineRunner {
 
     private void loadLanguages() {
         List<String> languages = List.of(
-                "Korean", "English", "Chinese", "Japanese", "French", "Spanish", "Burmese",
-                "Portuguese", "German", "Nepali", "Mongolian", "Swahili", "Arabic",
-                "Uzbek", "Indonesian", "Khmer", "Persian", "Hebrew", "Hindi",
-                "Greek", "Netherlandic", "Latin", "Russian", "Rumanian", "Albanian",
-                "Ukrainian", "Italian", "Georgian", "Czech", "Slovak", "Turkish",
-                "Polish", "Finnish", "Hungarian", "Thai", "Swedish", "Danish",
-                "Vietnamese", "Norwegian", "Catalan", "Croatian", "Malay",
-                "Kazakh", "Bulgarian"
+                "ko", "cn", "hk", "jp", "mo", "mn", "tw", "bn", "kh", "id", "la", "my",
+                "mm", "ph", "sg", "th", "tl", "vn", "bd", "bt", "in", "mv", "np", "pk",
+                "lk", "kz", "kg", "tj", "tm", "uz", "ca", "mx", "us", "cr", "cu", "do",
+                "sv", "gt", "pa", "ar", "bo", "br", "cl", "co", "ec", "py", "pe", "uy",
+                "ve", "at", "be", "fr", "de", "gr", "ie", "it", "lu", "nl", "pt", "es",
+                "ch", "gb", "dk", "ee", "fi", "is", "lv", "lt", "no", "se", "by", "bg",
+                "hr", "cz", "hu", "pl", "ro", "ru", "sk", "si", "ua", "au", "fj", "nz",
+                "eg", "ir", "iq", "il", "jo", "kw", "lb", "ma", "om", "qa", "sa", "tr", "ae"
         );
         languages.forEach(languageName -> {
             if (!languageRepository.findByLanguageName(languageName).isPresent()) {
@@ -53,10 +53,11 @@ public class DataLoader implements CommandLineRunner {
 
     private void loadInterests() {
         List<String> interests = List.of(
-                "K-POP", "공연 & 전시회 관람", "독서", "영화", "원데이클래스", "체험카페", "카페 투어",
-                "게임", "농구", "등산", "러닝", "볼링", "스포츠 경기 관람", "야구", "축구", "테니스",
-                "헬스", "노래", "춤", "공예", "악기 연주", "사진 촬영", "연기", "맛집 투어", "맥주",
-                "베이킹", "요리", "이색 음식 체험"
+                "kpop", "performance", "reading", "movie", "oneday", "experience", "cafe",
+                "game", "basketball", "hiking", "running", "bowling", "sports",
+                "baseball", "soccer", "tennis", "fitness", "singing", "dance",
+                "crafts", "instrument", "photo", "acting", "restaurant", "beer",
+                "baking", "cooking", "food_experience"
         );
         interests.forEach(interestName -> {
             if (!interestRepository.findByInterestName(interestName).isPresent()) {
@@ -81,14 +82,14 @@ public class DataLoader implements CommandLineRunner {
     private void createMockStudents() {
         List<OnBoardingRequest> mockRequests = List.of(
                 new OnBoardingRequest(
-                        "홍길동", "Computer Science", "Korea", true,
+                        "홍길동", "Computer Science", "ko", true,
                         true, "01012345678", "male",
-                         "Sejong University", List.of("Korean", "English"), List.of("영화", "독서")
+                         "Sejong University", List.of("ko", "en"), List.of("performance", "reading")
                 ),
                 new OnBoardingRequest(
                         "Alice", "Computer Science", "Canada", false,
                         true, "01087654321", "female",
-                        "Sejong University", List.of("Korean", "English"), List.of("K-POP", "독서")
+                        "Sejong University", List.of("en", "ko"), List.of("kpop", "movie")
                 )
         );
         mockRequests.forEach(request -> {
