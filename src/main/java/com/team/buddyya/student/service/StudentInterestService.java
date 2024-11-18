@@ -4,8 +4,8 @@ import com.team.buddyya.student.domain.Interest;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.domain.StudentInterest;
 import com.team.buddyya.student.dto.request.OnBoardingRequest;
-import com.team.buddyya.student.exception.OnBoardingException;
-import com.team.buddyya.student.exception.OnBoardingExceptionType;
+import com.team.buddyya.student.exception.StudentException;
+import com.team.buddyya.student.exception.StudentExceptionType;
 import com.team.buddyya.student.repository.InterestRepository;
 import com.team.buddyya.student.repository.StudentInterestRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ public class StudentInterestService {
     public void createStudentInterests(OnBoardingRequest request, Student student) {
         request.interests().forEach(interestName -> {
             Interest interest = interestRepository.findByInterestName(interestName)
-                    .orElseThrow(() -> new OnBoardingException(OnBoardingExceptionType.INTEREST_NOT_FOUND));
+                    .orElseThrow(() -> new StudentException(StudentExceptionType.INTEREST_NOT_FOUND));
             studentInterestRepository.save(StudentInterest.builder()
                     .student(student)
                     .interest(interest)
