@@ -4,8 +4,8 @@ import com.team.buddyya.auth.domain.StudentInfo;
 import com.team.buddyya.certification.dto.request.EmailCertificationRequest;
 import com.team.buddyya.certification.dto.request.EmailCodeRequest;
 import com.team.buddyya.certification.dto.response.EmailCertificationResponse;
-import com.team.buddyya.certification.exception.EmailAuthException;
-import com.team.buddyya.certification.exception.EmailAuthExceptionType;
+import com.team.buddyya.certification.exception.EmailCertificateException;
+import com.team.buddyya.certification.exception.EmailCertificateExceptionType;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.exception.OnBoardingException;
 import com.team.buddyya.student.exception.OnBoardingExceptionType;
@@ -33,14 +33,14 @@ public class CertificationService {
         Student student = studentRepository.findById(studentInfo.id())
                 .orElseThrow(() -> new OnBoardingException(OnBoardingExceptionType.STUDENT_NOT_FOUND));
         if (student.getIsCertificated()) {
-            throw new EmailAuthException(EmailAuthExceptionType.ALREADY_CERTIFICATED);
+            throw new EmailCertificateException(EmailCertificateExceptionType.ALREADY_CERTIFICATED);
         }
         try {
             Map<String, Object> univCertResponse = UnivCert.certify(UnivcertApiKey, emailRequest.email(), emailRequest.univName(), true);
             boolean isSuccess = (Boolean) univCertResponse.get("success");
             return new EmailCertificationResponse(isSuccess);
         } catch (IOException e) {
-            throw new EmailAuthException(EmailAuthExceptionType.EMAIL_AUTH_FAILED);
+            throw new EmailCertificateException(EmailCertificateExceptionType.EMAIL_CERTIFICATE_FAILED);
         }
     }
 
@@ -51,13 +51,13 @@ public class CertificationService {
             if (isSuccess) {
                 Student student = studentRepository.findById(studentInfo.id())
                         .orElseThrow(() -> new OnBoardingException(OnBoardingExceptionType.STUDENT_NOT_FOUND));
-                student.checkIsCertificated(true);
+                student.updateIsCertificated(true);
                 studentRepository.save(student);
             }
             UnivCert.clear(UnivcertApiKey);
             return new EmailCertificationResponse(isSuccess);
         } catch (IOException e) {
-            throw new EmailAuthException(EmailAuthExceptionType.EMAIL_AUTH_FAILED);
+            throw new EmailCertificateException(EmailCertificateExceptionType.EMAIL_CERTIFICATE_FAILED);
         }
     }
 }

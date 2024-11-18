@@ -22,12 +22,12 @@ public class CertificationController {
 
     private final CertificationService certificationService;
 
-    @PostMapping("/email")
-    public ResponseEntity<EmailCertificationResponse> emailCertificate(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody EmailCertificationRequest emailCertificationRequest) {
+    @PostMapping("/email/send")
+    public ResponseEntity<EmailCertificationResponse> sendEmail(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody EmailCertificationRequest emailCertificationRequest) {
         return ResponseEntity.ok(certificationService.certificateEmail(userDetails.getStudentInfo(), emailCertificationRequest));
     }
 
-    @PostMapping("/email/code")
+    @PostMapping("/email/verify-code")
     public ResponseEntity<EmailCertificationResponse> emailCodeCertificate(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody EmailCodeRequest codeRequest) {
         return ResponseEntity.ok(certificationService.certificateEmailCode(userDetails.getStudentInfo(), codeRequest));
     }
