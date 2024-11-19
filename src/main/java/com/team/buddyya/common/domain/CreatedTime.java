@@ -17,9 +17,4 @@ public class CreatedTime {
     @CreatedDate
     @Column(name = "create_date", updatable = false)
     private LocalDateTime createdDate;
-
-    @PrePersist
-    public void onPrePersist() {
-        this.createdDate = LocalDateTime.now();
-    }
 }
