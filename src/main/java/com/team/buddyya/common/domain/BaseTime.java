@@ -20,14 +20,5 @@ public class BaseTime {
     @Column(name = "updated_date")
     private LocalDateTime updatedDate;
 
-    @PrePersist
-    public void onPrePersist(){
-        this.createdDate = LocalDateTime.now();
-        this.updatedDate = this.createdDate;
-    }
 
-    @PreUpdate
-    public void onPreUpdate(){
-        this.updatedDate = LocalDateTime.now();
-    }
 }
