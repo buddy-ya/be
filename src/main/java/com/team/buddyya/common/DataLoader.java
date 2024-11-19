@@ -67,11 +67,7 @@ public class DataLoader implements CommandLineRunner {
     }
 
     private void loadUniversities() {
-        List<String> universities = List.of(
-                "Sejong University", "Seoul National University", "Korea University",
-                "Yonsei University", "Hanyang University", "Sungkyunkwan University",
-                "KAIST", "POSTECH", "GIST", "Konkuk University"
-        );
+        List<String> universities = List.of("sju");
         universities.forEach(universityName -> {
             if (!universityRepository.findByUniversityName(universityName).isPresent()) {
                 universityRepository.save(new University(universityName, 0L));
@@ -84,12 +80,12 @@ public class DataLoader implements CommandLineRunner {
                 new OnBoardingRequest(
                         "홍길동", "Computer Science", "ko", true,
                         true, "01012345678", "male",
-                         "Sejong University", List.of("ko", "en"), List.of("performance", "reading")
+                         "sju", List.of("ko", "en"), List.of("performance", "reading")
                 ),
                 new OnBoardingRequest(
                         "Alice", "Computer Science", "Canada", false,
                         true, "01087654321", "female",
-                        "Sejong University", List.of("en", "ko"), List.of("kpop", "movie")
+                        "sju", List.of("en", "ko"), List.of("kpop", "movie")
                 )
         );
         mockRequests.forEach(request -> {
