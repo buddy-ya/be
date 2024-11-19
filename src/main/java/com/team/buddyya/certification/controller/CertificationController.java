@@ -18,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class CertificationController {
 
     private final CertificationService certificationService;
-    private final S3UploadService s3UploadService;
 
     @PostMapping("/email/send")
     public ResponseEntity<CertificationResponse> sendEmail(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody EmailCertificationRequest emailCertificationRequest) {
@@ -33,5 +32,10 @@ public class CertificationController {
     @PostMapping("/student-id-card")
     public ResponseEntity<CertificationResponse> sendStudentIdCard(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestPart("file") MultipartFile file) {
         return ResponseEntity.ok(certificationService.uploadStudentIdCard(userDetails.getStudentInfo(), file));
+    }
+
+    @GetMapping
+    public ResponseEntity<CertificationResponse> checkCertificationStatus(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.ok(certificationService.isCertificated(userDetails.getStudentInfo()));
     }
 }

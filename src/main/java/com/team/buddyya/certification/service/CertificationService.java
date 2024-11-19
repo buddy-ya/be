@@ -82,4 +82,10 @@ public class CertificationService {
         studentIdCardRepository.save(studentIdCard);
         return new CertificationResponse(true);
     }
+
+    public CertificationResponse isCertificated(StudentInfo studentInfo) {
+        Student student = studentRepository.findById(studentInfo.id())
+                .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
+        return new CertificationResponse(student.getIsCertificated());
+    }
 }
