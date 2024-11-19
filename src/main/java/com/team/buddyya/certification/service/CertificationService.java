@@ -8,7 +8,7 @@ import com.team.buddyya.certification.dto.response.CertificationResponse;
 import com.team.buddyya.certification.exception.CertificateException;
 import com.team.buddyya.certification.exception.CertificateExceptionType;
 import com.team.buddyya.certification.repository.StudentIdCardRepository;
-import com.team.buddyya.common.infrastructure.S3UploadManager;
+import com.team.buddyya.common.service.S3UploadService;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.exception.StudentException;
 import com.team.buddyya.student.exception.StudentExceptionType;
@@ -31,7 +31,7 @@ public class CertificationService {
 
     private final StudentRepository studentRepository;
     private final StudentIdCardRepository studentIdCardRepository;
-    private final S3UploadManager s3UploadManager;
+    private final S3UploadService s3UploadService;
 
     @Value("${univcert.api.key}")
     private String univcertApiKey;
@@ -74,7 +74,7 @@ public class CertificationService {
         if (student.getIsCertificated()) {
             throw new CertificateException(CertificateExceptionType.ALREADY_CERTIFICATED);
         }
-        String imageUrl = s3UploadManager.uploadFile(STUDENT_ID_CARD.getDirectoryName(), file);
+        String imageUrl = s3UploadService.uploadFile(STUDENT_ID_CARD.getDirectoryName(), file);
         StudentIdCard studentIdCard = StudentIdCard.builder()
                 .imageUrl(imageUrl)
                 .student(student)

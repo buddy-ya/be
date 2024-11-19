@@ -5,7 +5,7 @@ import com.team.buddyya.certification.dto.request.EmailCertificationRequest;
 import com.team.buddyya.certification.dto.request.EmailCodeRequest;
 import com.team.buddyya.certification.dto.response.CertificationResponse;
 import com.team.buddyya.certification.service.CertificationService;
-import com.team.buddyya.common.infrastructure.S3UploadManager;
+import com.team.buddyya.common.service.S3UploadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class CertificationController {
 
     private final CertificationService certificationService;
-    private final S3UploadManager s3UploadManager;
+    private final S3UploadService s3UploadService;
 
     @PostMapping("/email/send")
     public ResponseEntity<CertificationResponse> sendEmail(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody EmailCertificationRequest emailCertificationRequest) {
