@@ -7,7 +7,7 @@ public class CertificateException extends BaseException {
 
     private final CertificateExceptionType certificateExceptionType;
 
-    public CertificateException(final CertificateExceptionType certificateExceptionType) {
+    public CertificateException(CertificateExceptionType certificateExceptionType) {
         this.certificateExceptionType = certificateExceptionType;
     }
 

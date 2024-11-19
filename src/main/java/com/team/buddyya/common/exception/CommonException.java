@@ -4,7 +4,7 @@ public class CommonException extends BaseException {
 
     private final CommonExceptionType commonExceptionType;
 
-    public CommonException(final CommonExceptionType commonExceptionType) {
+    public CommonException(CommonExceptionType commonExceptionType) {
         this.commonExceptionType = commonExceptionType;
     }
 

@@ -7,7 +7,7 @@ public class PhoneAuthenticationException extends BaseException {
 
     private final PhoneAuthenticationExceptionType phoneAuthenticationExceptionType;
 
-    public PhoneAuthenticationException(final PhoneAuthenticationExceptionType phoneAuthenticationExceptionType) {
+    public PhoneAuthenticationException(PhoneAuthenticationExceptionType phoneAuthenticationExceptionType) {
         this.phoneAuthenticationExceptionType = phoneAuthenticationExceptionType;
     }
 
