@@ -1,18 +1,16 @@
-package com.team.buddyya.certification.exception;
+package com.team.buddyya.common.exception;
 
-import com.team.buddyya.common.exception.BaseExceptionType;
 import org.springframework.http.HttpStatus;
 
-public enum CertificateExceptionType implements BaseExceptionType {
+public enum CommonExceptionType implements BaseExceptionType {
 
-    CERTIFICATE_FAILED(101, HttpStatus.UNAUTHORIZED, "인증 중 오류 발생"),
-    ALREADY_CERTIFICATED(102, HttpStatus.UNAUTHORIZED, "이미 인증된 상태입니다");
+    FILE_UPLOAD_ERROR(900, HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드 중 오류 발생");
 
     private final int errorCode;
     private final HttpStatus httpStatus;
     private final String errorMessage;
 
-    CertificateExceptionType(int errorCode, HttpStatus httpStatus, String errorMessage) {
+    CommonExceptionType(int errorCode, HttpStatus httpStatus, String errorMessage) {
         this.errorCode = errorCode;
         this.httpStatus = httpStatus;
         this.errorMessage = errorMessage;

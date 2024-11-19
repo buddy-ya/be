@@ -1,6 +1,6 @@
 package com.team.buddyya.certification.dto.response;
 
-public record EmailCertificationResponse(
+public record CertificationResponse(
         boolean success
 ) {
 }

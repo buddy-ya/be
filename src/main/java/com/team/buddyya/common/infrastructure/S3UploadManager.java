@@ -2,6 +2,8 @@ package com.team.buddyya.common.infrastructure;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.team.buddyya.common.exception.CommonException;
+import com.team.buddyya.common.exception.CommonExceptionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -21,12 +23,16 @@ public class S3UploadManager {
     @Value("${cloud.aws.s3.url}")
     private String defaultUrl;
 
-    public String uploadFile(String dir, MultipartFile file) throws IOException {
-        String bucketDir = bucketName + dir;
-        String dirUrl = defaultUrl + dir + "/";
-        String fileName = generateFileName(file);
-        amazonS3.putObject(bucketDir, fileName, file.getInputStream(), getObjectMetadata(file));
-        return dirUrl + fileName;
+    public String uploadFile(String dir, MultipartFile file) {
+        try {
+            String bucketDir = bucketName + dir;
+            String dirUrl = defaultUrl + dir + "/";
+            String fileName = generateFileName(file);
+            amazonS3.putObject(bucketDir, fileName, file.getInputStream(), getObjectMetadata(file));
+            return dirUrl + fileName;
+        } catch (IOException e) {
+            throw new CommonException(CommonExceptionType.FILE_UPLOAD_ERROR);
+        }
     }
 
     private ObjectMetadata getObjectMetadata(MultipartFile file) {
