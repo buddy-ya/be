@@ -21,7 +21,7 @@ public class StudentMajorService {
     public void createStudentMajors(OnBoardingRequest request, Student student) {
         request.majors().forEach(majorName -> {
             Major major = majorRepository.findByMajorName(majorName)
-                    .orElseThrow(() -> new StudentException(StudentExceptionType.Major_NOT_FOUND));
+                    .orElseThrow(() -> new StudentException(StudentExceptionType.MAJOR_NOT_FOUND));
             studentMajorRepository.save(StudentMajor.builder()
                     .student(student)
                     .major(major)
