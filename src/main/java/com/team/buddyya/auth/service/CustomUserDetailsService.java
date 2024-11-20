@@ -3,8 +3,8 @@ package com.team.buddyya.auth.service;
 import com.team.buddyya.auth.domain.CustomUserDetails;
 import com.team.buddyya.auth.domain.StudentInfo;
 import com.team.buddyya.student.domain.Student;
-import com.team.buddyya.student.exception.OnBoardingException;
-import com.team.buddyya.student.exception.OnBoardingExceptionType;
+import com.team.buddyya.student.exception.StudentException;
+import com.team.buddyya.student.exception.StudentExceptionType;
 import com.team.buddyya.student.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -22,7 +22,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public CustomUserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
         Student student = studentRepository.findById(Long.parseLong(id))
-                .orElseThrow(() -> new OnBoardingException(OnBoardingExceptionType.STUDENT_NOT_FOUND));
+                .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
         StudentInfo studentInfo = StudentInfo.from(student);
         return new CustomUserDetails(studentInfo);
     }

@@ -1,6 +1,8 @@
 package com.team.buddyya.student.domain;
 
 import com.team.buddyya.auth.domain.AuthToken;
+import com.team.buddyya.certification.domain.StudentIdCard;
+import com.team.buddyya.common.domain.BaseTime;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,7 +18,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Table(name = "student")
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-public class Student {
+public class Student extends BaseTime {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -63,6 +65,9 @@ public class Student {
 
     @OneToOne(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private AuthToken authToken;
+
+    @OneToMany(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<StudentIdCard> studentIdCards;
 
     @Builder
     public Student(String name, String phoneNumber, String major, String country, Boolean isKorean, Role role, University university, Gender gender) {

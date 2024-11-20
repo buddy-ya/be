@@ -3,7 +3,7 @@ package com.team.buddyya.student.exception;
 import com.team.buddyya.common.exception.BaseExceptionType;
 import org.springframework.http.HttpStatus;
 
-public enum OnBoardingExceptionType implements BaseExceptionType {
+public enum StudentExceptionType implements BaseExceptionType {
 
     STUDENT_NOT_FOUND(200, HttpStatus.NOT_FOUND, "해당 학생을 찾지 못하였습니다."),
     UNIVERSITY_NOT_FOUND(200, HttpStatus.NOT_FOUND, "해당 대학을 찾지 못하였습니다."),
@@ -15,7 +15,7 @@ public enum OnBoardingExceptionType implements BaseExceptionType {
     private final HttpStatus httpStatus;
     private final String errorMessage;
 
-    OnBoardingExceptionType(int errorCode, HttpStatus httpStatus, String errorMessage) {
+    StudentExceptionType(int errorCode, HttpStatus httpStatus, String errorMessage) {
         this.errorCode = errorCode;
         this.httpStatus = httpStatus;
         this.errorMessage = errorMessage;

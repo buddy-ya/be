@@ -3,11 +3,11 @@ package com.team.buddyya.student.exception;
 import com.team.buddyya.common.exception.BaseException;
 import com.team.buddyya.common.exception.BaseExceptionType;
 
-public class OnBoardingException extends BaseException {
+public class StudentException extends BaseException {
 
-    private final OnBoardingExceptionType exceptionType;
+    private final StudentExceptionType exceptionType;
 
-    public OnBoardingException(OnBoardingExceptionType exceptionType) {
+    public StudentException(StudentExceptionType exceptionType) {
         this.exceptionType = exceptionType;
     }
 

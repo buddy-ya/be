@@ -1,5 +1,6 @@
 package com.team.buddyya.student.domain;
 
+import com.team.buddyya.common.domain.CreatedTime;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +14,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Table(name = "student_language")
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-public class StudentLanguage {
+public class StudentLanguage extends CreatedTime {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)

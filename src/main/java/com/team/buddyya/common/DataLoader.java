@@ -35,14 +35,14 @@ public class DataLoader implements CommandLineRunner {
 
     private void loadLanguages() {
         List<String> languages = List.of(
-                "ko", "cn", "hk", "jp", "mo", "mn", "tw", "bn", "kh", "id", "la", "my",
-                "mm", "ph", "sg", "th", "tl", "vn", "bd", "bt", "in", "mv", "np", "pk",
-                "lk", "kz", "kg", "tj", "tm", "uz", "ca", "mx", "us", "cr", "cu", "do",
-                "sv", "gt", "pa", "ar", "bo", "br", "cl", "co", "ec", "py", "pe", "uy",
-                "ve", "at", "be", "fr", "de", "gr", "ie", "it", "lu", "nl", "pt", "es",
-                "ch", "gb", "dk", "ee", "fi", "is", "lv", "lt", "no", "se", "by", "bg",
-                "hr", "cz", "hu", "pl", "ro", "ru", "sk", "si", "ua", "au", "fj", "nz",
-                "eg", "ir", "iq", "il", "jo", "kw", "lb", "ma", "om", "qa", "sa", "tr", "ae"
+                "ko", "en", "zh", "ja", "yue", "vi", "th", "id",
+                "ms", "tl", "km", "fr", "de", "es", "it", "ru", "hi", "bn",
+                "ur", "fa", "ar", "he", "nl", "pl", "tr", "uk", "cs", "sv",
+                "hu", "el", "da", "fi", "no", "ro", "sk", "hr", "sr", "sl",
+                "bg", "lt", "lv", "et", "is", "af", "sq", "am", "hy", "az",
+                "eu", "bs", "ca", "gl", "ka", "gu", "ht", "kn", "kk", "ku",
+                "mk", "ml", "mr", "mn", "ne", "ps", "pt", "pa", "so", "sw",
+                "ta", "te", "xh", "zu"
         );
         languages.forEach(languageName -> {
             if (!languageRepository.findByLanguageName(languageName).isPresent()) {
@@ -53,7 +53,7 @@ public class DataLoader implements CommandLineRunner {
 
     private void loadInterests() {
         List<String> interests = List.of(
-                "kpop", "performance", "reading", "movie", "oneday", "experience", "cafe",
+                    "kpop", "performance", "reading", "movie", "oneday", "experience", "cafe",
                 "game", "basketball", "hiking", "running", "bowling", "sports",
                 "baseball", "soccer", "tennis", "fitness", "singing", "dance",
                 "crafts", "instrument", "photo", "acting", "restaurant", "beer",
@@ -67,11 +67,7 @@ public class DataLoader implements CommandLineRunner {
     }
 
     private void loadUniversities() {
-        List<String> universities = List.of(
-                "Sejong University", "Seoul National University", "Korea University",
-                "Yonsei University", "Hanyang University", "Sungkyunkwan University",
-                "KAIST", "POSTECH", "GIST", "Konkuk University"
-        );
+        List<String> universities = List.of("sju");
         universities.forEach(universityName -> {
             if (!universityRepository.findByUniversityName(universityName).isPresent()) {
                 universityRepository.save(new University(universityName, 0L));
@@ -84,12 +80,12 @@ public class DataLoader implements CommandLineRunner {
                 new OnBoardingRequest(
                         "홍길동", "Computer Science", "ko", true,
                         true, "01012345678", "male",
-                         "Sejong University", List.of("ko", "en"), List.of("performance", "reading")
+                         "sju", List.of("ko", "en"), List.of("performance", "reading")
                 ),
                 new OnBoardingRequest(
                         "Alice", "Computer Science", "Canada", false,
                         true, "01087654321", "female",
-                        "Sejong University", List.of("en", "ko"), List.of("kpop", "movie")
+                        "sju", List.of("en", "ko"), List.of("kpop", "movie")
                 )
         );
         mockRequests.forEach(request -> {

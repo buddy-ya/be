@@ -12,7 +12,7 @@ public class GlobalExceptionHandler {
     private final Logger log = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     @ExceptionHandler(BaseException.class)
-    public ResponseEntity<ExceptionResponse> handleBaseException(final BaseException e) {
+    public ResponseEntity<ExceptionResponse> handleBaseException(BaseException e) {
         final BaseExceptionType baseExceptionType = e.exceptionType();
         final ExceptionResponse exceptionResponse = new ExceptionResponse(baseExceptionType.errorCode(), baseExceptionType.errorMessage());
         log.info("error = {}", exceptionResponse);

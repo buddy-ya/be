@@ -7,7 +7,7 @@ public class AuthException extends BaseException {
 
     private final AuthExceptionType authExceptionType;
 
-    public AuthException(final AuthExceptionType authExceptionType) {
+    public AuthException(AuthExceptionType authExceptionType) {
         this.authExceptionType = authExceptionType;
     }
 

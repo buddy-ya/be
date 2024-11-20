@@ -12,7 +12,7 @@ public class ExceptionResponse {
     private int code;
     private String message;
 
-    public ExceptionResponse(final int code, final String message) {
+    public ExceptionResponse(int code,String message) {
         this.code = code;
         this.message = message;
     }

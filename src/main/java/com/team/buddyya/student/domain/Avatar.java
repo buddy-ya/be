@@ -1,5 +1,6 @@
 package com.team.buddyya.student.domain;
 
+import com.team.buddyya.common.domain.BaseTime;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +14,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Table(name = "avatar")
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-public class Avatar {
+public class Avatar extends BaseTime {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
