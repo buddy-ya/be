@@ -3,9 +3,13 @@ package com.team.buddyya.feed.service;
 import com.team.buddyya.auth.domain.StudentInfo;
 import com.team.buddyya.feed.domain.Category;
 import com.team.buddyya.feed.domain.Feed;
+import com.team.buddyya.feed.domain.FeedUserAction;
 import com.team.buddyya.feed.dto.request.FeedListRequest;
 import com.team.buddyya.feed.dto.response.FeedListItemResponse;
 import com.team.buddyya.feed.dto.response.FeedListResponse;
+import com.team.buddyya.feed.dto.response.FeedResponse;
+import com.team.buddyya.feed.exception.FeedException;
+import com.team.buddyya.feed.exception.FeedExceptionType;
 import com.team.buddyya.feed.respository.FeedRepository;
 import jakarta.transaction.Transactional;
 import java.util.List;
@@ -30,17 +34,30 @@ public class FeedService {
         PageRequest pageRequest = PageRequest.of(request.page(), request.size(),
                 Sort.by(Sort.Direction.DESC, "createdDate"));
         Page<Feed> feeds = feedRepository.findAllByCategory(category, pageRequest);
-        List<FeedListItemResponse> feedResponses = feeds.getContent().stream()
-                .map(feed -> createFeedListItemResponse(feed, studentInfo))
+        List<FeedListItemResponse> response = feeds.getContent().stream()
+                .map(feed -> createFeedListItemResponse(feed, studentInfo.id()))
                 .toList();
-        return FeedListResponse.from(feeds, feedResponses);
+        return FeedListResponse.from(feeds, response);
     }
 
-    private FeedListItemResponse createFeedListItemResponse(Feed feed, StudentInfo studentInfo) {
-        Long feedId = feed.getId();
-        Long studentId = studentInfo.id();
+    public FeedResponse getFeed(StudentInfo studentInfo, Long feedId) {
+        Feed feed = findFeedById(feedId);
+        FeedUserAction userAction = getUserAction(studentInfo.id(), feedId);
+        return FeedResponse.from(feed, userAction.isLiked(), userAction.isBookmarked());
+    }
+
+    public Feed findFeedById(Long feedId) {
+        return feedRepository.findById(feedId).orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND));
+    }
+
+    private FeedListItemResponse createFeedListItemResponse(Feed feed, Long studentId) {
+        FeedUserAction userAction = getUserAction(studentId, feed.getId());
+        return FeedListItemResponse.from(feed, userAction.isLiked(), userAction.isBookmarked());
+    }
+
+    private FeedUserAction getUserAction(Long studentId, Long feedId) {
         boolean isLiked = likeSevice.isLikedByStudent(studentId, feedId);
         boolean isBookmarked = bookmarkService.isBookmarkedByStudent(studentId, feedId);
-        return FeedListItemResponse.from(feed, isLiked, isBookmarked);
+        return FeedUserAction.from(isLiked, isBookmarked);
     }
 }

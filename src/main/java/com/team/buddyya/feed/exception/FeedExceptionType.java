@@ -5,7 +5,8 @@ import org.springframework.http.HttpStatus;
 
 public enum FeedExceptionType implements BaseExceptionType {
 
-    CATEGORY_NOT_FOUND(200, HttpStatus.NOT_FOUND, "해당 카테고리를 찾지 못했습니다.");
+    FEED_NOT_FOUND(400, HttpStatus.NOT_FOUND, "해당 피드를 찾지 못했습니다."),
+    CATEGORY_NOT_FOUND(400, HttpStatus.NOT_FOUND, "해당 카테고리를 찾지 못했습니다.");
 
     private final int errorCode;
     private final HttpStatus httpStatus;

@@ -11,12 +11,12 @@ public record FeedListResponse(
         boolean hasNext
 ) {
 
-    public static FeedListResponse from(Page<Feed> feeds, List<FeedListItemResponse> feedResponses) {
+    public static FeedListResponse from(Page<Feed> feedInfo, List<FeedListItemResponse> feeds) {
         return new FeedListResponse(
-                feedResponses,
-                feeds.getNumber(),
-                feeds.getTotalPages(),
-                feeds.hasNext()
+                feeds,
+                feedInfo.getNumber(),
+                feedInfo.getTotalPages(),
+                feedInfo.hasNext()
         );
     }
 }
