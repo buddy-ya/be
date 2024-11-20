@@ -4,7 +4,7 @@ import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
-import com.team.buddyya.common.domain.BaseTime;
+import com.team.buddyya.common.domain.CreatedTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "feed_image")
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-public class FeedImage extends BaseTime {
+public class FeedImage extends CreatedTime {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
