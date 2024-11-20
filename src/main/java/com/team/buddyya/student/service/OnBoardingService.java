@@ -20,6 +20,7 @@ public class OnBoardingService {
     private final AvatarService avatarService;
     private final StudentInterestService studentInterestService;
     private final StudentLanguageService studentLanguageService;
+    private final StudentMajorService studentMajorService;
     private final AuthTokenRepository authTokenRepository;
     private final JwtUtils jwtUtils;
 
@@ -28,9 +29,10 @@ public class OnBoardingService {
         String accessToken = jwtUtils.createAccessToken(new TokenInfoRequest(student.getId()));
         String refreshToken = createAndSaveToken(student);
         avatarService.createAvatar(request, student);
+        studentMajorService.createStudentMajors(request,student);
         studentInterestService.createStudentInterests(request, student);
         studentLanguageService.createStudentLanguages(request, student);
-        return OnBoardingResponse.from(student, accessToken, refreshToken);
+        return OnBoardingResponse.from(accessToken, refreshToken);
     }
 
     private String createAndSaveToken(Student student) {
