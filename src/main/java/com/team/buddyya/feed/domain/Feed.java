@@ -64,6 +64,9 @@ public class Feed extends BaseTime {
     @OneToMany(mappedBy = "feed", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Like> likes;
 
+    @OneToMany(mappedBy = "feed", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<BookMark> bookmarks;
+
     @Builder
     public Feed(String title, String content, Student student, Category category, University university) {
         this.title = title;
