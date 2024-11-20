@@ -10,6 +10,7 @@ public record OnBoardingRequest(
         String phoneNumber,
         String gender,
         String university,
+        List<String> majors,
         List<String> languages,
         List<String> interests
 ) {}

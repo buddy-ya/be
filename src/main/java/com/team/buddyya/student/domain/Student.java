@@ -31,9 +31,6 @@ public class Student extends BaseTime {
     private String name;
 
     @Column(length = 64, nullable = false)
-    private String major;
-
-    @Column(length = 64, nullable = false)
     private String country;
 
     @Column(name = "certificated", nullable = false)
@@ -58,6 +55,9 @@ public class Student extends BaseTime {
     private Gender gender;
 
     @OneToMany(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<StudentMajor> majors;
+
+    @OneToMany(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<StudentLanguage> languages;
 
     @OneToMany(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
@@ -70,10 +70,9 @@ public class Student extends BaseTime {
     private List<StudentIdCard> studentIdCards;
 
     @Builder
-    public Student(String name, String phoneNumber, String major, String country, Boolean isKorean, Role role, University university, Gender gender) {
+    public Student(String name, String phoneNumber, String country, Boolean isKorean, Role role, University university, Gender gender) {
         this.name = name;
         this.phoneNumber = phoneNumber;
-        this.major = major;
         this.country = country;
         this.isKorean = isKorean;
         this.role = role;
@@ -85,4 +84,10 @@ public class Student extends BaseTime {
     public void updateIsCertificated(boolean isCertificated) {
         this.isCertificated = isCertificated;
     }
+
+    @PreRemove
+    public void updateDeactivateDate(){
+
+    }
+
 }

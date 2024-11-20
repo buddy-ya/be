@@ -3,11 +3,13 @@ package com.team.buddyya.common;
 import com.team.buddyya.student.controller.OnBoardingController;
 import com.team.buddyya.student.domain.Interest;
 import com.team.buddyya.student.domain.Language;
+import com.team.buddyya.student.domain.Major;
 import com.team.buddyya.student.domain.University;
 import com.team.buddyya.student.dto.request.OnBoardingRequest;
 import com.team.buddyya.student.dto.response.OnBoardingResponse;
 import com.team.buddyya.student.repository.InterestRepository;
 import com.team.buddyya.student.repository.LanguageRepository;
+import com.team.buddyya.student.repository.MajorRepository;
 import com.team.buddyya.student.repository.UniversityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
@@ -20,6 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DataLoader implements CommandLineRunner {
 
+    private final MajorRepository majorRepository;
     private final LanguageRepository languageRepository;
     private final InterestRepository interestRepository;
     private final UniversityRepository universityRepository;
@@ -27,10 +30,23 @@ public class DataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        loadMajors();
         loadLanguages();
         loadInterests();
         loadUniversities();
         createMockStudents();
+    }
+
+    private void loadMajors() {
+        List<String> majors = List.of(
+                "humanities", "social_sciences", "business", "education", "natural_sciences",
+                "it", "engineering", "arts_sports", "nursing", "pharmacy", "veterinary", "medicine"
+        );
+        majors.forEach(majorName -> {
+            if (!majorRepository.findByMajorName(majorName).isPresent()) {
+                majorRepository.save(new Major(majorName));
+            }
+        });
     }
 
     private void loadLanguages() {
@@ -78,14 +94,16 @@ public class DataLoader implements CommandLineRunner {
     private void createMockStudents() {
         List<OnBoardingRequest> mockRequests = List.of(
                 new OnBoardingRequest(
-                        "홍길동", "Computer Science", "ko", true,
-                        true, "01012345678", "male",
-                         "sju", List.of("ko", "en"), List.of("performance", "reading")
+                        "john", "ko", true, true,
+                        "01012345678","male" , "sju",
+                        List.of("engineering", "it"),
+                        List.of("ko", "en"), List.of("performance", "reading")
                 ),
                 new OnBoardingRequest(
-                        "Alice", "Computer Science", "Canada", false,
-                        true, "01087654321", "female",
-                        "sju", List.of("en", "ko"), List.of("kpop", "movie")
+                        "Alice", "us", false, false,
+                        "01087654321","female" , "sju",
+                        List.of("humanities", "social_sciences"),
+                        List.of("en", "ko"), List.of("kpop", "movie")
                 )
         );
         mockRequests.forEach(request -> {
