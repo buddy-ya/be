@@ -67,6 +67,13 @@ public class FeedService {
         return FeedCreateResponse.from(feedRepository.save(feed).getId());
     }
 
+    public void deleteFeed(StudentInfo studentInfo, Long feedId) {
+        Feed feed = findFeedById(feedId);
+        if (!studentInfo.id().equals(feed.getStudent().getId())) {
+            throw new FeedException(FeedExceptionType.NOT_FEED_OWNER);
+        }
+    }
+
     public Feed findFeedById(Long feedId) {
         return feedRepository.findById(feedId).orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND));
     }

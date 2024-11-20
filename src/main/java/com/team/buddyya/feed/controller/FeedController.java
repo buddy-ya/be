@@ -10,6 +10,7 @@ import com.team.buddyya.feed.service.FeedService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,5 +45,13 @@ public class FeedController {
                                                          @RequestBody FeedCreateRequest request) {
         FeedCreateResponse response = feedService.createFeed(userDetails.getStudentInfo(), request);
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{feedId}")
+    public ResponseEntity<Void> deleteFeed(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long feedId) {
+        feedService.deleteFeed(userDetails.getStudentInfo(), feedId);
+        return ResponseEntity.noContent().build();
     }
 }

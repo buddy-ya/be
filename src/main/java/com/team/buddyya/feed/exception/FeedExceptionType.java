@@ -6,7 +6,8 @@ import org.springframework.http.HttpStatus;
 public enum FeedExceptionType implements BaseExceptionType {
 
     FEED_NOT_FOUND(400, HttpStatus.NOT_FOUND, "해당 피드를 찾지 못했습니다."),
-    CATEGORY_NOT_FOUND(400, HttpStatus.NOT_FOUND, "해당 카테고리를 찾지 못했습니다.");
+    CATEGORY_NOT_FOUND(400, HttpStatus.NOT_FOUND, "해당 카테고리를 찾지 못했습니다."),
+    NOT_FEED_OWNER(403, HttpStatus.FORBIDDEN, "해당 피드의 글쓴이기 아닙니다.");
 
     private final int errorCode;
     private final HttpStatus httpStatus;
