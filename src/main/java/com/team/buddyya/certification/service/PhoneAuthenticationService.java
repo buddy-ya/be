@@ -54,7 +54,6 @@ public class PhoneAuthenticationService {
             String refreshToken = jwtUtils.createRefreshToken(new TokenInfoRequest(student.getId()));
             return new VerifyCodeResponse(phoneNumber, EXISTING_MEMBER, accessToken, refreshToken);
         }
-
         return new VerifyCodeResponse(phoneNumber, NEW_MEMBER, null, null);
     }
 }

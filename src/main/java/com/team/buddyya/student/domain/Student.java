@@ -84,10 +84,4 @@ public class Student extends BaseTime {
     public void updateIsCertificated(boolean isCertificated) {
         this.isCertificated = isCertificated;
     }
-
-    @PreRemove
-    public void updateDeactivateDate(){
-
-    }
-
 }
