@@ -69,7 +69,7 @@ public class DataLoader implements CommandLineRunner {
 
     private void loadInterests() {
         List<String> interests = List.of(
-                    "kpop", "performance", "reading", "movie", "oneday", "experience", "cafe",
+                "kpop", "performance", "reading", "movie", "oneday", "experience", "cafe",
                 "game", "basketball", "hiking", "running", "bowling", "sports",
                 "baseball", "soccer", "tennis", "fitness", "singing", "dance",
                 "crafts", "instrument", "photo", "acting", "restaurant", "beer",
@@ -95,13 +95,13 @@ public class DataLoader implements CommandLineRunner {
         List<OnBoardingRequest> mockRequests = List.of(
                 new OnBoardingRequest(
                         "john", "ko", true, true,
-                        "01012345678","male" , "sju",
+                        "01012345678", "male", "sju",
                         List.of("engineering", "it"),
                         List.of("ko", "en"), List.of("performance", "reading")
                 ),
                 new OnBoardingRequest(
                         "Alice", "us", false, false,
-                        "01087654321","female" , "sju",
+                        "01087654321", "female", "sju",
                         List.of("humanities", "social_sciences"),
                         List.of("en", "ko"), List.of("kpop", "movie")
                 )
