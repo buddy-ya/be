@@ -4,13 +4,19 @@ import com.team.buddyya.auth.domain.StudentInfo;
 import com.team.buddyya.feed.domain.Category;
 import com.team.buddyya.feed.domain.Feed;
 import com.team.buddyya.feed.domain.FeedUserAction;
+import com.team.buddyya.feed.dto.request.FeedCreateRequest;
 import com.team.buddyya.feed.dto.request.FeedListRequest;
+import com.team.buddyya.feed.dto.response.FeedCreateResponse;
 import com.team.buddyya.feed.dto.response.FeedListItemResponse;
 import com.team.buddyya.feed.dto.response.FeedListResponse;
 import com.team.buddyya.feed.dto.response.FeedResponse;
 import com.team.buddyya.feed.exception.FeedException;
 import com.team.buddyya.feed.exception.FeedExceptionType;
 import com.team.buddyya.feed.respository.FeedRepository;
+import com.team.buddyya.student.domain.Student;
+import com.team.buddyya.student.exception.StudentException;
+import com.team.buddyya.student.exception.StudentExceptionType;
+import com.team.buddyya.student.repository.StudentRepository;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +31,7 @@ import org.springframework.stereotype.Service;
 public class FeedService {
 
     private final FeedRepository feedRepository;
+    private final StudentRepository studentRepository;
     private final LikeSevice likeSevice;
     private final BookmarkService bookmarkService;
     private final CategoryService categoryService;
@@ -44,6 +51,20 @@ public class FeedService {
         Feed feed = findFeedById(feedId);
         FeedUserAction userAction = getUserAction(studentInfo.id(), feedId);
         return FeedResponse.from(feed, userAction.isLiked(), userAction.isBookmarked());
+    }
+
+    public FeedCreateResponse createFeed(StudentInfo studentInfo, FeedCreateRequest request) {
+        Category category = categoryService.getCategory(request.category());
+        Student student = studentRepository.findById(studentInfo.id())
+                .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
+        Feed feed = Feed.builder()
+                .title(request.title())
+                .content(request.content())
+                .student(student)
+                .category(category)
+                .university(student.getUniversity())
+                .build();
+        return FeedCreateResponse.from(feedRepository.save(feed).getId());
     }
 
     public Feed findFeedById(Long feedId) {

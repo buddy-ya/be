@@ -1,7 +1,9 @@
 package com.team.buddyya.feed.controller;
 
 import com.team.buddyya.auth.domain.CustomUserDetails;
+import com.team.buddyya.feed.dto.request.FeedCreateRequest;
 import com.team.buddyya.feed.dto.request.FeedListRequest;
+import com.team.buddyya.feed.dto.response.FeedCreateResponse;
 import com.team.buddyya.feed.dto.response.FeedListResponse;
 import com.team.buddyya.feed.dto.response.FeedResponse;
 import com.team.buddyya.feed.service.FeedService;
@@ -11,6 +13,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -32,6 +36,13 @@ public class FeedController {
     public ResponseEntity<FeedResponse> getFeed(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                 @PathVariable Long feedId) {
         FeedResponse response = feedService.getFeed(userDetails.getStudentInfo(), feedId);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping
+    public ResponseEntity<FeedCreateResponse> createFeed(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                         @RequestBody FeedCreateRequest request) {
+        FeedCreateResponse response = feedService.createFeed(userDetails.getStudentInfo(), request);
         return ResponseEntity.ok(response);
     }
 }
