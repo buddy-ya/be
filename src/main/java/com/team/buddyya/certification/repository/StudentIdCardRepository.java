@@ -12,4 +12,6 @@ public interface StudentIdCardRepository extends JpaRepository<StudentIdCard, Lo
     Optional<StudentIdCard> findByStudent(Student student);
 
     List<StudentIdCard> findAllByOrderByCreatedDateAsc();
+
+    void deleteByStudent(Student student);
 }
