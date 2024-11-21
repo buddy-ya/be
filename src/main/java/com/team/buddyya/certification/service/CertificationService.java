@@ -79,15 +79,19 @@ public class CertificationService {
         String imageUrl = s3UploadService.uploadFile(STUDENT_ID_CARD.getDirectoryName(), file);
         Optional<StudentIdCard> existStudentIdCard = studentIdCardRepository.findByStudent(student);
         if (existStudentIdCard.isPresent()) {
-            s3UploadService.deleteFile(STUDENT_ID_CARD.getDirectoryName(), existStudentIdCard.get().getImageUrl());
-            existStudentIdCard.get().updateImageUrl(imageUrl);
-            return new CertificationResponse(true);
+            return updateExistingStudentIdCard(imageUrl, existStudentIdCard.get());
         }
         StudentIdCard studentIdCard = StudentIdCard.builder()
                 .imageUrl(imageUrl)
                 .student(student)
                 .build();
         studentIdCardRepository.save(studentIdCard);
+        return new CertificationResponse(true);
+    }
+
+    private CertificationResponse updateExistingStudentIdCard(String imageUrl, StudentIdCard existStudentIdCard) {
+        s3UploadService.deleteFile(STUDENT_ID_CARD.getDirectoryName(), existStudentIdCard.getImageUrl());
+        existStudentIdCard.updateImageUrl(imageUrl);
         return new CertificationResponse(true);
     }
 
