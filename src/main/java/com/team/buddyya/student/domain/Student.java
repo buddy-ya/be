@@ -54,6 +54,9 @@ public class Student extends BaseTime {
     @Column(nullable = false)
     private Gender gender;
 
+    @Column(name = "student_number")
+    private Integer studentNumber;
+
     @OneToMany(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<StudentMajor> majors;
 
@@ -79,9 +82,14 @@ public class Student extends BaseTime {
         this.university = university;
         this.gender = gender;
         this.isCertificated = false;
+        this.studentNumber = null;
     }
 
     public void updateIsCertificated(boolean isCertificated) {
         this.isCertificated = isCertificated;
+    }
+
+    public void updateStudentNumber(Integer studentNumber) {
+        this.studentNumber = studentNumber;
     }
 }
