@@ -66,8 +66,8 @@ public class Student extends BaseTime {
     @OneToOne(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private AuthToken authToken;
 
-    @OneToMany(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<StudentIdCard> studentIdCards;
+    @OneToOne(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private StudentIdCard studentIdCard;
 
     @Builder
     public Student(String name, String phoneNumber, String country, Boolean isKorean, Role role, University university, Gender gender) {
