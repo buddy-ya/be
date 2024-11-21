@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -18,11 +19,8 @@ public class AdminService {
     private final StudentIdCardRepository studentIdCardRepository;
 
     public List<StudentIdCardResponse> getStudentIdCards() {
-        List<StudentIdCard> studentIdCards = studentIdCardRepository.findAllByOrderByCreatedDateAsc();
-        List<StudentIdCardResponse> studentIdCardResponses = new ArrayList<>();
-        for(StudentIdCard studentIdCard : studentIdCards) {
-            studentIdCardResponses.add(StudentIdCardResponse.from(studentIdCard));
-        }
-        return studentIdCardResponses;
+        return studentIdCardRepository.findAllByOrderByCreatedDateAsc().stream()
+                .map(StudentIdCardResponse::from)
+                .collect(Collectors.toList());
     }
 }
