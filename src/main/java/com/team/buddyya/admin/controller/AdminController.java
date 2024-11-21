@@ -21,7 +21,7 @@ public class AdminController {
     @GetMapping("/student-id-cards")
     public ResponseEntity<StudentIdCardListResponse> getStudentIdCards() {
         List<StudentIdCardResponse> studentIdCards = adminService.getStudentIdCards();
-        return ResponseEntity.ok(new StudentIdCardListResponse(adminService.getStudentIdCards()));
+        return ResponseEntity.ok(new StudentIdCardListResponse(studentIdCards));
     }
 
     @PostMapping("/student-id-cards/verify")

@@ -26,6 +26,10 @@ import static com.team.buddyya.common.domain.S3DirectoryName.STUDENT_ID_CARD;
 @Transactional
 public class AdminService {
 
+    private static final String REQUEST_REJECTED_MESSAGE = "인증 요청이 거절되었습니다";
+    private static final String ALREADY_REGISTERED_MESSAGE = "이미 등록된 학번입니다";
+    private static final String VERIFICATION_COMPLETED_MESSAGE = "학생 인증이 완료되었습니다";
+
     private final StudentService studentService;
     private final StudentRepository studentRepository;
     private final StudentIdCardRepository studentIdCardRepository;
@@ -43,12 +47,12 @@ public class AdminService {
                 .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
         studentIdCardRepository.deleteByStudent(student);
         if (request.studentNumber() == null) {
-            return new StudentVerificationResponse(true);
+            return new StudentVerificationResponse(REQUEST_REJECTED_MESSAGE);
         }
         if (studentService.isDuplicateStudentNumber(request.studentNumber(), student.getUniversity())) {
-            return new StudentVerificationResponse(false);
+            return new StudentVerificationResponse(ALREADY_REGISTERED_MESSAGE);
         }
         studentService.updateStudentCertification(student, request.studentNumber());
-        return new StudentVerificationResponse(true);
+        return new StudentVerificationResponse(VERIFICATION_COMPLETED_MESSAGE);
     }
 }
