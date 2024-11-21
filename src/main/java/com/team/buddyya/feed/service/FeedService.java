@@ -7,7 +7,6 @@ import com.team.buddyya.feed.domain.FeedUserAction;
 import com.team.buddyya.feed.dto.request.FeedCreateRequest;
 import com.team.buddyya.feed.dto.request.FeedListRequest;
 import com.team.buddyya.feed.dto.request.FeedUpdateRequest;
-import com.team.buddyya.feed.dto.response.FeedCreateResponse;
 import com.team.buddyya.feed.dto.response.FeedListItemResponse;
 import com.team.buddyya.feed.dto.response.FeedListResponse;
 import com.team.buddyya.feed.dto.response.FeedResponse;
@@ -37,6 +36,10 @@ public class FeedService {
     private final FeedRepository feedRepository;
     private final StudentRepository studentRepository;
 
+    public Feed findFeedById(Long feedId) {
+        return feedRepository.findById(feedId).orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND));
+    }
+
     public FeedListResponse getFeeds(StudentInfo studentInfo, FeedListRequest request) {
         Category category = categoryService.getCategory(request.category());
         PageRequest pageRequest = PageRequest.of(request.page(), request.size(),
@@ -54,7 +57,7 @@ public class FeedService {
         return FeedResponse.from(feed, userAction.isLiked(), userAction.isBookmarked());
     }
 
-    public FeedCreateResponse createFeed(StudentInfo studentInfo, FeedCreateRequest request) {
+    public void createFeed(StudentInfo studentInfo, FeedCreateRequest request) {
         Category category = categoryService.getCategory(request.category());
         Student student = studentRepository.findById(studentInfo.id())
                 .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
@@ -65,7 +68,7 @@ public class FeedService {
                 .category(category)
                 .university(student.getUniversity())
                 .build();
-        return FeedCreateResponse.from(feedRepository.save(feed).getId());
+        feedRepository.save(feed);
     }
 
     public void updateFeed(StudentInfo studentInfo, Long feedId, FeedUpdateRequest request) {
@@ -79,10 +82,6 @@ public class FeedService {
         Feed feed = findFeedById(feedId);
         validateFeedOwner(studentInfo.id(), feed);
         feedRepository.delete(feed);
-    }
-
-    public Feed findFeedById(Long feedId) {
-        return feedRepository.findById(feedId).orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND));
     }
 
     private void validateFeedOwner(Long studentId, Feed feed) {

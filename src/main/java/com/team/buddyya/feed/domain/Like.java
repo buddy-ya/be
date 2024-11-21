@@ -39,5 +39,4 @@ public class Like extends CreatedTime {
         this.feed = feed;
         this.student = student;
     }
-
 }
