@@ -78,6 +78,12 @@ public class Feed extends BaseTime {
         this.commentCount = 0;
     }
 
+    public void updateFeed(String title, String content, Category category) {
+        this.title = title;
+        this.content = content;
+        this.category = category;
+    }
+
     public void increaseLikeCount() {
         this.likeCount++;
     }

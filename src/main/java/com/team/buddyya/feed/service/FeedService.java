@@ -6,6 +6,7 @@ import com.team.buddyya.feed.domain.Feed;
 import com.team.buddyya.feed.domain.FeedUserAction;
 import com.team.buddyya.feed.dto.request.FeedCreateRequest;
 import com.team.buddyya.feed.dto.request.FeedListRequest;
+import com.team.buddyya.feed.dto.request.FeedUpdateRequest;
 import com.team.buddyya.feed.dto.response.FeedCreateResponse;
 import com.team.buddyya.feed.dto.response.FeedListItemResponse;
 import com.team.buddyya.feed.dto.response.FeedListResponse;
@@ -30,11 +31,11 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class FeedService {
 
-    private final FeedRepository feedRepository;
-    private final StudentRepository studentRepository;
     private final LikeSevice likeSevice;
     private final BookmarkService bookmarkService;
     private final CategoryService categoryService;
+    private final FeedRepository feedRepository;
+    private final StudentRepository studentRepository;
 
     public FeedListResponse getFeeds(StudentInfo studentInfo, FeedListRequest request) {
         Category category = categoryService.getCategory(request.category());
@@ -67,15 +68,27 @@ public class FeedService {
         return FeedCreateResponse.from(feedRepository.save(feed).getId());
     }
 
+    public void updateFeed(StudentInfo studentInfo, Long feedId, FeedUpdateRequest request) {
+        Feed feed = findFeedById(feedId);
+        validateFeedOwner(studentInfo.id(), feed);
+        Category category = categoryService.getCategory(request.category());
+        feed.updateFeed(request.title(), request.content(), category);
+    }
+
     public void deleteFeed(StudentInfo studentInfo, Long feedId) {
         Feed feed = findFeedById(feedId);
-        if (!studentInfo.id().equals(feed.getStudent().getId())) {
-            throw new FeedException(FeedExceptionType.NOT_FEED_OWNER);
-        }
+        validateFeedOwner(studentInfo.id(), feed);
+        feedRepository.delete(feed);
     }
 
     public Feed findFeedById(Long feedId) {
         return feedRepository.findById(feedId).orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND));
+    }
+
+    private void validateFeedOwner(Long studentId, Feed feed) {
+        if (!studentId.equals(feed.getStudent().getId())) {
+            throw new FeedException(FeedExceptionType.NOT_FEED_OWNER);
+        }
     }
 
     private FeedListItemResponse createFeedListItemResponse(Feed feed, Long studentId) {
