@@ -32,4 +32,14 @@ public class StudentService {
                 .build();
         return studentRepository.save(student);
     }
+
+    public boolean isDuplicateStudentNumber(Integer studentNumber, University university) {
+        return studentRepository.findByStudentNumberAndUniversity(studentNumber, university)
+                .isPresent();
+    }
+
+    public void updateStudentCertification(Student student, Integer studentNumber) {
+        student.updateIsCertificated(true);
+        student.updateStudentNumber(studentNumber);
+    }
 }

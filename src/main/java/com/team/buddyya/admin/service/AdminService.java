@@ -6,12 +6,15 @@ import com.team.buddyya.admin.dto.response.StudentVerificationResponse;
 import com.team.buddyya.certification.repository.StudentIdCardRepository;
 import com.team.buddyya.common.service.S3UploadService;
 import com.team.buddyya.student.domain.Student;
+import com.team.buddyya.student.domain.University;
 import com.team.buddyya.student.exception.StudentException;
 import com.team.buddyya.student.exception.StudentExceptionType;
 import com.team.buddyya.student.repository.StudentRepository;
+import com.team.buddyya.student.service.StudentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -23,6 +26,7 @@ import static com.team.buddyya.common.domain.S3DirectoryName.STUDENT_ID_CARD;
 @Transactional
 public class AdminService {
 
+    private final StudentService studentService;
     private final StudentRepository studentRepository;
     private final StudentIdCardRepository studentIdCardRepository;
     private final S3UploadService s3UploadService;
@@ -38,15 +42,13 @@ public class AdminService {
         Student student = studentRepository.findById(request.studentId())
                 .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
         studentIdCardRepository.deleteByStudent(student);
-        if(request.studentNumber() == null){
+        if (request.studentNumber() == null) {
             return new StudentVerificationResponse(true);
         }
-        Optional<Student> existingStudent = studentRepository.findByStudentNumberAndUniversity(request.studentNumber(), student.getUniversity());
-        if (existingStudent.isPresent()) {
+        if (studentService.isDuplicateStudentNumber(request.studentNumber(), student.getUniversity())) {
             return new StudentVerificationResponse(false);
         }
-        student.updateIsCertificated(true);
-        student.updateStudentNumber(request.studentNumber());
+        studentService.updateStudentCertification(student, request.studentNumber());
         return new StudentVerificationResponse(true);
     }
 }
