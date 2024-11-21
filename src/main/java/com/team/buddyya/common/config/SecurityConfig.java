@@ -40,7 +40,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/onboarding", "/phone-auth/**",
                                 "/auth/reissue").permitAll()
-                        .requestMatchers("/auth/fail").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers("/auth/fail", "/admin/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/auth/success", "/certification/**").hasAuthority("ROLE_STUDENT")
                         .anyRequest().authenticated()
                 );
