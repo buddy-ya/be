@@ -11,6 +11,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreRemove;
 import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
@@ -38,5 +40,15 @@ public class Like extends CreatedTime {
     public Like(Feed feed, Student student) {
         this.feed = feed;
         this.student = student;
+    }
+
+    @PrePersist
+    private void prePersist() {
+        feed.increaseLikeCount();
+    }
+
+    @PreRemove
+    private void PreRemove() {
+        feed.decreaseLikeCount();
     }
 }
