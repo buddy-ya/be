@@ -39,17 +39,15 @@ public class LikeSevice {
         if (isLiked) {
             Like like = findLikeByStudentIdAndFeedId(studentInfo.id(), feedId);
             likeRepository.delete(like);
-        } else {
-            Student student = studentRepository.findById(studentInfo.id())
-                    .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
-            Like like = Like.builder()
-                    .feed(feed)
-                    .student(student)
-                    .build();
-            likeRepository.save(like);
+            return LikeResponse.from(false, feed.getLikeCount());
         }
-        return LikeResponse.from(!isLiked, feed.getLikeCount());
+        Student student = studentRepository.findById(studentInfo.id())
+                .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
+        Like like = Like.builder()
+                .feed(feed)
+                .student(student)
+                .build();
+        likeRepository.save(like);
+        return LikeResponse.from(true, feed.getLikeCount());
     }
-
-
 }

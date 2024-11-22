@@ -1,8 +1,8 @@
 package com.team.buddyya.feed.controller;
 
 import com.team.buddyya.auth.domain.CustomUserDetails;
-import com.team.buddyya.feed.dto.response.LikeResponse;
-import com.team.buddyya.feed.service.LikeSevice;
+import com.team.buddyya.feed.dto.response.BookmarkResponse;
+import com.team.buddyya.feed.service.BookmarkService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -12,17 +12,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/feeds/{feedId}/like")
+@RequestMapping("/feeds/{feedId}/bookmark")
 @RequiredArgsConstructor
-public class LikeController {
+public class BookmarkController {
 
-    private final LikeSevice likeSevice;
+    private final BookmarkService bookmarkService;
 
     @PutMapping
-    public ResponseEntity<LikeResponse> toggleLike(
+    public ResponseEntity<BookmarkResponse> toggleBookmark(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long feedId) {
-        LikeResponse response = likeSevice.toggleLike(userDetails.getStudentInfo(), feedId);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(bookmarkService.toggleBookmark(userDetails.getStudentInfo(), feedId));
     }
 }

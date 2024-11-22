@@ -1,9 +1,12 @@
 package com.team.buddyya.feed.respository;
 
-import com.team.buddyya.feed.domain.BookMark;
+import com.team.buddyya.feed.domain.Bookmark;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface BookmarkRepository extends JpaRepository<BookMark, Long> {
+public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
+
+    Optional<Bookmark> findByStudentIdAndFeedId(Long studentId, Long feedId);
 
     boolean existsByStudentIdAndFeedId(Long studentId, Long feedId);
 }
