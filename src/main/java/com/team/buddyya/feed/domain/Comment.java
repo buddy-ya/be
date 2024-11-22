@@ -4,6 +4,7 @@ import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
+import com.team.buddyya.common.domain.BaseTime;
 import com.team.buddyya.student.domain.Student;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,7 +21,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "comment")
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-public class Comment {
+public class Comment extends BaseTime {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -41,6 +42,10 @@ public class Comment {
     public Comment(Student student, Feed feed, String content) {
         this.student = student;
         this.feed = feed;
+        this.content = content;
+    }
+
+    public void updateComment(String content) {
         this.content = content;
     }
 }
