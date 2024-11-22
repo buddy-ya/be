@@ -4,8 +4,8 @@ import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
+import com.team.buddyya.common.domain.CreatedTime;
 import com.team.buddyya.student.domain.Student;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -17,30 +17,26 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "comment")
+@Table(name = "bookmark")
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-public class Comment {
+public class BookMark extends CreatedTime {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "student_id", nullable = false)
-    private Student student;
-
-    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "feed_id", nullable = false)
     private Feed feed;
 
-    @Column(columnDefinition = "TEXT", nullable = false)
-    private String content;
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "student_id", nullable = false)
+    private Student student;
 
     @Builder
-    public Comment(Student student, Feed feed, String content) {
-        this.student = student;
+    public BookMark(Feed feed, Student student) {
         this.feed = feed;
-        this.content = content;
+        this.student = student;
     }
 }
