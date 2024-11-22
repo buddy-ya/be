@@ -1,4 +1,4 @@
-package com.team.buddyya.feed.dto.response;
+package com.team.buddyya.feed.dto.response.comment;
 
 import java.util.List;
 

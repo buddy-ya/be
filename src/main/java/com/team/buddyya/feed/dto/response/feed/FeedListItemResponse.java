@@ -1,9 +1,9 @@
-package com.team.buddyya.feed.dto.response;
+package com.team.buddyya.feed.dto.response.feed;
 
 import com.team.buddyya.feed.domain.Feed;
 import java.time.LocalDateTime;
 
-public record FeedResponse(
+public record FeedListItemResponse(
         Long id,
         String name,
         String country,
@@ -16,8 +16,8 @@ public record FeedResponse(
         LocalDateTime createdDate
 ) {
 
-    public static FeedResponse from(Feed feed, boolean isLiked, boolean isBookmarked) {
-        return new FeedResponse(
+    public static FeedListItemResponse from(Feed feed, boolean isLiked, boolean isBookmarked) {
+        return new FeedListItemResponse(
                 feed.getId(),
                 feed.getStudent().getName(),
                 feed.getStudent().getCountry(),

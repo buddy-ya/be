@@ -1,4 +1,4 @@
-package com.team.buddyya.feed.dto.response;
+package com.team.buddyya.feed.dto.response.comment;
 
 import com.team.buddyya.feed.domain.Comment;
 import java.time.LocalDateTime;

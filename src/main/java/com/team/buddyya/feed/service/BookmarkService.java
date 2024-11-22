@@ -34,7 +34,7 @@ public class BookmarkService {
     }
 
     public BookmarkResponse toggleBookmark(StudentInfo studentInfo, Long feedId) {
-        Feed feed = feedService.findFeedById(feedId);
+        Feed feed = feedService.findFeedByFeedId(feedId);
         boolean isBookmarked = existsByStudentIdAndFeedId(studentInfo.id(), feedId);
         if (isBookmarked) {
             Bookmark bookmark = findByStudentIdAndFeedId(studentInfo.id(), feedId);

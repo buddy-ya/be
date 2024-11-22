@@ -1,11 +1,11 @@
 package com.team.buddyya.feed.controller;
 
 import com.team.buddyya.auth.domain.CustomUserDetails;
-import com.team.buddyya.feed.dto.request.FeedCreateRequest;
-import com.team.buddyya.feed.dto.request.FeedListRequest;
-import com.team.buddyya.feed.dto.request.FeedUpdateRequest;
-import com.team.buddyya.feed.dto.response.FeedListResponse;
-import com.team.buddyya.feed.dto.response.FeedResponse;
+import com.team.buddyya.feed.dto.request.feed.FeedCreateRequest;
+import com.team.buddyya.feed.dto.request.feed.FeedListRequest;
+import com.team.buddyya.feed.dto.request.feed.FeedUpdateRequest;
+import com.team.buddyya.feed.dto.response.feed.FeedListResponse;
+import com.team.buddyya.feed.dto.response.feed.FeedResponse;
 import com.team.buddyya.feed.service.FeedService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
