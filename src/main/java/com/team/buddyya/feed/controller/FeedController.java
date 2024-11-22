@@ -38,7 +38,7 @@ public class FeedController {
     public ResponseEntity<Void> createFeed(@AuthenticationPrincipal CustomUserDetails userDetails,
                                            @RequestBody FeedCreateRequest request) {
         feedService.createFeed(userDetails.getStudentInfo(), request);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{feedId}")
@@ -54,7 +54,7 @@ public class FeedController {
             @PathVariable Long feedId,
             @RequestBody FeedUpdateRequest request) {
         feedService.updateFeed(userDetails.getStudentInfo(), feedId, request);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
 

@@ -34,7 +34,7 @@ public class LikeSevice {
     }
 
     public LikeResponse toggleLike(StudentInfo studentInfo, Long feedId) {
-        Feed feed = feedService.findFeedById(feedId);
+        Feed feed = feedService.findFeedByFeedId(feedId);
         boolean isLiked = existsByStudentIdAndFeedId(studentInfo.id(), feedId);
         if (isLiked) {
             Like like = findLikeByStudentIdAndFeedId(studentInfo.id(), feedId);

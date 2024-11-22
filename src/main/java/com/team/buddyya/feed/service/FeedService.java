@@ -36,7 +36,7 @@ public class FeedService {
     private final FeedRepository feedRepository;
     private final StudentRepository studentRepository;
 
-    public Feed findFeedById(Long feedId) {
+    public Feed findFeedByFeedId(Long feedId) {
         return feedRepository.findById(feedId)
                 .orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND));
     }
@@ -53,7 +53,7 @@ public class FeedService {
     }
 
     public FeedResponse getFeed(StudentInfo studentInfo, Long feedId) {
-        Feed feed = findFeedById(feedId);
+        Feed feed = findFeedByFeedId(feedId);
         FeedUserAction userAction = getUserAction(studentInfo.id(), feedId);
         return FeedResponse.from(feed, userAction.isLiked(), userAction.isBookmarked());
     }
@@ -73,14 +73,14 @@ public class FeedService {
     }
 
     public void updateFeed(StudentInfo studentInfo, Long feedId, FeedUpdateRequest request) {
-        Feed feed = findFeedById(feedId);
+        Feed feed = findFeedByFeedId(feedId);
         validateFeedOwner(studentInfo.id(), feed);
         Category category = categoryService.getCategory(request.category());
         feed.updateFeed(request.title(), request.content(), category);
     }
 
     public void deleteFeed(StudentInfo studentInfo, Long feedId) {
-        Feed feed = findFeedById(feedId);
+        Feed feed = findFeedByFeedId(feedId);
         validateFeedOwner(studentInfo.id(), feed);
         feedRepository.delete(feed);
     }
@@ -97,8 +97,8 @@ public class FeedService {
     }
 
     private FeedUserAction getUserAction(Long studentId, Long feedId) {
-        boolean isLiked = likeSevice.isLikedByStudent(studentId, feedId);
-        boolean isBookmarked = bookmarkService.isBookmarkedByStudent(studentId, feedId);
+        boolean isLiked = likeSevice.existsByStudentIdAndFeedId(studentId, feedId);
+        boolean isBookmarked = bookmarkService.existsByStudentIdAndFeedId(studentId, feedId);
         return FeedUserAction.from(isLiked, isBookmarked);
     }
 }
