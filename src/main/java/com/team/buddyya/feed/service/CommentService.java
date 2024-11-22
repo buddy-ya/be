@@ -37,8 +37,10 @@ public class CommentService {
 
     public CommentListResponse getComments(StudentInfo studentInfo, Long feedId) {
         Feed feed = feedService.findFeedByFeedId(feedId);
+        Long feedOwnerId = feed.getStudent().getId();
+        Long currentUserId = studentInfo.id();
         List<CommentResponse> response = feed.getComments().stream()
-                .map(CommentResponse::from)
+                .map(comment -> createCommentResponse(comment, feedOwnerId, currentUserId))
                 .toList();
         return CommentListResponse.from(response);
     }
@@ -73,5 +75,11 @@ public class CommentService {
         if (!studentId.equals(comment.getStudent().getId())) {
             throw new FeedException(FeedExceptionType.NOT_COMMENT_OWNER);
         }
+    }
+
+    private CommentResponse createCommentResponse(Comment comment, Long feedOwnerId, Long currentUserId) {
+        boolean isFeedOwner = feedOwnerId.equals(comment.getStudent().getId());
+        boolean isCommentOwner = currentUserId.equals(comment.getStudent().getId());
+        return CommentResponse.from(comment, isFeedOwner, isCommentOwner);
     }
 }

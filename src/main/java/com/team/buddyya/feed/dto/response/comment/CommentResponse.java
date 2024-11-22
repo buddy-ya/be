@@ -8,16 +8,20 @@ public record CommentResponse(
         String content,
         String name,
         String country,
-        LocalDateTime createdDate
+        LocalDateTime createdDate,
+        boolean isFeedOwner,
+        boolean isCommentOwner
 ) {
 
-    public static CommentResponse from(Comment comment) {
+    public static CommentResponse from(Comment comment, boolean isFeedOwner, boolean isCommentOwner) {
         return new CommentResponse(
                 comment.getId(),
                 comment.getContent(),
                 comment.getStudent().getName(),
                 comment.getStudent().getCountry(),
-                comment.getCreatedDate()
+                comment.getCreatedDate(),
+                isFeedOwner,
+                isCommentOwner
         );
     }
 }
