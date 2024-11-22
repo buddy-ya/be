@@ -7,7 +7,6 @@ import com.team.buddyya.feed.domain.FeedUserAction;
 import com.team.buddyya.feed.dto.request.feed.FeedCreateRequest;
 import com.team.buddyya.feed.dto.request.feed.FeedListRequest;
 import com.team.buddyya.feed.dto.request.feed.FeedUpdateRequest;
-import com.team.buddyya.feed.dto.response.feed.FeedListItemResponse;
 import com.team.buddyya.feed.dto.response.feed.FeedListResponse;
 import com.team.buddyya.feed.dto.response.feed.FeedResponse;
 import com.team.buddyya.feed.exception.FeedException;
@@ -48,8 +47,8 @@ public class FeedService {
         PageRequest pageRequest = PageRequest.of(request.page(), request.size(),
                 Sort.by(Sort.Direction.DESC, "createdDate"));
         Page<Feed> feeds = feedRepository.findAllByCategory(category, pageRequest);
-        List<FeedListItemResponse> response = feeds.getContent().stream()
-                .map(feed -> createFeedListItemResponse(feed, studentInfo.id()))
+        List<FeedResponse> response = feeds.getContent().stream()
+                .map(feed -> createFeedResponse(feed, studentInfo.id()))
                 .toList();
         return FeedListResponse.from(feeds, response);
     }
@@ -93,9 +92,9 @@ public class FeedService {
         }
     }
 
-    private FeedListItemResponse createFeedListItemResponse(Feed feed, Long studentId) {
+    private FeedResponse createFeedResponse(Feed feed, Long studentId) {
         FeedUserAction userAction = getUserAction(studentId, feed.getId());
-        return FeedListItemResponse.from(feed, userAction.isLiked(), userAction.isBookmarked());
+        return FeedResponse.from(feed, userAction.isLiked(), userAction.isBookmarked());
     }
 
     private FeedUserAction getUserAction(Long studentId, Long feedId) {
