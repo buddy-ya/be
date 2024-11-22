@@ -51,19 +51,19 @@ public class CommentService {
         Student student = studentRepository.findById(studentInfo.id())
                 .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
         Feed feed = feedService.findFeedByFeedId(feedId);
-
         Comment comment = Comment.builder()
                 .student(student)
                 .feed(feed)
                 .content(request.content())
                 .build();
         commentRepository.save(comment);
-
         CommentInfo commentInfo = CommentInfo.of(comment, feed.getStudent().getId(), studentInfo.id());
         return CommentCreateResponse.from(commentInfo);
     }
 
-    public CommentUpdateResponse updateComment(StudentInfo studentInfo, Long commentId, CommentUpdateRequest request) {
+    public CommentUpdateResponse updateComment(StudentInfo studentInfo, Long feedId, Long commentId,
+                                               CommentUpdateRequest request) {
+        Feed feed = feedService.findFeedByFeedId(feedId);
         Comment comment = findCommentByCommentId(commentId);
         validateCommentOwner(studentInfo.id(), comment);
         comment.updateComment(request.content());
@@ -72,7 +72,8 @@ public class CommentService {
         return CommentUpdateResponse.from(commentInfo);
     }
 
-    public void deleteComment(StudentInfo studentInfo, Long commentId) {
+    public void deleteComment(StudentInfo studentInfo, Long feedId, Long commentId) {
+        Feed feed = feedService.findFeedByFeedId(feedId);
         Comment comment = findCommentByCommentId(commentId);
         validateCommentOwner(studentInfo.id(), comment);
         commentRepository.delete(comment);
