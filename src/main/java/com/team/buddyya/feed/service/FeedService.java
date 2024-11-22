@@ -37,7 +37,8 @@ public class FeedService {
     private final StudentRepository studentRepository;
 
     public Feed findFeedById(Long feedId) {
-        return feedRepository.findById(feedId).orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND));
+        return feedRepository.findById(feedId)
+                .orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND));
     }
 
     public FeedListResponse getFeeds(StudentInfo studentInfo, FeedListRequest request) {
