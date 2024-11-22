@@ -1,6 +1,6 @@
 package com.team.buddyya.feed.dto.response.comment;
 
-import com.team.buddyya.feed.domain.Comment;
+import com.team.buddyya.feed.domain.CommentInfo;
 import java.time.LocalDateTime;
 
 public record CommentCreateResponse(
@@ -8,16 +8,20 @@ public record CommentCreateResponse(
         String content,
         String name,
         String country,
-        LocalDateTime createdDate
+        LocalDateTime createdDate,
+        boolean isFeedOwner,
+        boolean isCommentOwner
 ) {
 
-    public static CommentCreateResponse from(Comment comment) {
+    public static CommentCreateResponse from(CommentInfo info) {
         return new CommentCreateResponse(
-                comment.getId(),
-                comment.getContent(),
-                comment.getStudent().getName(),
-                comment.getStudent().getCountry(),
-                comment.getCreatedDate()
+                info.comment().getId(),
+                info.comment().getContent(),
+                info.comment().getStudent().getName(),
+                info.comment().getStudent().getCountry(),
+                info.comment().getCreatedDate(),
+                info.isFeedOwner(),
+                info.isCommentOwner()
         );
     }
 }

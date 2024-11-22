@@ -2,6 +2,7 @@ package com.team.buddyya.feed.service;
 
 import com.team.buddyya.auth.domain.StudentInfo;
 import com.team.buddyya.feed.domain.Comment;
+import com.team.buddyya.feed.domain.CommentInfo;
 import com.team.buddyya.feed.domain.Feed;
 import com.team.buddyya.feed.dto.request.comment.CommentCreateRequest;
 import com.team.buddyya.feed.dto.request.comment.CommentUpdateRequest;
@@ -37,35 +38,41 @@ public class CommentService {
 
     public CommentListResponse getComments(StudentInfo studentInfo, Long feedId) {
         Feed feed = feedService.findFeedByFeedId(feedId);
-        Long feedOwnerId = feed.getStudent().getId();
-        Long currentUserId = studentInfo.id();
-        List<CommentResponse> response = feed.getComments().stream()
-                .map(comment -> createCommentResponse(comment, feedOwnerId, currentUserId))
+        List<CommentInfo> commentInfos = feed.getComments().stream()
+                .map(comment -> CommentInfo.of(comment, feed.getStudent().getId(), studentInfo.id()))
                 .toList();
-        return CommentListResponse.from(response);
+        List<CommentResponse> responses = commentInfos.stream()
+                .map(CommentResponse::from)
+                .toList();
+        return CommentListResponse.from(responses);
     }
 
     public CommentCreateResponse createComment(StudentInfo studentInfo, Long feedId, CommentCreateRequest request) {
         Student student = studentRepository.findById(studentInfo.id())
                 .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
         Feed feed = feedService.findFeedByFeedId(feedId);
+
         Comment comment = Comment.builder()
                 .student(student)
                 .feed(feed)
                 .content(request.content())
                 .build();
         commentRepository.save(comment);
-        return CommentCreateResponse.from(comment);
+
+        CommentInfo commentInfo = CommentInfo.of(comment, feed.getStudent().getId(), studentInfo.id());
+        return CommentCreateResponse.from(commentInfo);
     }
 
     public CommentUpdateResponse updateComment(StudentInfo studentInfo, Long commentId, CommentUpdateRequest request) {
         Comment comment = findCommentByCommentId(commentId);
         validateCommentOwner(studentInfo.id(), comment);
         comment.updateComment(request.content());
-        return CommentUpdateResponse.from(comment);
+
+        CommentInfo commentInfo = CommentInfo.of(comment, comment.getFeed().getStudent().getId(), studentInfo.id());
+        return CommentUpdateResponse.from(commentInfo);
     }
 
-    public void deleteComment(StudentInfo studentInfo, Long feedId, Long commentId) {
+    public void deleteComment(StudentInfo studentInfo, Long commentId) {
         Comment comment = findCommentByCommentId(commentId);
         validateCommentOwner(studentInfo.id(), comment);
         commentRepository.delete(comment);
@@ -75,11 +82,5 @@ public class CommentService {
         if (!studentId.equals(comment.getStudent().getId())) {
             throw new FeedException(FeedExceptionType.NOT_COMMENT_OWNER);
         }
-    }
-
-    private CommentResponse createCommentResponse(Comment comment, Long feedOwnerId, Long currentUserId) {
-        boolean isFeedOwner = feedOwnerId.equals(comment.getStudent().getId());
-        boolean isCommentOwner = currentUserId.equals(comment.getStudent().getId());
-        return CommentResponse.from(comment, isFeedOwner, isCommentOwner);
     }
 }

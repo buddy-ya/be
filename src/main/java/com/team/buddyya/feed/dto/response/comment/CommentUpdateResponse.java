@@ -1,23 +1,29 @@
 package com.team.buddyya.feed.dto.response.comment;
 
-import com.team.buddyya.feed.domain.Comment;
+import com.team.buddyya.feed.domain.CommentInfo;
 import java.time.LocalDateTime;
+
 
 public record CommentUpdateResponse(
         Long id,
         String content,
         String name,
         String country,
-        LocalDateTime createdDate
+        LocalDateTime createdDate,
+        boolean isFeedOwner,
+        boolean isCommentOwner
 ) {
-
-    public static CommentUpdateResponse from(Comment comment) {
+    
+    public static CommentUpdateResponse from(CommentInfo info) {
         return new CommentUpdateResponse(
-                comment.getId(),
-                comment.getContent(),
-                comment.getStudent().getName(),
-                comment.getStudent().getCountry(),
-                comment.getCreatedDate()
+                info.comment().getId(),
+                info.comment().getContent(),
+                info.comment().getStudent().getName(),
+                info.comment().getStudent().getCountry(),
+                info.comment().getCreatedDate(),
+                info.isFeedOwner(),
+                info.isCommentOwner()
         );
     }
 }
+
