@@ -12,6 +12,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreRemove;
 import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
@@ -47,5 +49,15 @@ public class Comment extends BaseTime {
 
     public void updateComment(String content) {
         this.content = content;
+    }
+
+    @PrePersist
+    private void prePersist() {
+        feed.increaseCommentCount();
+    }
+
+    @PreRemove
+    private void PreRemove() {
+        feed.decreaseCommentCount();
     }
 }

@@ -37,8 +37,7 @@ public class CommentService {
 
     public CommentListResponse getComments(StudentInfo studentInfo, Long feedId) {
         Feed feed = feedService.findFeedByFeedId(feedId);
-        List<Comment> comments = commentRepository.findAllByFeedId(feedId);
-        List<CommentResponse> response = comments.stream()
+        List<CommentResponse> response = feed.getComments().stream()
                 .map(CommentResponse::from)
                 .toList();
         return CommentListResponse.from(response);
