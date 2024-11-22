@@ -12,7 +12,9 @@ import com.team.buddyya.feed.dto.response.feed.FeedListResponse;
 import com.team.buddyya.feed.dto.response.feed.FeedResponse;
 import com.team.buddyya.feed.exception.FeedException;
 import com.team.buddyya.feed.exception.FeedExceptionType;
+import com.team.buddyya.feed.respository.BookmarkRepository;
 import com.team.buddyya.feed.respository.FeedRepository;
+import com.team.buddyya.feed.respository.LikeRepository;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.exception.StudentException;
 import com.team.buddyya.student.exception.StudentExceptionType;
@@ -30,11 +32,11 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class FeedService {
 
-    private final LikeSevice likeSevice;
-    private final BookmarkService bookmarkService;
     private final CategoryService categoryService;
     private final FeedRepository feedRepository;
     private final StudentRepository studentRepository;
+    private final LikeRepository likeRepository;
+    private final BookmarkRepository bookmarkRepository;
 
     public Feed findFeedByFeedId(Long feedId) {
         return feedRepository.findById(feedId)
@@ -97,8 +99,8 @@ public class FeedService {
     }
 
     private FeedUserAction getUserAction(Long studentId, Long feedId) {
-        boolean isLiked = likeSevice.existsByStudentIdAndFeedId(studentId, feedId);
-        boolean isBookmarked = bookmarkService.existsByStudentIdAndFeedId(studentId, feedId);
+        boolean isLiked = likeRepository.existsByStudentIdAndFeedId(studentId, feedId);
+        boolean isBookmarked = bookmarkRepository.existsByStudentIdAndFeedId(studentId, feedId);
         return FeedUserAction.from(isLiked, isBookmarked);
     }
 }

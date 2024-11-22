@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class LikeSevice {
+public class LikeService {
 
     private final LikeRepository likeRepository;
     private final StudentRepository studentRepository;
