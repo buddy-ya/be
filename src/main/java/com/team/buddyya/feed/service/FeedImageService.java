@@ -1,5 +1,6 @@
 package com.team.buddyya.feed.service;
 
+import com.team.buddyya.common.domain.S3DirectoryName;
 import com.team.buddyya.common.service.S3UploadService;
 import com.team.buddyya.feed.domain.Feed;
 import com.team.buddyya.feed.domain.FeedImage;
@@ -24,7 +25,7 @@ public class FeedImageService {
     }
 
     private FeedImage uploadFeedImage(Feed feed, MultipartFile image) {
-        String imageUrl = s3UploadService.uploadFile("/feeds", image);
+        String imageUrl = s3UploadService.uploadFile(S3DirectoryName.FEED_IMAGE.getDirectoryName(), image);
         FeedImage feedImage = FeedImage.builder()
                 .feed(feed)
                 .url(imageUrl)
