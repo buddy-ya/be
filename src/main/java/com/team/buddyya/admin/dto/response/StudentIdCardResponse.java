@@ -3,7 +3,6 @@ package com.team.buddyya.admin.dto.response;
 import com.team.buddyya.certification.domain.StudentIdCard;
 
 public record StudentIdCardResponse(
-
         Long id,
         Long studentId,
         String imageUrl
