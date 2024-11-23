@@ -38,7 +38,7 @@ public class AdminService {
         List<StudentIdCardResponse> studentIdCards = studentIdCardRepository.findAllByOrderByCreatedDateAsc().stream()
                 .map(StudentIdCardResponse::from)
                 .collect(Collectors.toList());
-        return new StudentIdCardListResponse(studentIdCards);
+        return StudentIdCardListResponse.from(studentIdCards);
     }
 
     public StudentVerificationResponse verifyStudentIdCard(StudentVerificationRequest request) {
