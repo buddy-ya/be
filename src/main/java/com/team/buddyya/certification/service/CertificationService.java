@@ -19,8 +19,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.team.buddyya.common.domain.S3DirectoryName.STUDENT_ID_CARD;
 
@@ -75,11 +77,21 @@ public class CertificationService {
             throw new CertificateException(CertificateExceptionType.ALREADY_CERTIFICATED);
         }
         String imageUrl = s3UploadService.uploadFile(STUDENT_ID_CARD.getDirectoryName(), file);
+        Optional<StudentIdCard> existStudentIdCard = studentIdCardRepository.findByStudent(student);
+        if (existStudentIdCard.isPresent()) {
+            return updateExistingStudentIdCard(imageUrl, existStudentIdCard.get());
+        }
         StudentIdCard studentIdCard = StudentIdCard.builder()
                 .imageUrl(imageUrl)
                 .student(student)
                 .build();
         studentIdCardRepository.save(studentIdCard);
+        return new CertificationResponse(true);
+    }
+
+    private CertificationResponse updateExistingStudentIdCard(String imageUrl, StudentIdCard existStudentIdCard) {
+        s3UploadService.deleteFile(STUDENT_ID_CARD.getDirectoryName(), existStudentIdCard.getImageUrl());
+        existStudentIdCard.updateImageUrl(imageUrl);
         return new CertificationResponse(true);
     }
 

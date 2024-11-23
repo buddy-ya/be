@@ -6,7 +6,6 @@ import com.team.buddyya.common.exception.CommonException;
 import com.team.buddyya.common.exception.CommonExceptionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -47,5 +46,14 @@ public class S3UploadService {
     private String generateFileName(MultipartFile file) {
         String fileName = UUID.randomUUID().toString() + "-" + file.getOriginalFilename();
         return fileName.replaceAll("\\s", "_");
+    }
+
+    public void deleteFile(String dir, String fileUrl) {
+        String fileName = extractFileName(fileUrl);
+        amazonS3.deleteObject(bucketName + dir, fileName);
+    }
+
+    private String extractFileName(String fileUrl) {
+        return fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
     }
 }
