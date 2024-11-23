@@ -54,6 +54,9 @@ public class Student extends BaseTime {
     @Column(nullable = false)
     private Gender gender;
 
+    @Column(name = "student_number")
+    private String studentNumber;
+
     @OneToMany(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<StudentMajor> majors;
 
@@ -66,8 +69,8 @@ public class Student extends BaseTime {
     @OneToOne(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private AuthToken authToken;
 
-    @OneToMany(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<StudentIdCard> studentIdCards;
+    @OneToOne(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private StudentIdCard studentIdCard;
 
     @Builder
     public Student(String name, String phoneNumber, String country, Boolean isKorean, Role role, University university, Gender gender) {
@@ -79,9 +82,14 @@ public class Student extends BaseTime {
         this.university = university;
         this.gender = gender;
         this.isCertificated = false;
+        this.studentNumber = null;
     }
 
     public void updateIsCertificated(boolean isCertificated) {
         this.isCertificated = isCertificated;
+    }
+
+    public void updateStudentNumber(String studentNumber) {
+        this.studentNumber = studentNumber;
     }
 }

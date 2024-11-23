@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import static jakarta.persistence.FetchType.LAZY;
+
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
@@ -23,7 +23,7 @@ public class StudentIdCard extends CreatedTime {
     @Column(nullable = false)
     private String imageUrl;
 
-    @ManyToOne(fetch = LAZY)
+    @OneToOne
     @JoinColumn(name = "student_id", nullable = false)
     private Student student;
 
@@ -31,5 +31,9 @@ public class StudentIdCard extends CreatedTime {
     public StudentIdCard(String imageUrl, Student student) {
         this.imageUrl = imageUrl;
         this.student = student;
+    }
+
+    public void updateImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }
