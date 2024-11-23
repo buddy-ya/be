@@ -37,6 +37,7 @@ public class DataLoader implements CommandLineRunner {
         loadInterests();
         loadUniversities();
         createMockStudents();
+        loadCategories();
     }
 
     private void loadMajors() {
