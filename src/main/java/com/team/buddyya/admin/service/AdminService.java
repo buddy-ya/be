@@ -42,10 +42,10 @@ public class AdminService {
     }
 
     public StudentVerificationResponse verifyStudentIdCard(StudentVerificationRequest request) {
-        s3UploadService.deleteFile(STUDENT_ID_CARD.getDirectoryName(), request.imageUrl());
         Student student = studentRepository.findById(request.studentId())
                 .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
         studentIdCardRepository.deleteByStudent(student);
+        s3UploadService.deleteFile(STUDENT_ID_CARD.getDirectoryName(), request.imageUrl());
         if (request.studentNumber() == null) {
             return new StudentVerificationResponse(REQUEST_REJECTED_MESSAGE);
         }
