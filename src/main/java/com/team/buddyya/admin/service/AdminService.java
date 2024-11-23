@@ -1,12 +1,12 @@
 package com.team.buddyya.admin.service;
 
 import com.team.buddyya.admin.dto.request.StudentVerificationRequest;
+import com.team.buddyya.admin.dto.response.StudentIdCardListResponse;
 import com.team.buddyya.admin.dto.response.StudentIdCardResponse;
 import com.team.buddyya.admin.dto.response.StudentVerificationResponse;
 import com.team.buddyya.certification.repository.StudentIdCardRepository;
 import com.team.buddyya.common.service.S3UploadService;
 import com.team.buddyya.student.domain.Student;
-import com.team.buddyya.student.domain.University;
 import com.team.buddyya.student.exception.StudentException;
 import com.team.buddyya.student.exception.StudentExceptionType;
 import com.team.buddyya.student.repository.StudentRepository;
@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.team.buddyya.common.domain.S3DirectoryName.STUDENT_ID_CARD;
@@ -35,10 +34,11 @@ public class AdminService {
     private final StudentIdCardRepository studentIdCardRepository;
     private final S3UploadService s3UploadService;
 
-    public List<StudentIdCardResponse> getStudentIdCards() {
-        return studentIdCardRepository.findAllByOrderByCreatedDateAsc().stream()
+    public StudentIdCardListResponse getStudentIdCards() {
+        List<StudentIdCardResponse> studentIdCards = studentIdCardRepository.findAllByOrderByCreatedDateAsc().stream()
                 .map(StudentIdCardResponse::from)
                 .collect(Collectors.toList());
+        return new StudentIdCardListResponse(studentIdCards);
     }
 
     public StudentVerificationResponse verifyStudentIdCard(StudentVerificationRequest request) {
