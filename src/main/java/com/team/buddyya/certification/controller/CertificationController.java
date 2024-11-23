@@ -5,6 +5,7 @@ import com.team.buddyya.certification.dto.request.EmailCertificationRequest;
 import com.team.buddyya.certification.dto.request.EmailCodeRequest;
 import com.team.buddyya.certification.dto.response.CertificationResponse;
 import com.team.buddyya.certification.dto.response.CertificationStatusResponse;
+import com.team.buddyya.certification.dto.response.StudentIdCardResponse;
 import com.team.buddyya.certification.service.CertificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +33,11 @@ public class CertificationController {
     @PostMapping("/student-id-card")
     public ResponseEntity<CertificationResponse> sendStudentIdCard(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestPart("file") MultipartFile file) {
         return ResponseEntity.ok(certificationService.uploadStudentIdCard(userDetails.getStudentInfo(), file));
+    }
+
+    @GetMapping("/student-id-card")
+    public ResponseEntity<StudentIdCardResponse> getStudentIdCard(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.ok(certificationService.getStudentIdCard(userDetails.getStudentInfo()));
     }
 
     @GetMapping

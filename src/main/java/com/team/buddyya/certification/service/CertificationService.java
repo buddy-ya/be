@@ -6,6 +6,7 @@ import com.team.buddyya.certification.dto.request.EmailCertificationRequest;
 import com.team.buddyya.certification.dto.request.EmailCodeRequest;
 import com.team.buddyya.certification.dto.response.CertificationResponse;
 import com.team.buddyya.certification.dto.response.CertificationStatusResponse;
+import com.team.buddyya.certification.dto.response.StudentIdCardResponse;
 import com.team.buddyya.certification.exception.CertificateException;
 import com.team.buddyya.certification.exception.CertificateExceptionType;
 import com.team.buddyya.certification.repository.StudentIdCardRepository;
@@ -116,5 +117,11 @@ public class CertificationService {
         boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
                 .isPresent();
         return new CertificationStatusResponse(student.getIsCertificated(), isStudentIdCardRequested);
+    }
+
+    public StudentIdCardResponse getStudentIdCard(StudentInfo studentInfo) {
+        StudentIdCard studentIdCard = studentIdCardRepository.findByStudent_Id(studentInfo.id())
+                .orElseThrow(() -> new CertificateException(CertificateExceptionType.STUDENT_ID_CARD_NOT_FOUND));
+        return new StudentIdCardResponse(studentIdCard.getImageUrl());
     }
 }
