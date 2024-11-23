@@ -11,7 +11,7 @@ public record FeedListResponse(
         boolean hasNext
 ) {
 
-    public static FeedListResponse from(Page<Feed> feedInfo, List<FeedResponse> feeds) {
+    public static FeedListResponse from(List<FeedResponse> feeds, Page<Feed> feedInfo) {
         return new FeedListResponse(
                 feeds,
                 feedInfo.getNumber(),

@@ -50,7 +50,7 @@ public class FeedService {
         List<FeedResponse> response = feeds.getContent().stream()
                 .map(feed -> createFeedResponse(feed, studentInfo.id()))
                 .toList();
-        return FeedListResponse.from(feeds, response);
+        return FeedListResponse.from(response, feeds);
     }
 
     public FeedResponse getFeed(StudentInfo studentInfo, Long feedId) {
