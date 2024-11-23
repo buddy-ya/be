@@ -13,6 +13,7 @@ import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.exception.StudentException;
 import com.team.buddyya.student.exception.StudentExceptionType;
 import com.team.buddyya.student.repository.StudentRepository;
+import com.team.buddyya.student.service.StudentService;
 import com.univcert.api.UnivCert;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,6 +35,7 @@ public class CertificationService {
     private final StudentRepository studentRepository;
     private final StudentIdCardRepository studentIdCardRepository;
     private final S3UploadService s3UploadService;
+    private final StudentService studentService;
 
     @Value("${univcert.api.key}")
     private String univcertApiKey;
@@ -41,15 +43,22 @@ public class CertificationService {
     public CertificationResponse certificateEmail(StudentInfo studentInfo, EmailCertificationRequest emailRequest) {
         Student student = studentRepository.findById(studentInfo.id())
                 .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
-        if (student.getIsCertificated()) {
-            throw new CertificateException(CertificateExceptionType.ALREADY_CERTIFICATED);
-        }
+        validateStatusAndEmail(emailRequest, student);
         try {
             Map<String, Object> univCertResponse = UnivCert.certify(univcertApiKey, emailRequest.email(), emailRequest.univName(), true);
             boolean isSuccess = (Boolean) univCertResponse.get("success");
             return new CertificationResponse(isSuccess);
         } catch (IOException e) {
             throw new CertificateException(CertificateExceptionType.CERTIFICATE_FAILED);
+        }
+    }
+
+    private void validateStatusAndEmail(EmailCertificationRequest emailRequest, Student student) {
+        if (student.getIsCertificated()) {
+            throw new CertificateException(CertificateExceptionType.ALREADY_CERTIFICATED);
+        }
+        if (studentService.isDuplicateStudentEmail(emailRequest.email())) {
+            throw new CertificateException(CertificateExceptionType.DUPLICATE_EMAIL);
         }
     }
 
@@ -60,14 +69,19 @@ public class CertificationService {
             if (isSuccess) {
                 Student student = studentRepository.findById(studentInfo.id())
                         .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
-                student.updateIsCertificated(true);
-                studentRepository.save(student);
+                updateCertification(codeRequest, student);
             }
             UnivCert.clear(univcertApiKey);
             return new CertificationResponse(isSuccess);
         } catch (IOException e) {
             throw new CertificateException(CertificateExceptionType.CERTIFICATE_FAILED);
         }
+    }
+
+    private void updateCertification(EmailCodeRequest codeRequest, Student student) {
+        student.updateIsCertificated(true);
+        student.updateEmail(codeRequest.email());
+        studentRepository.save(student);
     }
 
     public CertificationResponse uploadStudentIdCard(StudentInfo studentInfo, MultipartFile file) {
