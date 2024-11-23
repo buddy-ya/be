@@ -23,8 +23,7 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -45,11 +44,9 @@ public class FeedService {
                 .orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND));
     }
 
-    public FeedListResponse getFeeds(StudentInfo studentInfo, FeedListRequest request) {
+    public FeedListResponse getFeeds(StudentInfo studentInfo, Pageable pageable, FeedListRequest request) {
         Category category = categoryService.getCategory(request.category());
-        PageRequest pageRequest = PageRequest.of(request.page(), request.size(),
-                Sort.by(Sort.Direction.DESC, "createdDate"));
-        Page<Feed> feeds = feedRepository.findAllByCategory(category, pageRequest);
+        Page<Feed> feeds = feedRepository.findAllByCategoryName(category.getName(), pageable);
         List<FeedResponse> response = feeds.getContent().stream()
                 .map(feed -> createFeedResponse(feed, studentInfo.id()))
                 .toList();

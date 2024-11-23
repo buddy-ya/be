@@ -9,6 +9,9 @@ import com.team.buddyya.feed.dto.response.feed.FeedResponse;
 import com.team.buddyya.feed.service.FeedService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,8 +34,9 @@ public class FeedController {
 
     @GetMapping
     public ResponseEntity<FeedListResponse> getFeeds(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                     @PageableDefault(size = 10, sort = "createdDate", direction = Direction.DESC) Pageable pageable,
                                                      @ModelAttribute FeedListRequest request) {
-        FeedListResponse response = feedService.getFeeds(userDetails.getStudentInfo(), request);
+        FeedListResponse response = feedService.getFeeds(userDetails.getStudentInfo(), pageable, request);
         return ResponseEntity.ok(response);
     }
 
