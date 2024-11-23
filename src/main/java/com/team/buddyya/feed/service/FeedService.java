@@ -23,7 +23,9 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -46,7 +48,12 @@ public class FeedService {
 
     public FeedListResponse getFeeds(StudentInfo studentInfo, Pageable pageable, FeedListRequest request) {
         Category category = categoryService.getCategory(request.category());
-        Page<Feed> feeds = feedRepository.findAllByCategoryName(category.getName(), pageable);
+        Pageable customPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                getSortBy(category)
+        );
+        Page<Feed> feeds = feedRepository.findAllByCategoryName(category.getName(), customPageable);
         List<FeedResponse> response = feeds.getContent().stream()
                 .map(feed -> createFeedResponse(feed, studentInfo.id()))
                 .toList();
@@ -111,5 +118,11 @@ public class FeedService {
             List<FeedImage> feedImages = feedImageService.uploadFeedImages(feed, images);
             feedImages.forEach(feed::uploadFeedImage);
         }
+    }
+
+    private Sort getSortBy(Category category) {
+        return category.getName().equals("POPULAR")
+                ? Sort.by(Sort.Direction.DESC, "likeCount", "createdDate")
+                : Sort.by(Sort.Direction.DESC, "createdDate");
     }
 }
