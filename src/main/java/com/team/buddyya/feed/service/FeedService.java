@@ -3,6 +3,7 @@ package com.team.buddyya.feed.service;
 import com.team.buddyya.auth.domain.StudentInfo;
 import com.team.buddyya.feed.domain.Category;
 import com.team.buddyya.feed.domain.Feed;
+import com.team.buddyya.feed.domain.FeedImage;
 import com.team.buddyya.feed.domain.FeedUserAction;
 import com.team.buddyya.feed.dto.request.feed.FeedCreateRequest;
 import com.team.buddyya.feed.dto.request.feed.FeedListRequest;
@@ -25,6 +26,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Transactional
@@ -36,6 +38,7 @@ public class FeedService {
     private final StudentRepository studentRepository;
     private final LikeRepository likeRepository;
     private final BookmarkRepository bookmarkRepository;
+    private final FeedImageService feedImageService;
 
     public Feed findFeedByFeedId(Long feedId) {
         return feedRepository.findById(feedId)
@@ -55,11 +58,10 @@ public class FeedService {
 
     public FeedResponse getFeed(StudentInfo studentInfo, Long feedId) {
         Feed feed = findFeedByFeedId(feedId);
-        FeedUserAction userAction = getUserAction(studentInfo.id(), feedId);
-        return FeedResponse.from(feed, userAction.isLiked(), userAction.isBookmarked());
+        return createFeedResponse(feed, studentInfo.id());
     }
 
-    public void createFeed(StudentInfo studentInfo, FeedCreateRequest request) {
+    public void createFeed(StudentInfo studentInfo, FeedCreateRequest request, List<MultipartFile> images) {
         Category category = categoryService.getCategory(request.category());
         Student student = studentRepository.findById(studentInfo.id())
                 .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
@@ -71,13 +73,16 @@ public class FeedService {
                 .university(student.getUniversity())
                 .build();
         feedRepository.save(feed);
+        uploadImages(feed, images);
     }
 
-    public void updateFeed(StudentInfo studentInfo, Long feedId, FeedUpdateRequest request) {
+    public void updateFeed(StudentInfo studentInfo, Long feedId, FeedUpdateRequest request,
+                           List<MultipartFile> images) {
         Feed feed = findFeedByFeedId(feedId);
         validateFeedOwner(studentInfo.id(), feed);
         Category category = categoryService.getCategory(request.category());
         feed.updateFeed(request.title(), request.content(), category);
+        uploadImages(feed, images);
     }
 
     public void deleteFeed(StudentInfo studentInfo, Long feedId) {
@@ -94,12 +99,20 @@ public class FeedService {
 
     private FeedResponse createFeedResponse(Feed feed, Long studentId) {
         FeedUserAction userAction = getUserAction(studentId, feed.getId());
-        return FeedResponse.from(feed, userAction.isLiked(), userAction.isBookmarked());
+        return FeedResponse.from(feed, userAction);
     }
 
     private FeedUserAction getUserAction(Long studentId, Long feedId) {
+        boolean isFeedOwner = studentId.equals(feedId);
         boolean isLiked = likeRepository.existsByStudentIdAndFeedId(studentId, feedId);
         boolean isBookmarked = bookmarkRepository.existsByStudentIdAndFeedId(studentId, feedId);
-        return FeedUserAction.from(isLiked, isBookmarked);
+        return FeedUserAction.of(isFeedOwner, isLiked, isBookmarked);
+    }
+
+    private void uploadImages(Feed feed, List<MultipartFile> images) {
+        if (images != null && !images.isEmpty()) {
+            List<FeedImage> feedImages = feedImageService.uploadFeedImages(feed, images);
+            feedImages.forEach(feed::uploadFeedImage);
+        }
     }
 }

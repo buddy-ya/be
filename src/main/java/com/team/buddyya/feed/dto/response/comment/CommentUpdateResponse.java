@@ -9,18 +9,18 @@ public record CommentUpdateResponse(
         String content,
         String name,
         String country,
-        LocalDateTime createdDate,
+        LocalDateTime updateTime,
         boolean isFeedOwner,
         boolean isCommentOwner
 ) {
-    
+
     public static CommentUpdateResponse from(CommentInfo info) {
         return new CommentUpdateResponse(
                 info.comment().getId(),
                 info.comment().getContent(),
                 info.comment().getStudent().getName(),
                 info.comment().getStudent().getCountry(),
-                info.comment().getCreatedDate(),
+                info.comment().getUpdatedDate(),
                 info.isFeedOwner(),
                 info.isCommentOwner()
         );

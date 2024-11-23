@@ -7,6 +7,7 @@ import com.team.buddyya.feed.dto.request.feed.FeedUpdateRequest;
 import com.team.buddyya.feed.dto.response.feed.FeedListResponse;
 import com.team.buddyya.feed.dto.response.feed.FeedResponse;
 import com.team.buddyya.feed.service.FeedService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -16,9 +17,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/feeds")
@@ -35,9 +37,14 @@ public class FeedController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> createFeed(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                           @RequestBody FeedCreateRequest request) {
-        feedService.createFeed(userDetails.getStudentInfo(), request);
+    public ResponseEntity<Void> createFeed(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestPart(value = "title") String title,
+            @RequestPart(value = "content") String content,
+            @RequestPart(value = "category") String category,
+            @RequestPart(value = "images", required = false) List<MultipartFile> images) {
+        FeedCreateRequest request = FeedCreateRequest.from(title, content, category);
+        feedService.createFeed(userDetails.getStudentInfo(), request, images);
         return ResponseEntity.ok().build();
     }
 
@@ -52,8 +59,12 @@ public class FeedController {
     public ResponseEntity<Void> updateFeed(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long feedId,
-            @RequestBody FeedUpdateRequest request) {
-        feedService.updateFeed(userDetails.getStudentInfo(), feedId, request);
+            @RequestPart(value = "title") String title,
+            @RequestPart(value = "content") String content,
+            @RequestPart(value = "category") String category,
+            @RequestPart(value = "images", required = false) List<MultipartFile> images) {
+        FeedUpdateRequest request = FeedUpdateRequest.from(title, content, category);
+        feedService.updateFeed(userDetails.getStudentInfo(), feedId, request, images);
         return ResponseEntity.ok().build();
     }
 

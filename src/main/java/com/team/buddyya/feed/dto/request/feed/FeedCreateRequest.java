@@ -5,4 +5,8 @@ public record FeedCreateRequest(
         String content,
         String category
 ) {
+
+    public static FeedCreateRequest from(String title, String content, String category) {
+        return new FeedCreateRequest(title, content, category);
+    }
 }

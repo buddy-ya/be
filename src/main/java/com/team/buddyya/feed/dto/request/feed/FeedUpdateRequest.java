@@ -5,4 +5,8 @@ public record FeedUpdateRequest(
         String content,
         String category
 ) {
+
+    public static FeedUpdateRequest from(String title, String content, String category) {
+        return new FeedUpdateRequest(title, content, category);
+    }
 }

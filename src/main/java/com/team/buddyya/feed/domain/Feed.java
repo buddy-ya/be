@@ -99,4 +99,8 @@ public class Feed extends BaseTime {
     public void decreaseCommentCount() {
         this.commentCount--;
     }
+
+    public void uploadFeedImage(FeedImage image) {
+        this.images.add(image);
+    }
 }

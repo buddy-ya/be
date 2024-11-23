@@ -1,7 +1,10 @@
 package com.team.buddyya.feed.dto.response.feed;
 
 import com.team.buddyya.feed.domain.Feed;
+import com.team.buddyya.feed.domain.FeedImage;
+import com.team.buddyya.feed.domain.FeedUserAction;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record FeedResponse(
         Long id,
@@ -9,24 +12,30 @@ public record FeedResponse(
         String country,
         String title,
         String content,
+        List<String> imageUrls,
         int likeCount,
         int commentCount,
+        boolean isFeedOwner,
         boolean isLiked,
         boolean isBookmarked,
         LocalDateTime createdDate
 ) {
 
-    public static FeedResponse from(Feed feed, boolean isLiked, boolean isBookmarked) {
+    public static FeedResponse from(Feed feed, FeedUserAction userAction) {
         return new FeedResponse(
                 feed.getId(),
                 feed.getStudent().getName(),
                 feed.getStudent().getCountry(),
                 feed.getTitle(),
                 feed.getContent(),
+                feed.getImages().stream()
+                        .map(FeedImage::getUrl)
+                        .toList(),
                 feed.getLikeCount(),
                 feed.getCommentCount(),
-                isLiked,
-                isBookmarked,
+                userAction.isFeedOwner(),
+                userAction.isLiked(),
+                userAction.isBookmarked(),
                 feed.getCreatedDate()
         );
     }
