@@ -28,16 +28,16 @@ public enum FeedExceptionType implements BaseExceptionType {
 
     @Override
     public int errorCode() {
-        return errorCode();
+        return errorCode;
     }
 
     @Override
     public HttpStatus httpStatus() {
-        return httpStatus();
+        return httpStatus;
     }
 
     @Override
     public String errorMessage() {
-        return errorMessage();
+        return errorMessage;
     }
 }

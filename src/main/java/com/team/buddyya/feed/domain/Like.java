@@ -19,7 +19,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "like")
+@Table(name = "feed_like")
 @Getter
 @NoArgsConstructor(access = PROTECTED)
 public class Like extends CreatedTime {

@@ -1,6 +1,10 @@
 package com.team.buddyya.common.config;
 
-import com.team.buddyya.auth.jwt.*;
+import com.team.buddyya.auth.jwt.CustomAccessDeniedHandler;
+import com.team.buddyya.auth.jwt.CustomAuthenticationEntryPoint;
+import com.team.buddyya.auth.jwt.JwtAuthFilter;
+import com.team.buddyya.auth.jwt.JwtExceptionFilter;
+import com.team.buddyya.auth.jwt.JwtUtils;
 import com.team.buddyya.auth.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -32,7 +36,8 @@ public class SecurityConfig {
                 ))
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
-                .addFilterBefore(new JwtAuthFilter(customUserDetailsService, jwtUtils), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthFilter(customUserDetailsService, jwtUtils),
+                        UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtExceptionFilter, JwtAuthFilter.class)
                 .exceptionHandling((exceptionHandling) -> exceptionHandling
                         .authenticationEntryPoint(authenticationEntryPoint)
@@ -41,7 +46,7 @@ public class SecurityConfig {
                         .requestMatchers("/onboarding", "/phone-auth/**",
                                 "/auth/reissue").permitAll()
                         .requestMatchers("/auth/fail").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers("/auth/success", "/certification/**").hasAuthority("ROLE_STUDENT")
+                        .requestMatchers("/auth/success", "/certification/**", "/feeds/**").hasAuthority("ROLE_STUDENT")
                         .anyRequest().authenticated()
                 );
         return http.build();

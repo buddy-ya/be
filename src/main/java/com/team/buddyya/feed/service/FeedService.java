@@ -102,14 +102,14 @@ public class FeedService {
     }
 
     private FeedResponse createFeedResponse(Feed feed, Long studentId) {
-        FeedUserAction userAction = getUserAction(studentId, feed.getId());
+        FeedUserAction userAction = getUserAction(studentId, feed);
         return FeedResponse.from(feed, userAction);
     }
 
-    private FeedUserAction getUserAction(Long studentId, Long feedId) {
-        boolean isFeedOwner = studentId.equals(feedId);
-        boolean isLiked = likeRepository.existsByStudentIdAndFeedId(studentId, feedId);
-        boolean isBookmarked = bookmarkRepository.existsByStudentIdAndFeedId(studentId, feedId);
+    private FeedUserAction getUserAction(Long studentId, Feed feed) {
+        boolean isFeedOwner = studentId.equals(feed.getStudent().getId());
+        boolean isLiked = likeRepository.existsByStudentIdAndFeedId(studentId, feed.getId());
+        boolean isBookmarked = bookmarkRepository.existsByStudentIdAndFeedId(studentId, feed.getId());
         return FeedUserAction.of(isFeedOwner, isLiked, isBookmarked);
     }
 

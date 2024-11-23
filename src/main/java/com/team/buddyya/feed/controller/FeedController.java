@@ -46,7 +46,7 @@ public class FeedController {
             @RequestPart(value = "title") String title,
             @RequestPart(value = "content") String content,
             @RequestPart(value = "category") String category,
-            @RequestPart(value = "images", required = false) List<MultipartFile> images) {
+            @RequestPart(value = "images") List<MultipartFile> images) {
         FeedCreateRequest request = FeedCreateRequest.from(title, content, category);
         feedService.createFeed(userDetails.getStudentInfo(), request, images);
         return ResponseEntity.ok().build();
@@ -66,7 +66,7 @@ public class FeedController {
             @RequestPart(value = "title") String title,
             @RequestPart(value = "content") String content,
             @RequestPart(value = "category") String category,
-            @RequestPart(value = "images", required = false) List<MultipartFile> images) {
+            @RequestPart(value = "images") List<MultipartFile> images) {
         FeedUpdateRequest request = FeedUpdateRequest.from(title, content, category);
         feedService.updateFeed(userDetails.getStudentInfo(), feedId, request, images);
         return ResponseEntity.ok().build();
