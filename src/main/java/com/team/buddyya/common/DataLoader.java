@@ -1,5 +1,7 @@
 package com.team.buddyya.common;
 
+import com.team.buddyya.feed.domain.Category;
+import com.team.buddyya.feed.respository.CategoryRepository;
 import com.team.buddyya.student.controller.OnBoardingController;
 import com.team.buddyya.student.domain.Interest;
 import com.team.buddyya.student.domain.Language;
@@ -11,12 +13,11 @@ import com.team.buddyya.student.repository.InterestRepository;
 import com.team.buddyya.student.repository.LanguageRepository;
 import com.team.buddyya.student.repository.MajorRepository;
 import com.team.buddyya.student.repository.UniversityRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -27,6 +28,7 @@ public class DataLoader implements CommandLineRunner {
     private final InterestRepository interestRepository;
     private final UniversityRepository universityRepository;
     private final OnBoardingController onBoardingController;
+    private final CategoryRepository categoryRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -108,6 +110,17 @@ public class DataLoader implements CommandLineRunner {
         );
         mockRequests.forEach(request -> {
             ResponseEntity<OnBoardingResponse> response = onBoardingController.onboard(request);
+        });
+    }
+
+    private void loadCategories() {
+        List<String> categories = List.of(
+                "free", "popular", "recruitment", "info"
+        );
+        categories.forEach(categoryName -> {
+            if (!categoryRepository.existsByName(categoryName)) {
+                categoryRepository.save(new Category(categoryName));
+            }
         });
     }
 }
