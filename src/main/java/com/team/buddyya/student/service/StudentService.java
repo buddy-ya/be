@@ -1,6 +1,9 @@
 package com.team.buddyya.student.service;
 
-import com.team.buddyya.student.domain.*;
+import com.team.buddyya.student.domain.Gender;
+import com.team.buddyya.student.domain.Role;
+import com.team.buddyya.student.domain.Student;
+import com.team.buddyya.student.domain.University;
 import com.team.buddyya.student.dto.request.OnBoardingRequest;
 import com.team.buddyya.student.exception.StudentException;
 import com.team.buddyya.student.exception.StudentExceptionType;
@@ -33,12 +36,12 @@ public class StudentService {
         return studentRepository.save(student);
     }
 
-    public boolean isDuplicateStudentNumber(Integer studentNumber, University university) {
+    public boolean isDuplicateStudentNumber(String studentNumber, University university) {
         return studentRepository.findByStudentNumberAndUniversity(studentNumber, university)
                 .isPresent();
     }
 
-    public void updateStudentCertification(Student student, Integer studentNumber) {
+    public void updateStudentCertification(Student student, String studentNumber) {
         student.updateIsCertificated(true);
         student.updateStudentNumber(studentNumber);
     }
