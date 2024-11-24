@@ -20,7 +20,6 @@ import com.team.buddyya.student.exception.StudentException;
 import com.team.buddyya.student.exception.StudentExceptionType;
 import com.team.buddyya.student.repository.StudentRepository;
 import jakarta.transaction.Transactional;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,6 +27,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Service
 @Transactional
@@ -124,5 +125,19 @@ public class FeedService {
         return category.getName().equals("POPULAR")
                 ? Sort.by(Sort.Direction.DESC, "likeCount", "createdDate")
                 : Sort.by(Sort.Direction.DESC, "createdDate");
+    }
+
+    public FeedListResponse getMyFeed(StudentInfo studentInfo, Pageable pageable) {
+        Pageable customPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize()
+        );
+        Student student = studentRepository.findById(studentInfo.id())
+                .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
+        Page<Feed> feeds = feedRepository.findAllByStudent(student, customPageable);
+        List<FeedResponse> response = feeds.getContent().stream()
+                .map(feed -> createFeedResponse(feed, studentInfo.id()))
+                .toList();
+        return FeedListResponse.from(response, feeds);
     }
 }

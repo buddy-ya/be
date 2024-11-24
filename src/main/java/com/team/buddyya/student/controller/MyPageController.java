@@ -1,18 +1,20 @@
 package com.team.buddyya.student.controller;
 
 import com.team.buddyya.auth.domain.CustomUserDetails;
+import com.team.buddyya.feed.dto.response.feed.FeedListResponse;
+import com.team.buddyya.feed.service.FeedService;
 import com.team.buddyya.student.dto.request.MyPageUpdateInterestsRequest;
 import com.team.buddyya.student.dto.request.MyPageUpdateLanguagesRequest;
 import com.team.buddyya.student.dto.request.MyPageUpdateNameRequest;
 import com.team.buddyya.student.dto.response.MyPageUpdateResponse;
 import com.team.buddyya.student.service.MyPageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/mypage")
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class MyPageController {
 
     private final MyPageService myPageService;
+    private final FeedService feedService;
 
     @PatchMapping("/update/interests")
     public ResponseEntity<MyPageUpdateResponse> updateInterests(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody MyPageUpdateInterestsRequest request) {
@@ -34,5 +37,11 @@ public class MyPageController {
     @PatchMapping("/update/name")
     public ResponseEntity<MyPageUpdateResponse> updateName(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody MyPageUpdateNameRequest request) {
         return ResponseEntity.ok(myPageService.updateName(userDetails.getStudentInfo(), request));
+    }
+
+    @GetMapping("/myfeed")
+    public ResponseEntity<FeedListResponse> getMyFeed(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                      @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(feedService.getMyFeed(userDetails.getStudentInfo(), pageable));
     }
 }
