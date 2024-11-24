@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus;
 
 public enum CommonExceptionType implements BaseExceptionType {
 
-    FILE_UPLOAD_ERROR(900, HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드 중 오류 발생");
+    FILE_UPLOAD_ERROR(9000, HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드 중 오류 발생");
 
     private final int errorCode;
     private final HttpStatus httpStatus;
