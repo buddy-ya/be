@@ -5,6 +5,7 @@ import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.dto.request.MyPageUpdateInterestsRequest;
 import com.team.buddyya.student.dto.request.MyPageUpdateLanguagesRequest;
 import com.team.buddyya.student.dto.request.MyPageUpdateNameRequest;
+import com.team.buddyya.student.dto.response.MyPageResponse;
 import com.team.buddyya.student.dto.response.MyPageUpdateResponse;
 import com.team.buddyya.student.exception.StudentException;
 import com.team.buddyya.student.exception.StudentExceptionType;
@@ -43,5 +44,11 @@ public class MyPageService {
                 .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
         student.updateName(request.name());
         return new MyPageUpdateResponse(UPDATE_SUCCESS_MESSAGE);
+    }
+
+    public MyPageResponse getMyPage(StudentInfo studentInfo) {
+        Student student = studentRepository.findById(studentInfo.id())
+                .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
+        return MyPageResponse.from(student);
     }
 }

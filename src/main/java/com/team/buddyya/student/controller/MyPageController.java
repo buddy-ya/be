@@ -6,6 +6,7 @@ import com.team.buddyya.feed.service.FeedService;
 import com.team.buddyya.student.dto.request.MyPageUpdateInterestsRequest;
 import com.team.buddyya.student.dto.request.MyPageUpdateLanguagesRequest;
 import com.team.buddyya.student.dto.request.MyPageUpdateNameRequest;
+import com.team.buddyya.student.dto.response.MyPageResponse;
 import com.team.buddyya.student.dto.response.MyPageUpdateResponse;
 import com.team.buddyya.student.service.MyPageService;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,11 @@ public class MyPageController {
 
     private final MyPageService myPageService;
     private final FeedService feedService;
+
+    @GetMapping
+    public ResponseEntity<MyPageResponse> getMyPage(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.ok(myPageService.getMyPage(userDetails.getStudentInfo()));
+    }
 
     @PatchMapping("/update/interests")
     public ResponseEntity<MyPageUpdateResponse> updateInterests(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody MyPageUpdateInterestsRequest request) {
