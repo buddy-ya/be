@@ -44,4 +44,10 @@ public class MyPageController {
                                                       @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(feedService.getMyFeed(userDetails.getStudentInfo(), pageable));
     }
+
+    @GetMapping("/bookmark")
+    public ResponseEntity<FeedListResponse> getBookmarkFeed(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                            @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(feedService.getBookmarkFeed(userDetails.getStudentInfo(), pageable));
+    }
 }
