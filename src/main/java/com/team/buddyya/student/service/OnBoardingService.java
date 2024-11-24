@@ -29,8 +29,8 @@ public class OnBoardingService {
         String accessToken = jwtUtils.createAccessToken(new TokenInfoRequest(student.getId()));
         String refreshToken = createAndSaveToken(student);
         avatarService.createAvatar(request, student);
-        studentMajorService.createStudentMajors(request,student);
-        studentInterestService.createStudentInterests(request, student);
+        studentMajorService.createStudentMajors(request, student);
+        studentInterestService.createStudentInterests(request.interests(), student);
         studentLanguageService.createStudentLanguages(request, student);
         return OnBoardingResponse.from(accessToken, refreshToken);
     }
