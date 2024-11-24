@@ -6,12 +6,12 @@ import org.springframework.http.HttpStatus;
 public enum PhoneAuthenticationExceptionType implements BaseExceptionType {
 
     SMS_SEND_FAILED(
-            100,
+            1000,
             HttpStatus.UNAUTHORIZED,
             "SMS 전송 실패"
     ),
     CODE_MISMATCH(
-            100,
+            1000,
             HttpStatus.UNAUTHORIZED,
             "Authentication code가 일치하지 않습니다"
     );
@@ -21,8 +21,8 @@ public enum PhoneAuthenticationExceptionType implements BaseExceptionType {
     private final String errorMessage;
 
     PhoneAuthenticationExceptionType(final int errorCode,
-                      final HttpStatus httpStatus,
-                      final String errorMessage) {
+                                     final HttpStatus httpStatus,
+                                     final String errorMessage) {
         this.errorCode = errorCode;
         this.httpStatus = httpStatus;
         this.errorMessage = errorMessage;
