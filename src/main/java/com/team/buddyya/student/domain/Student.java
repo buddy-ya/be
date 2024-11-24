@@ -57,6 +57,9 @@ public class Student extends BaseTime {
     @Column(name = "student_number")
     private String studentNumber;
 
+    @Column(name = "email")
+    private String email;
+
     @OneToMany(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<StudentMajor> majors;
 
@@ -91,5 +94,9 @@ public class Student extends BaseTime {
 
     public void updateStudentNumber(String studentNumber) {
         this.studentNumber = studentNumber;
+    }
+
+    public void updateEmail(String email) {
+        this.email = email;
     }
 }
