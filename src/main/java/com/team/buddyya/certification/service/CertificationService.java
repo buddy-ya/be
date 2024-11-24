@@ -83,7 +83,6 @@ public class CertificationService {
     private void updateCertification(EmailCodeRequest codeRequest, Student student) {
         student.updateIsCertificated(true);
         student.updateEmail(codeRequest.email());
-        studentRepository.save(student);
     }
 
     public CertificationResponse uploadStudentIdCard(StudentInfo studentInfo, MultipartFile file) {
