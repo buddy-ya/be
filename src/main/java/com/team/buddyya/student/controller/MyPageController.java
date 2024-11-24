@@ -3,6 +3,7 @@ package com.team.buddyya.student.controller;
 import com.team.buddyya.auth.domain.CustomUserDetails;
 import com.team.buddyya.student.dto.request.MyPageUpdateInterestsRequest;
 import com.team.buddyya.student.dto.request.MyPageUpdateLanguagesRequest;
+import com.team.buddyya.student.dto.request.MyPageUpdateNameRequest;
 import com.team.buddyya.student.dto.response.MyPageUpdateResponse;
 import com.team.buddyya.student.service.MyPageService;
 import lombok.RequiredArgsConstructor;
@@ -28,5 +29,10 @@ public class MyPageController {
     @PatchMapping("/update/languages")
     public ResponseEntity<MyPageUpdateResponse> updateLanguages(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody MyPageUpdateLanguagesRequest request) {
         return ResponseEntity.ok(myPageService.updateLanguages(userDetails.getStudentInfo(), request));
+    }
+
+    @PatchMapping("/update/name")
+    public ResponseEntity<MyPageUpdateResponse> updateName(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody MyPageUpdateNameRequest request) {
+        return ResponseEntity.ok(myPageService.updateName(userDetails.getStudentInfo(), request));
     }
 }

@@ -92,4 +92,8 @@ public class Student extends BaseTime {
     public void updateStudentNumber(String studentNumber) {
         this.studentNumber = studentNumber;
     }
+
+    public void updateName(String name) {
+        this.name = name;
+    }
 }
