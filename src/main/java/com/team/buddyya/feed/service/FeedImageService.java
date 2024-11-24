@@ -19,9 +19,17 @@ public class FeedImageService {
     private final FeedImageRepository feedImageRepository;
 
     public List<FeedImage> uploadFeedImages(Feed feed, List<MultipartFile> images) {
+        if (images == null || images.isEmpty()) {
+            return List.of();
+        }
         return images.stream()
+                .filter(this::isValidImageFile)
                 .map(image -> uploadFeedImage(feed, image))
                 .toList();
+    }
+
+    private boolean isValidImageFile(MultipartFile image) {
+        return image != null && !image.isEmpty();
     }
 
     private FeedImage uploadFeedImage(Feed feed, MultipartFile image) {

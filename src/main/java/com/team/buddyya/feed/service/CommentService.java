@@ -67,7 +67,6 @@ public class CommentService {
         Comment comment = findCommentByCommentId(commentId);
         validateCommentOwner(studentInfo.id(), comment);
         comment.updateComment(request.content());
-
         CommentInfo commentInfo = CommentInfo.of(comment, comment.getFeed().getStudent().getId(), studentInfo.id());
         return CommentUpdateResponse.from(commentInfo);
     }
