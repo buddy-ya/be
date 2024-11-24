@@ -31,7 +31,7 @@ public class OnBoardingService {
         avatarService.createAvatar(request, student);
         studentMajorService.createStudentMajors(request, student);
         studentInterestService.createStudentInterests(request.interests(), student);
-        studentLanguageService.createStudentLanguages(request, student);
+        studentLanguageService.createStudentLanguages(request.languages(), student);
         return OnBoardingResponse.from(accessToken, refreshToken);
     }
 

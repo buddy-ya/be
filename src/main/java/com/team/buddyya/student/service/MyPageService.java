@@ -3,6 +3,7 @@ package com.team.buddyya.student.service;
 import com.team.buddyya.auth.domain.StudentInfo;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.dto.request.MyPageUpdateInterestsRequest;
+import com.team.buddyya.student.dto.request.MyPageUpdateLanguagesRequest;
 import com.team.buddyya.student.dto.response.MyPageUpdateResponse;
 import com.team.buddyya.student.exception.StudentException;
 import com.team.buddyya.student.exception.StudentExceptionType;
@@ -20,11 +21,19 @@ public class MyPageService {
 
     private final StudentRepository studentRepository;
     private final StudentInterestService studentInterestService;
+    private final StudentLanguageService studentLanguageService;
 
     public MyPageUpdateResponse updateInterests(StudentInfo studentInfo, MyPageUpdateInterestsRequest request) {
         Student student = studentRepository.findById(studentInfo.id())
                 .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
         studentInterestService.updateStudentInterests(request.interests(), student);
+        return new MyPageUpdateResponse(UPDATE_SUCCESS_MESSAGE);
+    }
+
+    public MyPageUpdateResponse updateLanguages(StudentInfo studentInfo, MyPageUpdateLanguagesRequest request) {
+        Student student = studentRepository.findById(studentInfo.id())
+                .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
+        studentLanguageService.updateStudentLanguages(request.languages(), student);
         return new MyPageUpdateResponse(UPDATE_SUCCESS_MESSAGE);
     }
 }

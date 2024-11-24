@@ -3,7 +3,6 @@ package com.team.buddyya.student.service;
 import com.team.buddyya.student.domain.Language;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.domain.StudentLanguage;
-import com.team.buddyya.student.dto.request.OnBoardingRequest;
 import com.team.buddyya.student.exception.StudentException;
 import com.team.buddyya.student.exception.StudentExceptionType;
 import com.team.buddyya.student.repository.LanguageRepository;
@@ -11,6 +10,8 @@ import com.team.buddyya.student.repository.StudentLanguageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -20,8 +21,8 @@ public class StudentLanguageService {
     private final StudentLanguageRepository studentLanguageRepository;
     private final LanguageRepository languageRepository;
 
-    public void createStudentLanguages(OnBoardingRequest request, Student student) {
-        request.languages().forEach(languageName -> {
+    public void createStudentLanguages(List<String> languages, Student student) {
+        languages.forEach(languageName -> {
             Language language = languageRepository.findByLanguageName(languageName)
                     .orElseThrow(() -> new StudentException(StudentExceptionType.LANGUAGE_NOT_FOUND));
             studentLanguageRepository.save(StudentLanguage.builder()
@@ -29,5 +30,10 @@ public class StudentLanguageService {
                     .language(language)
                     .build());
         });
+    }
+
+    public void updateStudentLanguages(List<String> languages, Student student) {
+        studentLanguageRepository.deleteByStudent(student);
+        createStudentLanguages((languages), student);
     }
 }
