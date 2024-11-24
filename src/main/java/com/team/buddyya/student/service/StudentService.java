@@ -50,5 +50,4 @@ public class StudentService {
         return studentRepository.findByEmail(email)
                 .isPresent();
     }
-
 }
