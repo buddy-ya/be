@@ -3,16 +3,18 @@ package com.team.buddyya.feed.service;
 import com.team.buddyya.auth.domain.StudentInfo;
 import com.team.buddyya.feed.domain.Category;
 import com.team.buddyya.feed.domain.Feed;
+import com.team.buddyya.feed.domain.FeedImage;
 import com.team.buddyya.feed.domain.FeedUserAction;
-import com.team.buddyya.feed.dto.request.FeedCreateRequest;
-import com.team.buddyya.feed.dto.request.FeedListRequest;
-import com.team.buddyya.feed.dto.request.FeedUpdateRequest;
-import com.team.buddyya.feed.dto.response.FeedListItemResponse;
-import com.team.buddyya.feed.dto.response.FeedListResponse;
-import com.team.buddyya.feed.dto.response.FeedResponse;
+import com.team.buddyya.feed.dto.request.feed.FeedCreateRequest;
+import com.team.buddyya.feed.dto.request.feed.FeedListRequest;
+import com.team.buddyya.feed.dto.request.feed.FeedUpdateRequest;
+import com.team.buddyya.feed.dto.response.feed.FeedListResponse;
+import com.team.buddyya.feed.dto.response.feed.FeedResponse;
 import com.team.buddyya.feed.exception.FeedException;
 import com.team.buddyya.feed.exception.FeedExceptionType;
+import com.team.buddyya.feed.respository.BookmarkRepository;
 import com.team.buddyya.feed.respository.FeedRepository;
+import com.team.buddyya.feed.respository.LikeRepository;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.exception.StudentException;
 import com.team.buddyya.student.exception.StudentExceptionType;
@@ -22,43 +24,48 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class FeedService {
 
-    private final LikeSevice likeSevice;
-    private final BookmarkService bookmarkService;
     private final CategoryService categoryService;
     private final FeedRepository feedRepository;
     private final StudentRepository studentRepository;
+    private final LikeRepository likeRepository;
+    private final BookmarkRepository bookmarkRepository;
+    private final FeedImageService feedImageService;
 
-    public Feed findFeedById(Long feedId) {
+    public Feed findFeedByFeedId(Long feedId) {
         return feedRepository.findById(feedId)
                 .orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND));
     }
 
-    public FeedListResponse getFeeds(StudentInfo studentInfo, FeedListRequest request) {
+    public FeedListResponse getFeeds(StudentInfo studentInfo, Pageable pageable, FeedListRequest request) {
         Category category = categoryService.getCategory(request.category());
-        PageRequest pageRequest = PageRequest.of(request.page(), request.size(),
-                Sort.by(Sort.Direction.DESC, "createdDate"));
-        Page<Feed> feeds = feedRepository.findAllByCategory(category, pageRequest);
-        List<FeedListItemResponse> response = feeds.getContent().stream()
-                .map(feed -> createFeedListItemResponse(feed, studentInfo.id()))
+        Pageable customPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                getSortBy(category)
+        );
+        Page<Feed> feeds = feedRepository.findAllByCategoryName(category.getName(), customPageable);
+        List<FeedResponse> response = feeds.getContent().stream()
+                .map(feed -> createFeedResponse(feed, studentInfo.id()))
                 .toList();
-        return FeedListResponse.from(feeds, response);
+        return FeedListResponse.from(response, feeds);
     }
 
     public FeedResponse getFeed(StudentInfo studentInfo, Long feedId) {
-        Feed feed = findFeedById(feedId);
-        FeedUserAction userAction = getUserAction(studentInfo.id(), feedId);
-        return FeedResponse.from(feed, userAction.isLiked(), userAction.isBookmarked());
+        Feed feed = findFeedByFeedId(feedId);
+        return createFeedResponse(feed, studentInfo.id());
     }
 
-    public void createFeed(StudentInfo studentInfo, FeedCreateRequest request) {
+    public void createFeed(StudentInfo studentInfo, FeedCreateRequest request, List<MultipartFile> images) {
         Category category = categoryService.getCategory(request.category());
         Student student = studentRepository.findById(studentInfo.id())
                 .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
@@ -70,18 +77,22 @@ public class FeedService {
                 .university(student.getUniversity())
                 .build();
         feedRepository.save(feed);
+        uploadImages(feed, images);
     }
 
-    public void updateFeed(StudentInfo studentInfo, Long feedId, FeedUpdateRequest request) {
-        Feed feed = findFeedById(feedId);
+    public void updateFeed(StudentInfo studentInfo, Long feedId, FeedUpdateRequest request,
+                           List<MultipartFile> images) {
+        Feed feed = findFeedByFeedId(feedId);
         validateFeedOwner(studentInfo.id(), feed);
         Category category = categoryService.getCategory(request.category());
         feed.updateFeed(request.title(), request.content(), category);
+        uploadImages(feed, images);
     }
 
     public void deleteFeed(StudentInfo studentInfo, Long feedId) {
-        Feed feed = findFeedById(feedId);
+        Feed feed = findFeedByFeedId(feedId);
         validateFeedOwner(studentInfo.id(), feed);
+        feedImageService.deleteFeedImages(feed);
         feedRepository.delete(feed);
     }
 
@@ -91,14 +102,28 @@ public class FeedService {
         }
     }
 
-    private FeedListItemResponse createFeedListItemResponse(Feed feed, Long studentId) {
-        FeedUserAction userAction = getUserAction(studentId, feed.getId());
-        return FeedListItemResponse.from(feed, userAction.isLiked(), userAction.isBookmarked());
+    private FeedResponse createFeedResponse(Feed feed, Long studentId) {
+        FeedUserAction userAction = getUserAction(studentId, feed);
+        return FeedResponse.from(feed, userAction);
     }
 
-    private FeedUserAction getUserAction(Long studentId, Long feedId) {
-        boolean isLiked = likeSevice.isLikedByStudent(studentId, feedId);
-        boolean isBookmarked = bookmarkService.isBookmarkedByStudent(studentId, feedId);
-        return FeedUserAction.from(isLiked, isBookmarked);
+    private FeedUserAction getUserAction(Long studentId, Feed feed) {
+        boolean isFeedOwner = studentId.equals(feed.getStudent().getId());
+        boolean isLiked = likeRepository.existsByStudentIdAndFeedId(studentId, feed.getId());
+        boolean isBookmarked = bookmarkRepository.existsByStudentIdAndFeedId(studentId, feed.getId());
+        return FeedUserAction.of(isFeedOwner, isLiked, isBookmarked);
+    }
+
+    private void uploadImages(Feed feed, List<MultipartFile> images) {
+        if (images != null && !images.isEmpty()) {
+            List<FeedImage> feedImages = feedImageService.uploadFeedImages(feed, images);
+            feedImages.forEach(feed::uploadFeedImage);
+        }
+    }
+
+    private Sort getSortBy(Category category) {
+        return category.getName().equals("POPULAR")
+                ? Sort.by(Sort.Direction.DESC, "likeCount", "createdDate")
+                : Sort.by(Sort.Direction.DESC, "createdDate");
     }
 }

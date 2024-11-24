@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "bookmark")
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-public class BookMark extends CreatedTime {
+public class Bookmark extends CreatedTime {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -35,7 +35,7 @@ public class BookMark extends CreatedTime {
     private Student student;
 
     @Builder
-    public BookMark(Feed feed, Student student) {
+    public Bookmark(Feed feed, Student student) {
         this.feed = feed;
         this.student = student;
     }
