@@ -49,7 +49,7 @@ public class CertificationService {
         try {
             Map<String, Object> univCertResponse = UnivCert.certify(univcertApiKey, emailRequest.email(), emailRequest.univName(), true);
             boolean isSuccess = (Boolean) univCertResponse.get("success");
-            return new CertificationResponse(isSuccess);
+            return CertificationResponse.from(isSuccess);
         } catch (IOException e) {
             throw new CertificateException(CertificateExceptionType.CERTIFICATE_FAILED);
         }
@@ -74,7 +74,7 @@ public class CertificationService {
                 updateCertification(codeRequest, student);
             }
             UnivCert.clear(univcertApiKey);
-            return new CertificationResponse(isSuccess);
+            return CertificationResponse.from(isSuccess);
         } catch (IOException e) {
             throw new CertificateException(CertificateExceptionType.CERTIFICATE_FAILED);
         }
@@ -101,13 +101,13 @@ public class CertificationService {
                 .student(student)
                 .build();
         studentIdCardRepository.save(studentIdCard);
-        return new CertificationResponse(true);
+        return CertificationResponse.from(true);
     }
 
     private CertificationResponse updateExistingStudentIdCard(String imageUrl, StudentIdCard existStudentIdCard) {
         s3UploadService.deleteFile(STUDENT_ID_CARD.getDirectoryName(), existStudentIdCard.getImageUrl());
         existStudentIdCard.updateImageUrl(imageUrl);
-        return new CertificationResponse(true);
+        return CertificationResponse.from(true);
     }
 
     public CertificationStatusResponse isCertificated(StudentInfo studentInfo) {
@@ -115,12 +115,12 @@ public class CertificationService {
                 .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
         boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
                 .isPresent();
-        return new CertificationStatusResponse(student.getIsCertificated(), isStudentIdCardRequested);
+        return CertificationStatusResponse.from(student.getIsCertificated(), isStudentIdCardRequested);
     }
 
     public StudentIdCardResponse getStudentIdCard(StudentInfo studentInfo) {
         StudentIdCard studentIdCard = studentIdCardRepository.findByStudent_Id(studentInfo.id())
                 .orElseThrow(() -> new CertificateException(CertificateExceptionType.STUDENT_ID_CARD_NOT_FOUND));
-        return new StudentIdCardResponse(studentIdCard.getImageUrl());
+        return StudentIdCardResponse.from(studentIdCard.getImageUrl());
     }
 }
