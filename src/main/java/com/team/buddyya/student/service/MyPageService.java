@@ -29,21 +29,21 @@ public class MyPageService {
         Student student = studentRepository.findById(studentInfo.id())
                 .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
         studentInterestService.updateStudentInterests(request.interests(), student);
-        return new MyPageUpdateResponse(UPDATE_SUCCESS_MESSAGE);
+        return MyPageUpdateResponse.from(UPDATE_SUCCESS_MESSAGE);
     }
 
     public MyPageUpdateResponse updateLanguages(StudentInfo studentInfo, MyPageUpdateLanguagesRequest request) {
         Student student = studentRepository.findById(studentInfo.id())
                 .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
         studentLanguageService.updateStudentLanguages(request.languages(), student);
-        return new MyPageUpdateResponse(UPDATE_SUCCESS_MESSAGE);
+        return MyPageUpdateResponse.from(UPDATE_SUCCESS_MESSAGE);
     }
 
     public MyPageUpdateResponse updateName(StudentInfo studentInfo, MyPageUpdateNameRequest request) {
         Student student = studentRepository.findById(studentInfo.id())
                 .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
         student.updateName(request.name());
-        return new MyPageUpdateResponse(UPDATE_SUCCESS_MESSAGE);
+        return MyPageUpdateResponse.from(UPDATE_SUCCESS_MESSAGE);
     }
 
     public MyPageResponse getMyPage(StudentInfo studentInfo) {
