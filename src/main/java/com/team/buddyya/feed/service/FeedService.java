@@ -90,6 +90,7 @@ public class FeedService {
     public void deleteFeed(StudentInfo studentInfo, Long feedId) {
         Feed feed = findFeedByFeedId(feedId);
         validateFeedOwner(studentInfo.id(), feed);
+        feedImageService.deleteFeedImages(feed);
         feedRepository.delete(feed);
     }
 

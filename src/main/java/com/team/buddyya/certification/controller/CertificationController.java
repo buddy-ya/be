@@ -4,8 +4,9 @@ import com.team.buddyya.auth.domain.CustomUserDetails;
 import com.team.buddyya.certification.dto.request.EmailCertificationRequest;
 import com.team.buddyya.certification.dto.request.EmailCodeRequest;
 import com.team.buddyya.certification.dto.response.CertificationResponse;
+import com.team.buddyya.certification.dto.response.CertificationStatusResponse;
+import com.team.buddyya.certification.dto.response.StudentIdCardResponse;
 import com.team.buddyya.certification.service.CertificationService;
-import com.team.buddyya.common.service.S3UploadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -34,8 +35,13 @@ public class CertificationController {
         return ResponseEntity.ok(certificationService.uploadStudentIdCard(userDetails.getStudentInfo(), file));
     }
 
+    @GetMapping("/student-id-card")
+    public ResponseEntity<StudentIdCardResponse> getStudentIdCard(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.ok(certificationService.getStudentIdCard(userDetails.getStudentInfo()));
+    }
+
     @GetMapping
-    public ResponseEntity<CertificationResponse> checkCertificationStatus(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<CertificationStatusResponse> checkCertificationStatus(@AuthenticationPrincipal CustomUserDetails userDetails) {
         return ResponseEntity.ok(certificationService.isCertificated(userDetails.getStudentInfo()));
     }
 }

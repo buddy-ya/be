@@ -45,4 +45,9 @@ public class StudentService {
         student.updateIsCertificated(true);
         student.updateStudentNumber(studentNumber);
     }
+
+    public boolean isDuplicateStudentEmail(String email) {
+        return studentRepository.findByEmail(email)
+                .isPresent();
+    }
 }

@@ -43,7 +43,6 @@ public class BookmarkService {
         }
         Student student = studentRepository.findById(studentInfo.id())
                 .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
-
         Bookmark bookmark = Bookmark.builder()
                 .feed(feed)
                 .student(student)
