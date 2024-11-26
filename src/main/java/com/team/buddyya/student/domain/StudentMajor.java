@@ -32,4 +32,9 @@ public class StudentMajor {
         this.student = student;
         this.major = major;
     }
+
+    @Override
+    public String toString() {
+        return major.getMajorName();
+    }
 }

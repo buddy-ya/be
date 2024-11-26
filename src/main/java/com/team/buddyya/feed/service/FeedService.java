@@ -1,10 +1,7 @@
 package com.team.buddyya.feed.service;
 
 import com.team.buddyya.auth.domain.StudentInfo;
-import com.team.buddyya.feed.domain.Category;
-import com.team.buddyya.feed.domain.Feed;
-import com.team.buddyya.feed.domain.FeedImage;
-import com.team.buddyya.feed.domain.FeedUserAction;
+import com.team.buddyya.feed.domain.*;
 import com.team.buddyya.feed.dto.request.feed.FeedCreateRequest;
 import com.team.buddyya.feed.dto.request.feed.FeedListRequest;
 import com.team.buddyya.feed.dto.request.feed.FeedUpdateRequest;
@@ -20,7 +17,6 @@ import com.team.buddyya.student.exception.StudentException;
 import com.team.buddyya.student.exception.StudentExceptionType;
 import com.team.buddyya.student.repository.StudentRepository;
 import jakarta.transaction.Transactional;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,6 +24,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Service
 @Transactional
@@ -125,5 +123,30 @@ public class FeedService {
         return category.getName().equals("POPULAR")
                 ? Sort.by(Sort.Direction.DESC, "likeCount", "createdDate")
                 : Sort.by(Sort.Direction.DESC, "createdDate");
+    }
+
+    public FeedListResponse getMyFeed(StudentInfo studentInfo, Pageable pageable) {
+        Pageable customPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize()
+        );
+        Student student = studentRepository.findById(studentInfo.id())
+                .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
+        Page<Feed> feeds = feedRepository.findAllByStudent(student, customPageable);
+        List<FeedResponse> response = feeds.getContent().stream()
+                .map(feed -> createFeedResponse(feed, studentInfo.id()))
+                .toList();
+        return FeedListResponse.from(response, feeds);
+    }
+
+    public FeedListResponse getBookmarkFeed(StudentInfo studentInfo, Pageable pageable) {
+        Student student = studentRepository.findById(studentInfo.id())
+                .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
+        Page<Bookmark> bookmarks = bookmarkRepository.findAllByStudent(student, pageable);
+        Page<Feed> feeds = bookmarks.map(Bookmark::getFeed);
+        List<FeedResponse> response = bookmarks.getContent().stream()
+                .map(bookmark -> createFeedResponse(bookmark.getFeed(), studentInfo.id()))
+                .toList();
+        return FeedListResponse.from(response, feeds);
     }
 }
