@@ -13,4 +13,6 @@ public interface FeedRepository extends JpaRepository<Feed, Long> {
     Page<Feed> findAllByCategoryName(String category, Pageable pageable);
 
     Page<Feed> findAllByStudent(Student student, Pageable pageable);
+
+    Page<Feed> findByTitleContainingOrContentContaining(String titleQuery, String contentQuery, Pageable pageable);
 }
