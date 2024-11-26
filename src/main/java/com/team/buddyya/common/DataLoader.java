@@ -1,19 +1,20 @@
 package com.team.buddyya.common;
 
 import com.team.buddyya.feed.domain.Category;
+import com.team.buddyya.feed.domain.Comment;
+import com.team.buddyya.feed.domain.Feed;
 import com.team.buddyya.feed.respository.CategoryRepository;
+import com.team.buddyya.feed.respository.CommentRepository;
+import com.team.buddyya.feed.respository.FeedRepository;
 import com.team.buddyya.student.controller.OnBoardingController;
-import com.team.buddyya.student.domain.Interest;
-import com.team.buddyya.student.domain.Language;
-import com.team.buddyya.student.domain.Major;
-import com.team.buddyya.student.domain.University;
+import com.team.buddyya.student.domain.*;
 import com.team.buddyya.student.dto.request.OnBoardingRequest;
 import com.team.buddyya.student.dto.response.OnBoardingResponse;
-import com.team.buddyya.student.repository.InterestRepository;
-import com.team.buddyya.student.repository.LanguageRepository;
-import com.team.buddyya.student.repository.MajorRepository;
-import com.team.buddyya.student.repository.UniversityRepository;
+import com.team.buddyya.student.repository.*;
+
 import java.util.List;
+import java.util.stream.IntStream;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,9 @@ public class DataLoader implements CommandLineRunner {
     private final UniversityRepository universityRepository;
     private final OnBoardingController onBoardingController;
     private final CategoryRepository categoryRepository;
+    private final FeedRepository feedRepository;
+    private final CommentRepository commentRepository;
+    private final StudentRepository studentRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -38,6 +42,7 @@ public class DataLoader implements CommandLineRunner {
         loadUniversities();
         createMockStudents();
         loadCategories();
+        createMockFeedsAndComments();
     }
 
     private void loadMajors() {
@@ -124,4 +129,71 @@ public class DataLoader implements CommandLineRunner {
             }
         });
     }
+
+    private void createMockFeedsAndComments() {
+        Student student = studentRepository.findAll().get(0);
+        Category category = categoryRepository.findAll().get(0);
+        List<Feed> mockFeeds = List.of(
+                Feed.builder()
+                        .title("학냥이 너무 귀여운 것 같아")
+                        .content("잘 찍었지? 학냥이가 너무너무 좋아. 잔디밭에서 뒹구는 것 봐 ㅎㅎㅎ")
+                        .student(student)
+                        .category(category)
+                        .university(student.getUniversity())
+                        .build(),
+                Feed.builder()
+                        .title("글글글 글글 글글 글")
+                        .content("맥주랑 크키카칵\n카스다카스다 어쩌고 ...")
+                        .student(student)
+                        .category(category)
+                        .university(student.getUniversity())
+                        .build(),
+                Feed.builder()
+                        .title("영국 맨체스터 대학교 교환학생 후기")
+                        .content("안녕하세요! 저는 이번에 맨체스터 대학교에서 한 학기를 보내고 왔습니다. 정말 값진 경험이었어요...")
+                        .student(student)
+                        .category(category)
+                        .university(student.getUniversity())
+                        .build()
+        );
+        mockFeeds.forEach(feed -> feedRepository.save(feed));
+        List<Comment> mockComments = List.of(
+                Comment.builder()
+                        .content("와 대박 ㅋㅋ 나도 학교 고양이 좋아하는데!")
+                        .feed(mockFeeds.get(0))
+                        .student(student)
+                        .build(),
+                Comment.builder()
+                        .content("우리 학교 근처에도 있어요")
+                        .feed(mockFeeds.get(0))
+                        .student(student)
+                        .build(),
+                Comment.builder()
+                        .content("귀엽다 ㅎㅎ")
+                        .feed(mockFeeds.get(0))
+                        .student(student)
+                        .build()
+        );
+        mockComments.forEach(comment -> commentRepository.save(comment));
+        IntStream.range(0, 15).forEach(i -> {
+            Feed feed = Feed.builder()
+                    .title("Sample Feed Title " + i)
+                    .content("Sample Feed Content " + i)
+                    .student(student)
+                    .category(category)
+                    .university(student.getUniversity())
+                    .build();
+            feedRepository.save(feed);
+
+            IntStream.range(0, 15).forEach(j -> {
+                Comment comment = Comment.builder()
+                        .content("Sample Comment " + j + " for Feed " + i)
+                        .feed(feed)
+                        .student(student)
+                        .build();
+                commentRepository.save(comment);
+            });
+        });
+    }
+
 }
