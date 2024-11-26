@@ -47,13 +47,18 @@ public class FeedService {
     }
 
     public FeedListResponse getFeeds(StudentInfo studentInfo, Pageable pageable, FeedListRequest request) {
-        Category category = categoryService.getCategory(request.category());
-        Pageable customPageable = PageRequest.of(
-                pageable.getPageNumber(),
-                pageable.getPageSize(),
-                getSortBy(category)
-        );
-        Page<Feed> feeds = feedRepository.findAllByCategoryName(category.getName(), customPageable);
+        Page<Feed> feeds;
+        if (request.keyword() == null || request.keyword().isBlank()) {
+            Category category = categoryService.getCategory(request.category());
+            Pageable customPageable = PageRequest.of(
+                    pageable.getPageNumber(),
+                    pageable.getPageSize(),
+                    getSortBy(category)
+            );
+            feeds = feedRepository.findAllByCategoryName(category.getName(), customPageable);
+        } else {
+            feeds = feedRepository.findByTitleContainingOrContentContaining(request.keyword(), request.keyword(), pageable);
+        }
         List<FeedResponse> response = feeds.getContent().stream()
                 .map(feed -> createFeedResponse(feed, studentInfo.id()))
                 .toList();
