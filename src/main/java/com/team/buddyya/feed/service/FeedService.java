@@ -47,18 +47,15 @@ public class FeedService {
     }
 
     public FeedListResponse getFeeds(StudentInfo studentInfo, Pageable pageable, FeedListRequest request) {
-        Page<Feed> feeds;
-        if (request.keyword() == null || request.keyword().isBlank()) {
-            Category category = categoryService.getCategory(request.category());
-            Pageable customPageable = PageRequest.of(
-                    pageable.getPageNumber(),
-                    pageable.getPageSize(),
-                    getSortBy(category)
-            );
-            feeds = feedRepository.findAllByCategoryName(category.getName(), customPageable);
-        } else {
-            feeds = feedRepository.findByTitleContainingOrContentContaining(request.keyword(), request.keyword(), pageable);
+        String keyword = request.keyword();
+        if (keyword == null || keyword.isBlank()) {
+            Page<Feed> feeds = fetchFeedsByCategory(request, pageable);
+            List<FeedResponse> response = feeds.getContent().stream()
+                    .map(feed -> createFeedResponse(feed, studentInfo.id()))
+                    .toList();
+            return FeedListResponse.from(response, feeds);
         }
+        Page<Feed> feeds = fetchFeedsByKeyword(keyword, pageable);
         List<FeedResponse> response = feeds.getContent().stream()
                 .map(feed -> createFeedResponse(feed, studentInfo.id()))
                 .toList();
@@ -100,6 +97,21 @@ public class FeedService {
         feedImageService.deleteFeedImages(feed);
         feedRepository.delete(feed);
     }
+
+    private Page<Feed> fetchFeedsByCategory(FeedListRequest request, Pageable pageable) {
+        Category category = categoryService.getCategory(request.category());
+        Pageable customPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                getSortBy(category)
+        );
+        return feedRepository.findAllByCategoryName(category.getName(), customPageable);
+    }
+
+    private Page<Feed> fetchFeedsByKeyword(String keyword, Pageable pageable) {
+        return feedRepository.findByTitleContainingOrContentContaining(keyword, keyword, pageable);
+    }
+
 
     private void validateFeedOwner(Long studentId, Feed feed) {
         if (!studentId.equals(feed.getStudent().getId())) {
