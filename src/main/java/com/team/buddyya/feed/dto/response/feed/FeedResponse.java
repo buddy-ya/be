@@ -12,6 +12,7 @@ public record FeedResponse(
         String country,
         String title,
         String content,
+        String university,
         List<String> imageUrls,
         int likeCount,
         int commentCount,
@@ -28,6 +29,7 @@ public record FeedResponse(
                 feed.getStudent().getCountry(),
                 feed.getTitle(),
                 feed.getContent(),
+                feed.getStudent().getUniversity().getUniversityName(),
                 feed.getImages().stream()
                         .map(FeedImage::getUrl)
                         .toList(),
