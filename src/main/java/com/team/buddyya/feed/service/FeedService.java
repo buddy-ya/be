@@ -112,7 +112,6 @@ public class FeedService {
         return feedRepository.findByTitleContainingOrContentContaining(keyword, keyword, pageable);
     }
 
-
     private void validateFeedOwner(Long studentId, Feed feed) {
         if (!studentId.equals(feed.getStudent().getId())) {
             throw new FeedException(FeedExceptionType.NOT_FEED_OWNER);
