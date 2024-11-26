@@ -33,4 +33,9 @@ public class StudentInterest extends CreatedTime {
         this.student = student;
         this.interest = interest;
     }
+
+    @Override
+    public String toString() {
+        return interest.getInterestName();
+    }
 }

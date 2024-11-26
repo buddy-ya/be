@@ -115,7 +115,7 @@ public class CertificationService {
                 .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
         boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
                 .isPresent();
-        return CertificationStatusResponse.from(student.getIsCertificated(), isStudentIdCardRequested);
+        return CertificationStatusResponse.from(student, isStudentIdCardRequested);
     }
 
     public StudentIdCardResponse getStudentIdCard(StudentInfo studentInfo) {
