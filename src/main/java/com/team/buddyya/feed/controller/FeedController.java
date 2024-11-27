@@ -7,7 +7,6 @@ import com.team.buddyya.feed.dto.request.feed.FeedUpdateRequest;
 import com.team.buddyya.feed.dto.response.feed.FeedListResponse;
 import com.team.buddyya.feed.dto.response.feed.FeedResponse;
 import com.team.buddyya.feed.service.FeedService;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
@@ -16,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/feeds")
@@ -35,12 +36,9 @@ public class FeedController {
     @PostMapping
     public ResponseEntity<Void> createFeed(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestPart(value = "title") String title,
-            @RequestPart(value = "content") String content,
-            @RequestPart(value = "category") String category,
-            @RequestPart(value = "images") List<MultipartFile> images) {
-        FeedCreateRequest request = FeedCreateRequest.from(title, content, category);
-        feedService.createFeed(userDetails.getStudentInfo(), request, images);
+            @ModelAttribute FeedCreateRequest request) {
+        System.out.println("request : " + request.category() + " " + request.title() + " " + request.content());
+        feedService.createFeed(userDetails.getStudentInfo(), request);
         return ResponseEntity.ok().build();
     }
 

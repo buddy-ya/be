@@ -65,7 +65,7 @@ public class FeedService {
         return createFeedResponse(feed, studentInfo.id());
     }
 
-    public void createFeed(StudentInfo studentInfo, FeedCreateRequest request, List<MultipartFile> images) {
+    public void createFeed(StudentInfo studentInfo, FeedCreateRequest request) {
         Category category = categoryService.getCategory(request.category());
         Student student = studentRepository.findById(studentInfo.id())
                 .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
@@ -77,7 +77,7 @@ public class FeedService {
                 .university(student.getUniversity())
                 .build();
         feedRepository.save(feed);
-        uploadImages(feed, images);
+        uploadImages(feed, request.images());
     }
 
     public void updateFeed(StudentInfo studentInfo, Long feedId, FeedUpdateRequest request,
