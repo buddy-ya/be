@@ -4,6 +4,7 @@ import com.team.buddyya.auth.domain.StudentInfo;
 import com.team.buddyya.certification.domain.StudentIdCard;
 import com.team.buddyya.certification.dto.request.EmailCertificationRequest;
 import com.team.buddyya.certification.dto.request.EmailCodeRequest;
+import com.team.buddyya.certification.dto.request.SendStudentIdCardRequest;
 import com.team.buddyya.certification.dto.response.CertificationResponse;
 import com.team.buddyya.certification.dto.response.CertificationStatusResponse;
 import com.team.buddyya.certification.dto.response.StudentIdCardResponse;
@@ -85,7 +86,8 @@ public class CertificationService {
         student.updateEmail(codeRequest.email());
     }
 
-    public CertificationResponse uploadStudentIdCard(StudentInfo studentInfo, MultipartFile file) {
+    public CertificationResponse uploadStudentIdCard(StudentInfo studentInfo, SendStudentIdCardRequest sendStudentIdCardRequest) {
+        MultipartFile file = sendStudentIdCardRequest.image();
         Student student = studentRepository.findById(studentInfo.id())
                 .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
         if (student.getIsCertificated()) {
