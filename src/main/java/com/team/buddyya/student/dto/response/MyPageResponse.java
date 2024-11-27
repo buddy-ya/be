@@ -10,6 +10,7 @@ public record MyPageResponse(
         String country,
         String university,
         String gender,
+        String profileImageUrl,
         List<String> majors,
         List<String> languages,
         List<String> interests
@@ -21,6 +22,7 @@ public record MyPageResponse(
                 student.getCountry(),
                 student.getUniversity().getUniversityName(),
                 student.getGender().getDisplayName(),
+                student.getProfileImage().getUrl(),
                 convertToStringList(student.getMajors()),
                 convertToStringList(student.getLanguages()),
                 convertToStringList(student.getInterests())
