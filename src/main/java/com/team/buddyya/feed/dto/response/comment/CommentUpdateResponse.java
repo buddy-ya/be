@@ -9,6 +9,7 @@ public record CommentUpdateResponse(
         String content,
         String name,
         String country,
+        String university,
         LocalDateTime updateTime,
         boolean isFeedOwner,
         boolean isCommentOwner
@@ -20,6 +21,7 @@ public record CommentUpdateResponse(
                 info.comment().getContent(),
                 info.comment().getStudent().getName(),
                 info.comment().getStudent().getCountry(),
+                info.comment().getStudent().getUniversity().getUniversityName(),
                 info.comment().getUpdatedDate(),
                 info.isFeedOwner(),
                 info.isCommentOwner()

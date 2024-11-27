@@ -3,6 +3,7 @@ package com.team.buddyya.certification.controller;
 import com.team.buddyya.auth.domain.CustomUserDetails;
 import com.team.buddyya.certification.dto.request.EmailCertificationRequest;
 import com.team.buddyya.certification.dto.request.EmailCodeRequest;
+import com.team.buddyya.certification.dto.request.SendStudentIdCardRequest;
 import com.team.buddyya.certification.dto.response.CertificationResponse;
 import com.team.buddyya.certification.dto.response.CertificationStatusResponse;
 import com.team.buddyya.certification.dto.response.StudentIdCardResponse;
@@ -31,8 +32,8 @@ public class CertificationController {
     }
 
     @PostMapping("/student-id-card")
-    public ResponseEntity<CertificationResponse> sendStudentIdCard(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestPart("file") MultipartFile file) {
-        return ResponseEntity.ok(certificationService.uploadStudentIdCard(userDetails.getStudentInfo(), file));
+    public ResponseEntity<CertificationResponse> sendStudentIdCard(@AuthenticationPrincipal CustomUserDetails userDetails, @ModelAttribute SendStudentIdCardRequest sendStudentIdCardRequest) {
+        return ResponseEntity.ok(certificationService.uploadStudentIdCard(userDetails.getStudentInfo(), sendStudentIdCardRequest));
     }
 
     @GetMapping("/student-id-card")
