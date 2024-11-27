@@ -8,6 +8,7 @@ public record CommentCreateResponse(
         String content,
         String name,
         String country,
+        String university,
         LocalDateTime createdDate,
         boolean isFeedOwner,
         boolean isCommentOwner
@@ -19,6 +20,7 @@ public record CommentCreateResponse(
                 info.comment().getContent(),
                 info.comment().getStudent().getName(),
                 info.comment().getStudent().getCountry(),
+                info.comment().getStudent().getUniversity().getUniversityName(),
                 info.comment().getCreatedDate(),
                 info.isFeedOwner(),
                 info.isCommentOwner()
