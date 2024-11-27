@@ -14,9 +14,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/feeds")
@@ -53,12 +50,8 @@ public class FeedController {
     public ResponseEntity<Void> updateFeed(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long feedId,
-            @RequestPart(value = "title") String title,
-            @RequestPart(value = "content") String content,
-            @RequestPart(value = "category") String category,
-            @RequestPart(value = "images") List<MultipartFile> images) {
-        FeedUpdateRequest request = FeedUpdateRequest.from(title, content, category);
-        feedService.updateFeed(userDetails.getStudentInfo(), feedId, request, images);
+            @ModelAttribute FeedUpdateRequest request) {
+        feedService.updateFeed(userDetails.getStudentInfo(), feedId, request);
         return ResponseEntity.ok().build();
     }
 
