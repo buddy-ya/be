@@ -80,13 +80,12 @@ public class FeedService {
         uploadImages(feed, request.images());
     }
 
-    public void updateFeed(StudentInfo studentInfo, Long feedId, FeedUpdateRequest request,
-                           List<MultipartFile> images) {
+    public void updateFeed(StudentInfo studentInfo, Long feedId, FeedUpdateRequest request) {
         Feed feed = findFeedByFeedId(feedId);
         validateFeedOwner(studentInfo.id(), feed);
         Category category = categoryService.getCategory(request.category());
         feed.updateFeed(request.title(), request.content(), category);
-        uploadImages(feed, images);
+        uploadImages(feed, request.images());
     }
 
     public void deleteFeed(StudentInfo studentInfo, Long feedId) {
