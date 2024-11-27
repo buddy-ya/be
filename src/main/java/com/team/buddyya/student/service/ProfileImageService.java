@@ -24,6 +24,12 @@ public class ProfileImageService {
         profileImageRepository.save(profileImage);
     }
 
+    public void updateProfileDefaultImage(Student student, String profileImageKey) {
+        ProfileDefaultImage defaultImage = ProfileDefaultImage.fromValue(profileImageKey);
+        ProfileImage profileImage = findProfileImageByStudent(student);
+        profileImage.updateUrl(defaultImage.getUrl());
+    }
+
     public ProfileImage findProfileImageByStudent(Student student){
         return profileImageRepository.findByStudent(student)
                 .orElseThrow(() -> new StudentException(StudentExceptionType.PROFILE_IMAGE_NOT_FOUND));

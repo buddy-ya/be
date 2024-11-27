@@ -56,4 +56,11 @@ public class MyPageController {
                                                             @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(feedService.getBookmarkFeed(userDetails.getStudentInfo(), pageable));
     }
+
+    @PostMapping("/update/profile-default-image")
+    public ResponseEntity<MyPageUpdateResponse> updateProfileDefaultImage(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam String profileImageKey) {
+        return ResponseEntity.ok(myPageService.updateProfileDefaultImage(userDetails.getStudentInfo(), profileImageKey));
+    }
 }
