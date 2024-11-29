@@ -21,6 +21,7 @@ public class MyPageService {
     private final StudentInterestService studentInterestService;
     private final StudentLanguageService studentLanguageService;
     private final StudentService studentService;
+    private final ProfileImageService profileImageService;
 
     public MyPageUpdateResponse updateInterests(StudentInfo studentInfo, MyPageUpdateInterestsRequest request) {
         Student student = studentService.findByStudentId(studentInfo.id());
@@ -37,6 +38,12 @@ public class MyPageService {
     public MyPageUpdateResponse updateName(StudentInfo studentInfo, MyPageUpdateNameRequest request) {
         Student student = studentService.findByStudentId(studentInfo.id());
         student.updateName(request.name());
+        return MyPageUpdateResponse.from(UPDATE_SUCCESS_MESSAGE);
+    }
+
+    public MyPageUpdateResponse updateProfileDefaultImage(StudentInfo studentInfo, String profileImageKey) {
+        Student student = studentService.findByStudentId(studentInfo.id());
+        profileImageService.updateProfileDefaultImage(student, profileImageKey);
         return MyPageUpdateResponse.from(UPDATE_SUCCESS_MESSAGE);
     }
 

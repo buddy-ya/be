@@ -10,7 +10,9 @@ public enum StudentExceptionType implements BaseExceptionType {
     MAJOR_NOT_FOUND(2000, HttpStatus.NOT_FOUND, "해당 전공을 찾지 못하였습니다."),
     LANGUAGE_NOT_FOUND(2000, HttpStatus.NOT_FOUND, "해당 언어를 찾지 못하였습니다."),
     INTEREST_NOT_FOUND(2000, HttpStatus.NOT_FOUND, "해당 관심사를 찾지 못하였습니다."),
-    INVALID_GENDER_VALUE(2000, HttpStatus.BAD_REQUEST, "유효하지 않은 성별 값입니다.");
+    PROFILE_IMAGE_NOT_FOUND(2000, HttpStatus.NOT_FOUND, "해당 학생의 프로필 이미지를 찾지 못하였습니다."),
+    INVALID_GENDER_VALUE(2000, HttpStatus.BAD_REQUEST, "유효하지 않은 성별 값입니다."),
+    INVALID_DEFAULT_IMAGE_KEY(2000, HttpStatus.BAD_REQUEST, "유효하지 않은 프로필 이미지 키값입니다.");
 
     private final int errorCode;
     private final HttpStatus httpStatus;

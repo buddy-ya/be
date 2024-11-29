@@ -10,6 +10,7 @@ public record CommentUpdateResponse(
         String name,
         String country,
         String university,
+        String profileImageUrl,
         LocalDateTime updateTime,
         boolean isFeedOwner,
         boolean isCommentOwner
@@ -22,6 +23,7 @@ public record CommentUpdateResponse(
                 info.comment().getStudent().getName(),
                 info.comment().getStudent().getCountry(),
                 info.comment().getStudent().getUniversity().getUniversityName(),
+                info.comment().getStudent().getProfileImage().getUrl(),
                 info.comment().getUpdatedDate(),
                 info.isFeedOwner(),
                 info.isCommentOwner()
