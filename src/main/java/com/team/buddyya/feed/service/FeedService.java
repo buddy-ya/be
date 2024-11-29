@@ -32,6 +32,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FeedService {
 
+    private static final int LIKE_COUNT_THRESHOLD = 10;
+
     private final CategoryService categoryService;
     private final FeedRepository feedRepository;
     private final StudentRepository studentRepository;
@@ -54,6 +56,14 @@ public class FeedService {
             return FeedListResponse.from(response, feeds);
         }
         Page<Feed> feeds = fetchFeedsByKeyword(keyword, pageable);
+        List<FeedResponse> response = feeds.getContent().stream()
+                .map(feed -> createFeedResponse(feed, studentInfo.id()))
+                .toList();
+        return FeedListResponse.from(response, feeds);
+    }
+
+    public FeedListResponse getPopularFeeds(StudentInfo studentInfo, Pageable pageable) {
+        Page<Feed> feeds = feedRepository.findByLikeCountGreaterThanEqual(LIKE_COUNT_THRESHOLD, pageable);
         List<FeedResponse> response = feeds.getContent().stream()
                 .map(feed -> createFeedResponse(feed, studentInfo.id()))
                 .toList();
