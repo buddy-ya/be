@@ -14,6 +14,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Getter
 @NoArgsConstructor(access = PROTECTED)
 public class ProfileImage extends CreatedTime {
+
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
