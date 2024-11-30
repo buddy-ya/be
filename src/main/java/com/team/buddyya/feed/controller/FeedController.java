@@ -55,7 +55,6 @@ public class FeedController {
         return ResponseEntity.ok().build();
     }
 
-
     @DeleteMapping("/{feedId}")
     public ResponseEntity<Void> deleteFeed(
             @AuthenticationPrincipal CustomUserDetails userDetails,
