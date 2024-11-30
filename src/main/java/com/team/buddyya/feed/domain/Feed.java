@@ -101,7 +101,7 @@ public class Feed extends BaseTime {
         this.commentCount--;
     }
 
-    public void uploadFeedImage(FeedImage image) {
-        this.images.add(image);
+    public void uploadFeedImages(List<FeedImage> images) {
+        this.images= images;
     }
 }

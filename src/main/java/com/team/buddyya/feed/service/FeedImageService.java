@@ -20,17 +20,25 @@ public class FeedImageService {
     private final S3UploadService s3UploadService;
     private final FeedImageRepository feedImageRepository;
 
-    public List<FeedImage> uploadFeedImages(Feed feed, List<MultipartFile> images) {
+    public void uploadFeedImages(List<FeedImage> images){
+        feedImageRepository.saveAll(images);
+    }
+
+    public void deleteFeedImages(Feed feed){
+        feedImageRepository.deleteByFeed(feed);
+    }
+
+    public List<FeedImage> uploadS3FeedImages(Feed feed, List<MultipartFile> images) {
         if (images == null || images.isEmpty()) {
             return List.of();
         }
         return images.stream()
                 .filter(this::isValidImageFile)
-                .map(image -> uploadFeedImage(feed, image))
+                .map(image -> uploadS3FeedImage(feed, image))
                 .toList();
     }
 
-    public void deleteFeedImages(Feed feed) {
+    public void deleteS3FeedImages(Feed feed) {
         feed.getImages()
                 .forEach(feedImage -> s3UploadService.deleteFile(FEED_IMAGE.getDirectoryName(), feedImage.getUrl()));
     }
@@ -39,7 +47,7 @@ public class FeedImageService {
         return image != null && !image.isEmpty();
     }
 
-    private FeedImage uploadFeedImage(Feed feed, MultipartFile image) {
+    private FeedImage uploadS3FeedImage(Feed feed, MultipartFile image) {
         String imageUrl = s3UploadService.uploadFile(S3DirectoryName.FEED_IMAGE.getDirectoryName(), image);
         FeedImage feedImage = FeedImage.builder()
                 .feed(feed)

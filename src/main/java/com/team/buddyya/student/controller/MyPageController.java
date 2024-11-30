@@ -57,7 +57,7 @@ public class MyPageController {
         return ResponseEntity.ok(feedService.getBookmarkFeed(userDetails.getStudentInfo(), pageable));
     }
 
-    @PostMapping("/update/profile-default-image")
+    @PatchMapping("/update/profile-default-image")
     public ResponseEntity<MyPageUpdateResponse> updateProfileDefaultImage(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam String profileImageKey) {

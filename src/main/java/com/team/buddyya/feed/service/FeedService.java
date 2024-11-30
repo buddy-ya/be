@@ -95,13 +95,13 @@ public class FeedService {
         validateFeedOwner(studentInfo.id(), feed);
         Category category = categoryService.getCategory(request.category());
         feed.updateFeed(request.title(), request.content(), category);
-        uploadImages(feed, request.images());
+        updateImages(feed, request.images());
     }
 
     public void deleteFeed(StudentInfo studentInfo, Long feedId) {
         Feed feed = findFeedByFeedId(feedId);
         validateFeedOwner(studentInfo.id(), feed);
-        feedImageService.deleteFeedImages(feed);
+        feedImageService.deleteS3FeedImages(feed);
         feedRepository.delete(feed);
     }
 
@@ -137,10 +137,19 @@ public class FeedService {
         return FeedUserAction.of(isFeedOwner, isLiked, isBookmarked);
     }
 
+    private void updateImages(Feed feed, List<MultipartFile> images) {
+        feedImageService.deleteFeedImages(feed);
+        feedImageService.deleteS3FeedImages(feed);
+        if (images != null && !images.isEmpty()) {
+            List<FeedImage> feedImages = feedImageService.uploadS3FeedImages(feed, images);
+            feedImageService.uploadFeedImages(feedImages);
+        }
+    }
+
     private void uploadImages(Feed feed, List<MultipartFile> images) {
         if (images != null && !images.isEmpty()) {
-            List<FeedImage> feedImages = feedImageService.uploadFeedImages(feed, images);
-            feedImages.forEach(feed::uploadFeedImage);
+            List<FeedImage> feedImages = feedImageService.uploadS3FeedImages(feed, images);
+            feed.uploadFeedImages(feedImages);
         }
     }
 
