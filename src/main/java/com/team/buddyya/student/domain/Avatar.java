@@ -29,7 +29,7 @@ public class Avatar extends BaseTime {
     @Column(name="loggedOut", nullable = false)
     private Boolean isLoggedOut;
 
-    @OneToOne
+    @OneToOne(fetch = LAZY)
     @JoinColumn(name = "student_id", nullable = false)
     private Student student;
 
@@ -39,5 +39,10 @@ public class Avatar extends BaseTime {
         this.student = student;
         this.isActive = true;
         this.isLoggedOut = false;
+    }
+
+    public void setStudent(Student student) {
+        this.student = student;
+        student.setAvatar(this);
     }
 }

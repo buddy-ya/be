@@ -34,6 +34,11 @@ public class StudentInterest extends CreatedTime {
         this.interest = interest;
     }
 
+    public void setStudent(Student student) {
+        this.student = student;
+        student.getInterests().add(this);
+    }
+
     @Override
     public String toString() {
         return interest.getInterestName();

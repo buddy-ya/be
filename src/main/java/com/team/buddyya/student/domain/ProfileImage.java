@@ -35,4 +35,9 @@ public class ProfileImage extends CreatedTime {
     public void updateUrl(String newUrl) {
         this.url = newUrl;
     }
+
+    public void setStudent(Student student) {
+        this.student = student;
+        student.setProfileImage(this);
+    }
 }

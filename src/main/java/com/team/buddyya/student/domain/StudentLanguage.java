@@ -34,6 +34,11 @@ public class StudentLanguage extends CreatedTime {
         this.language = language;
     }
 
+    public void setStudent(Student student) {
+        this.student = student;
+        student.getLanguages().add(this);
+    }
+
     @Override
     public String toString() {
         return language.getLanguageName();
