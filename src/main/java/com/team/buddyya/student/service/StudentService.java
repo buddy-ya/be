@@ -21,12 +21,6 @@ public class StudentService {
     private final StudentRepository studentRepository;
     private final UniversityRepository universityRepository;
 
-    @Transactional(readOnly = true)
-    public Student findByStudentId(long studentId) {
-        return studentRepository.findById(studentId)
-                .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
-    }
-
     public Student createStudent(OnBoardingRequest request) {
         University university = universityRepository.findByUniversityName(request.university())
                 .orElseThrow(() -> new StudentException(StudentExceptionType.UNIVERSITY_NOT_FOUND));
