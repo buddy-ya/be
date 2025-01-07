@@ -38,6 +38,7 @@ public class PhoneAuthenticationService {
         return new SendCodeResponse(phoneNumber);
     }
 
+    @Transactional(readOnly = true)
     public void verifyCode(String phoneNumber, String inputCode) {
         RegisteredPhone registeredPhone = registeredPhoneRepository.findByPhoneNumber(phoneNumber)
                 .orElseThrow(() -> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.CODE_MISMATCH));

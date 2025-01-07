@@ -106,4 +106,12 @@ public class Student extends BaseTime {
     public void updateName(String name) {
         this.name = name;
     }
+
+    public void setAvatar(Avatar avatar) {
+        this.avatar = avatar;
+    }
+
+    public void setProfileImage(ProfileImage profileImage) {
+        this.profileImage = profileImage;
+    }
 }

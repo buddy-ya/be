@@ -20,35 +20,35 @@ public class MyPageService {
 
     private final StudentInterestService studentInterestService;
     private final StudentLanguageService studentLanguageService;
-    private final StudentService studentService;
+    private final FindStudentService findStudentService;
     private final ProfileImageService profileImageService;
 
     public MyPageUpdateResponse updateInterests(StudentInfo studentInfo, MyPageUpdateInterestsRequest request) {
-        Student student = studentService.findByStudentId(studentInfo.id());
+        Student student = findStudentService.findByStudentId(studentInfo.id());
         studentInterestService.updateStudentInterests(request.interests(), student);
         return MyPageUpdateResponse.from(UPDATE_SUCCESS_MESSAGE);
     }
 
     public MyPageUpdateResponse updateLanguages(StudentInfo studentInfo, MyPageUpdateLanguagesRequest request) {
-        Student student = studentService.findByStudentId(studentInfo.id());
+        Student student = findStudentService.findByStudentId(studentInfo.id());
         studentLanguageService.updateStudentLanguages(request.languages(), student);
         return MyPageUpdateResponse.from(UPDATE_SUCCESS_MESSAGE);
     }
 
     public MyPageUpdateResponse updateName(StudentInfo studentInfo, MyPageUpdateNameRequest request) {
-        Student student = studentService.findByStudentId(studentInfo.id());
+        Student student = findStudentService.findByStudentId(studentInfo.id());
         student.updateName(request.name());
         return MyPageUpdateResponse.from(UPDATE_SUCCESS_MESSAGE);
     }
 
     public MyPageUpdateResponse updateProfileDefaultImage(StudentInfo studentInfo, String profileImageKey) {
-        Student student = studentService.findByStudentId(studentInfo.id());
+        Student student = findStudentService.findByStudentId(studentInfo.id());
         profileImageService.updateProfileDefaultImage(student, profileImageKey);
         return MyPageUpdateResponse.from(UPDATE_SUCCESS_MESSAGE);
     }
 
     public MyPageResponse getMyPage(StudentInfo studentInfo) {
-        Student student = studentService.findByStudentId(studentInfo.id());
+        Student student = findStudentService.findByStudentId(studentInfo.id());
         return MyPageResponse.from(student);
     }
 }

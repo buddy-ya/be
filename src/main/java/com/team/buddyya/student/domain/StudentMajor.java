@@ -33,6 +33,11 @@ public class StudentMajor {
         this.major = major;
     }
 
+    public void setStudent(Student student) {
+        this.student = student;
+        student.getMajors().add(this);
+    }
+
     @Override
     public String toString() {
         return major.getMajorName();

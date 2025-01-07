@@ -21,11 +21,6 @@ public class StudentService {
     private final StudentRepository studentRepository;
     private final UniversityRepository universityRepository;
 
-    public Student findByStudentId(long studentId) {
-        return studentRepository.findById(studentId)
-                .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
-    }
-
     public Student createStudent(OnBoardingRequest request) {
         University university = universityRepository.findByUniversityName(request.university())
                 .orElseThrow(() -> new StudentException(StudentExceptionType.UNIVERSITY_NOT_FOUND));
@@ -41,6 +36,7 @@ public class StudentService {
         return studentRepository.save(student);
     }
 
+    @Transactional(readOnly = true)
     public boolean isDuplicateStudentNumber(String studentNumber, University university) {
         return studentRepository.findByStudentNumberAndUniversity(studentNumber, university)
                 .isPresent();
@@ -51,6 +47,7 @@ public class StudentService {
         student.updateStudentNumber(studentNumber);
     }
 
+    @Transactional(readOnly = true)
     public boolean isDuplicateStudentEmail(String email) {
         return studentRepository.findByEmail(email)
                 .isPresent();

@@ -40,4 +40,9 @@ public class Avatar extends BaseTime {
         this.isActive = true;
         this.isLoggedOut = false;
     }
+
+    public void setStudent(Student student) {
+        this.student = student;
+        student.setAvatar(this);
+    }
 }
