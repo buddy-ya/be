@@ -125,8 +125,7 @@ public class CertificationService {
     }
 
     public void refreshStudentCertification(StudentInfo studentInfo) {
-        Student student = studentRepository.findById(studentInfo.id())
-                .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
+        Student student = findStudentService.findByStudentId(studentInfo.id());
         student.updateIsCertificated(false);
         student.updateEmail(null);
         studentIdCardRepository.deleteByStudent(student);
