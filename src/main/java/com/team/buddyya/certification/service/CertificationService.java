@@ -107,6 +107,7 @@ public class CertificationService {
         return CertificationResponse.from(true);
     }
 
+    @Transactional(readOnly = true)
     public CertificationStatusResponse isCertificated(StudentInfo studentInfo) {
         Student student = findStudentService.findByStudentId(studentInfo.id());
         boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
@@ -114,6 +115,7 @@ public class CertificationService {
         return CertificationStatusResponse.from(student, isStudentIdCardRequested);
     }
 
+    @Transactional(readOnly = true)
     public StudentIdCardResponse getStudentIdCard(StudentInfo studentInfo) {
         StudentIdCard studentIdCard = studentIdCardRepository.findByStudent_Id(studentInfo.id())
                 .orElseThrow(() -> new CertificateException(CertificateExceptionType.STUDENT_ID_CARD_NOT_FOUND));

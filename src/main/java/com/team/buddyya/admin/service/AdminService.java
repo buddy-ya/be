@@ -32,6 +32,7 @@ public class AdminService {
     private final StudentIdCardRepository studentIdCardRepository;
     private final S3UploadService s3UploadService;
 
+    @Transactional(readOnly = true)
     public StudentIdCardListResponse getStudentIdCards() {
         List<StudentIdCardResponse> studentIdCards = studentIdCardRepository.findAllByOrderByCreatedDateAsc().stream()
                 .map(StudentIdCardResponse::from)

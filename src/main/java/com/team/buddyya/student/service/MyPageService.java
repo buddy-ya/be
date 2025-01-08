@@ -47,6 +47,7 @@ public class MyPageService {
         return MyPageUpdateResponse.from(UPDATE_SUCCESS_MESSAGE);
     }
 
+    @Transactional(readOnly = true)
     public MyPageResponse getMyPage(StudentInfo studentInfo) {
         Student student = findStudentService.findByStudentId(studentInfo.id());
         return MyPageResponse.from(student);

@@ -17,7 +17,9 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private final FindStudentService findStudentService;
 
+
     @Override
+    @Transactional(readOnly = true)
     public CustomUserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
         Student student = findStudentService.findByStudentId(Long.parseLong(id));
         StudentInfo studentInfo = StudentInfo.from(student);
