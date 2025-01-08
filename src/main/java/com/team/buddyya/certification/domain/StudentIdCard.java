@@ -36,4 +36,9 @@ public class StudentIdCard extends CreatedTime {
     public void updateImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
+
+    public void setStudent(Student student) {
+        this.student = student;
+        student.setStudentIdCard(this);
+    }
 }

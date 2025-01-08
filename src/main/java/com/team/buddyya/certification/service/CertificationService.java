@@ -15,9 +15,7 @@ import com.team.buddyya.certification.exception.CertificateExceptionType;
 import com.team.buddyya.certification.repository.StudentIdCardRepository;
 import com.team.buddyya.common.service.S3UploadService;
 import com.team.buddyya.student.domain.Student;
-import com.team.buddyya.student.exception.StudentException;
-import com.team.buddyya.student.exception.StudentExceptionType;
-import com.team.buddyya.student.repository.StudentRepository;
+import com.team.buddyya.student.service.FindStudentService;
 import com.team.buddyya.student.service.StudentService;
 import com.univcert.api.UnivCert;
 import java.io.IOException;
@@ -34,7 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Transactional
 public class CertificationService {
 
-    private final StudentRepository studentRepository;
+    private final FindStudentService findStudentService;
     private final StudentIdCardRepository studentIdCardRepository;
     private final S3UploadService s3UploadService;
     private final StudentService studentService;
@@ -43,8 +41,7 @@ public class CertificationService {
     private String univcertApiKey;
 
     public CertificationResponse certificateEmail(StudentInfo studentInfo, EmailCertificationRequest emailRequest) {
-        Student student = studentRepository.findById(studentInfo.id())
-                .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
+        Student student = findStudentService.findByStudentId(studentInfo.id());
         validateStatusAndEmail(emailRequest, student);
         try {
             Map<String, Object> univCertResponse = UnivCert.certify(univcertApiKey, emailRequest.email(),
@@ -71,8 +68,7 @@ public class CertificationService {
                     codeRequest.univName(), codeRequest.code());
             Boolean isSuccess = (Boolean) univCertResponse.get("success");
             if (isSuccess) {
-                Student student = studentRepository.findById(studentInfo.id())
-                        .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
+                Student student = findStudentService.findByStudentId(studentInfo.id());
                 updateCertification(codeRequest, student);
             }
             UnivCert.clear(univcertApiKey);
@@ -90,8 +86,7 @@ public class CertificationService {
     public CertificationResponse uploadStudentIdCard(StudentInfo studentInfo,
                                                      SendStudentIdCardRequest sendStudentIdCardRequest) {
         MultipartFile file = sendStudentIdCardRequest.image();
-        Student student = studentRepository.findById(studentInfo.id())
-                .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
+        Student student = findStudentService.findByStudentId(studentInfo.id());
         if (student.getIsCertificated()) {
             throw new CertificateException(CertificateExceptionType.ALREADY_CERTIFICATED);
         }
@@ -114,14 +109,15 @@ public class CertificationService {
         return CertificationResponse.from(true);
     }
 
+    @Transactional(readOnly = true)
     public CertificationStatusResponse isCertificated(StudentInfo studentInfo) {
-        Student student = studentRepository.findById(studentInfo.id())
-                .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
+        Student student = findStudentService.findByStudentId(studentInfo.id());
         boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
                 .isPresent();
         return CertificationStatusResponse.from(student, isStudentIdCardRequested);
     }
 
+    @Transactional(readOnly = true)
     public StudentIdCardResponse getStudentIdCard(StudentInfo studentInfo) {
         StudentIdCard studentIdCard = studentIdCardRepository.findByStudent_Id(studentInfo.id())
                 .orElseThrow(() -> new CertificateException(CertificateExceptionType.STUDENT_ID_CARD_NOT_FOUND));

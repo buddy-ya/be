@@ -114,4 +114,12 @@ public class Student extends BaseTime {
     public void setProfileImage(ProfileImage profileImage) {
         this.profileImage = profileImage;
     }
+
+    public void setAuthToken(AuthToken authToken) {
+        this.authToken = authToken;
+    }
+
+    public void setStudentIdCard(StudentIdCard studentIdCard) {
+        this.studentIdCard = studentIdCard;
+    }
 }
