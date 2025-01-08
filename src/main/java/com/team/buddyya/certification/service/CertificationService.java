@@ -1,5 +1,7 @@
 package com.team.buddyya.certification.service;
 
+import static com.team.buddyya.common.domain.S3DirectoryName.STUDENT_ID_CARD;
+
 import com.team.buddyya.auth.domain.StudentInfo;
 import com.team.buddyya.certification.domain.StudentIdCard;
 import com.team.buddyya.certification.dto.request.EmailCertificationRequest;
@@ -16,17 +18,14 @@ import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.service.FindStudentService;
 import com.team.buddyya.student.service.StudentService;
 import com.univcert.api.UnivCert;
+import java.io.IOException;
+import java.util.Map;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.util.Map;
-import java.util.Optional;
-
-import static com.team.buddyya.common.domain.S3DirectoryName.STUDENT_ID_CARD;
 
 @Service
 @RequiredArgsConstructor
