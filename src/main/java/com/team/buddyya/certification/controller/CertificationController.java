@@ -11,8 +11,13 @@ import com.team.buddyya.certification.service.CertificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,27 +27,40 @@ public class CertificationController {
     private final CertificationService certificationService;
 
     @PostMapping("/email/send")
-    public ResponseEntity<CertificationResponse> sendEmail(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody EmailCertificationRequest emailCertificationRequest) {
-        return ResponseEntity.ok(certificationService.certificateEmail(userDetails.getStudentInfo(), emailCertificationRequest));
+    public ResponseEntity<CertificationResponse> sendEmail(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                           @RequestBody EmailCertificationRequest emailCertificationRequest) {
+        return ResponseEntity.ok(
+                certificationService.certificateEmail(userDetails.getStudentInfo(), emailCertificationRequest));
     }
 
     @PostMapping("/email/verify-code")
-    public ResponseEntity<CertificationResponse> emailCodeCertificate(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody EmailCodeRequest codeRequest) {
+    public ResponseEntity<CertificationResponse> emailCodeCertificate(
+            @AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody EmailCodeRequest codeRequest) {
         return ResponseEntity.ok(certificationService.certificateEmailCode(userDetails.getStudentInfo(), codeRequest));
     }
 
     @PostMapping("/student-id-card")
-    public ResponseEntity<CertificationResponse> sendStudentIdCard(@AuthenticationPrincipal CustomUserDetails userDetails, @ModelAttribute SendStudentIdCardRequest sendStudentIdCardRequest) {
-        return ResponseEntity.ok(certificationService.uploadStudentIdCard(userDetails.getStudentInfo(), sendStudentIdCardRequest));
+    public ResponseEntity<CertificationResponse> sendStudentIdCard(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @ModelAttribute SendStudentIdCardRequest sendStudentIdCardRequest) {
+        return ResponseEntity.ok(
+                certificationService.uploadStudentIdCard(userDetails.getStudentInfo(), sendStudentIdCardRequest));
     }
 
     @GetMapping("/student-id-card")
-    public ResponseEntity<StudentIdCardResponse> getStudentIdCard(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<StudentIdCardResponse> getStudentIdCard(
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ResponseEntity.ok(certificationService.getStudentIdCard(userDetails.getStudentInfo()));
     }
 
     @GetMapping
-    public ResponseEntity<CertificationStatusResponse> checkCertificationStatus(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<CertificationStatusResponse> checkCertificationStatus(
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ResponseEntity.ok(certificationService.isCertificated(userDetails.getStudentInfo()));
+    }
+
+    @PutMapping("/refresh")
+    public void refreshCertification(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        certificationService.refreshStudentCertification(userDetails.getStudentInfo());
     }
 }
