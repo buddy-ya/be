@@ -1,5 +1,6 @@
 package com.team.buddyya.student.service;
 
+import com.team.buddyya.auth.domain.StudentInfo;
 import com.team.buddyya.student.domain.Gender;
 import com.team.buddyya.student.domain.Role;
 import com.team.buddyya.student.domain.Student;
@@ -51,5 +52,9 @@ public class StudentService {
     public boolean isDuplicateStudentEmail(String email) {
         return studentRepository.findByEmail(email)
                 .isPresent();
+    }
+
+    public void deleteStudent(StudentInfo studentInfo) {
+        studentRepository.deleteById(studentInfo.id());
     }
 }
