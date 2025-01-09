@@ -7,7 +7,6 @@ import com.team.buddyya.feed.domain.Feed;
 import com.team.buddyya.feed.dto.request.comment.CommentCreateRequest;
 import com.team.buddyya.feed.dto.request.comment.CommentUpdateRequest;
 import com.team.buddyya.feed.dto.response.comment.CommentCreateResponse;
-import com.team.buddyya.feed.dto.response.comment.CommentListResponse;
 import com.team.buddyya.feed.dto.response.comment.CommentResponse;
 import com.team.buddyya.feed.dto.response.comment.CommentUpdateResponse;
 import com.team.buddyya.feed.exception.FeedException;
@@ -36,15 +35,14 @@ public class CommentService {
                 .orElseThrow(() -> new FeedException(FeedExceptionType.COMMENT_NOT_FOUND));
     }
 
-    public CommentListResponse getComments(StudentInfo studentInfo, Long feedId) {
+    public List<CommentResponse> getComments(StudentInfo studentInfo, Long feedId) {
         Feed feed = feedService.findFeedByFeedId(feedId);
         List<CommentInfo> commentInfos = feed.getComments().stream()
                 .map(comment -> CommentInfo.of(comment, feed.getStudent().getId(), studentInfo.id()))
                 .toList();
-        List<CommentResponse> responses = commentInfos.stream()
+        return commentInfos.stream()
                 .map(CommentResponse::from)
                 .toList();
-        return CommentListResponse.from(responses);
     }
 
     public CommentCreateResponse createComment(StudentInfo studentInfo, Long feedId, CommentCreateRequest request) {
