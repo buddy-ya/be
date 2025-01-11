@@ -1,0 +1,23 @@
+package com.team.buddyya.common.config;
+
+import com.team.buddyya.chatting.service.ChatHandler;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.socket.config.annotation.EnableWebSocket;
+import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
+import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
+
+@Configuration
+@RequiredArgsConstructor
+@EnableWebSocket
+public class WebSocketConfig implements WebSocketConfigurer {
+
+    private final ChatHandler chatHandler;
+
+    @Override
+    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
+        // endpoint 설정 : /ws/chat
+        // 이를 통해서 ws://localhost:8080/ws/chat/{chatroomId} 으로 요청이 들어오면 websocket 통신을 진행합니다.
+        registry.addHandler(chatHandler, "ws/chat/{chatroomId}").setAllowedOrigins("*");
+    }
+}
