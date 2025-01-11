@@ -52,13 +52,13 @@ public class FeedService {
     public FeedListResponse getFeeds(StudentInfo studentInfo, Pageable pageable, FeedListRequest request) {
         String keyword = request.keyword();
         if (keyword == null || keyword.isBlank()) {
-            Page<Feed> feeds = fetchFeedsByCategory(request, pageable);
+            Page<Feed> feeds = getFeedsByCategory(request, pageable);
             List<FeedResponse> response = feeds.getContent().stream()
                     .map(feed -> createFeedResponse(feed, studentInfo.id()))
                     .toList();
             return FeedListResponse.from(response, feeds);
         }
-        Page<Feed> feeds = fetchFeedsByKeyword(keyword, pageable);
+        Page<Feed> feeds = getFeedsByKeyword(keyword, pageable);
         List<FeedResponse> response = feeds.getContent().stream()
                 .map(feed -> createFeedResponse(feed, studentInfo.id()))
                 .toList();
@@ -108,7 +108,7 @@ public class FeedService {
         feedRepository.delete(feed);
     }
 
-    private Page<Feed> fetchFeedsByCategory(FeedListRequest request, Pageable pageable) {
+    private Page<Feed> getFeedsByCategory(FeedListRequest request, Pageable pageable) {
         Category category = categoryService.getCategory(request.category());
         Pageable customPageable = PageRequest.of(
                 pageable.getPageNumber(),
@@ -118,7 +118,7 @@ public class FeedService {
         return feedRepository.findAllByCategoryName(category.getName(), customPageable);
     }
 
-    private Page<Feed> fetchFeedsByKeyword(String keyword, Pageable pageable) {
+    private Page<Feed> getFeedsByKeyword(String keyword, Pageable pageable) {
         return feedRepository.findByTitleContainingOrContentContaining(keyword, keyword, pageable);
     }
 
