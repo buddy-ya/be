@@ -1,18 +1,28 @@
 package com.team.buddyya.student.domain;
 
-import com.team.buddyya.auth.domain.AuthToken;
-import com.team.buddyya.certification.domain.StudentIdCard;
-import com.team.buddyya.common.domain.BaseTime;
-import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-import java.util.List;
-
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
+
+import com.team.buddyya.auth.domain.AuthToken;
+import com.team.buddyya.certification.domain.StudentIdCard;
+import com.team.buddyya.common.domain.BaseTime;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import java.util.List;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "student")
@@ -79,7 +89,8 @@ public class Student extends BaseTime {
     private StudentIdCard studentIdCard;
 
     @Builder
-    public Student(String name, String phoneNumber, String country, Boolean isKorean, Role role, University university, Gender gender) {
+    public Student(String name, String phoneNumber, String country, Boolean isKorean, Role role, University university,
+                   Gender gender) {
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.country = country;
@@ -101,6 +112,10 @@ public class Student extends BaseTime {
 
     public void updateEmail(String email) {
         this.email = email;
+    }
+
+    public void updatePhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public void updateName(String name) {
