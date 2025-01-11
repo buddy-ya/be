@@ -25,26 +25,27 @@ public class LikeService {
     private final StudentRepository studentRepository;
     private final FeedRepository feedRepository;
 
-    public boolean existsByStudentIdAndFeedId(Long studentId, Long feedId) {
-        return likeRepository.existsByStudentIdAndFeedId(studentId, feedId);
+    private boolean existsByStudentAndFeed(Student student, Feed feed) {
+        return likeRepository.existsByStudentAndFeed(student, feed);
     }
 
-    public Like findLikeByStudentIdAndFeedId(Long studentId, Long feedId) {
-        return likeRepository.findByStudentIdAndFeedId(studentId, feedId)
+    private Like findLikeByStudentAndFeed(Student student, Feed feed) {
+        return likeRepository.findByStudentAndFeed(student, feed)
                 .orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_LIKED));
     }
 
     public LikeResponse toggleLike(StudentInfo studentInfo, Long feedId) {
         Feed feed = feedRepository.findById(feedId)
                 .orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND));
-        boolean isLiked = existsByStudentIdAndFeedId(studentInfo.id(), feedId);
+
+        Student student = studentRepository.findById(studentInfo.id())
+                .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
+        boolean isLiked = existsByStudentAndFeed(student, feed);
         if (isLiked) {
-            Like like = findLikeByStudentIdAndFeedId(studentInfo.id(), feedId);
+            Like like = findLikeByStudentAndFeed(student, feed);
             likeRepository.delete(like);
             return LikeResponse.from(false, feed.getLikeCount());
         }
-        Student student = studentRepository.findById(studentInfo.id())
-                .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
         Like like = Like.builder()
                 .feed(feed)
                 .student(student)

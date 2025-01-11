@@ -17,9 +17,7 @@ import com.team.buddyya.feed.respository.BookmarkRepository;
 import com.team.buddyya.feed.respository.FeedRepository;
 import com.team.buddyya.feed.respository.LikeRepository;
 import com.team.buddyya.student.domain.Student;
-import com.team.buddyya.student.exception.StudentException;
-import com.team.buddyya.student.exception.StudentExceptionType;
-import com.team.buddyya.student.repository.StudentRepository;
+import com.team.buddyya.student.service.FindStudentService;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +37,7 @@ public class FeedService {
 
     private final CategoryService categoryService;
     private final FeedRepository feedRepository;
-    private final StudentRepository studentRepository;
+    private final FindStudentService findStudentService;
     private final LikeRepository likeRepository;
     private final BookmarkRepository bookmarkRepository;
     private final FeedImageService feedImageService;
@@ -47,6 +45,10 @@ public class FeedService {
     private Feed findFeedByFeedId(Long feedId) {
         return feedRepository.findById(feedId)
                 .orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND));
+    }
+
+    private Student findStudentByStudentId(Long studentId) {
+        return findStudentService.findByStudentId(studentId);
     }
 
     public FeedListResponse getFeeds(StudentInfo studentInfo, Pageable pageable, FeedListRequest request) {
@@ -80,8 +82,7 @@ public class FeedService {
 
     public void createFeed(StudentInfo studentInfo, FeedCreateRequest request) {
         Category category = categoryService.getCategory(request.category());
-        Student student = studentRepository.findById(studentInfo.id())
-                .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
+        Student student = findStudentByStudentId(studentInfo.id());
         Feed feed = Feed.builder()
                 .title(request.title())
                 .content(request.content())
@@ -129,14 +130,15 @@ public class FeedService {
     }
 
     private FeedResponse createFeedResponse(Feed feed, Long studentId) {
-        FeedUserAction userAction = getUserAction(studentId, feed);
+        Student student = findStudentByStudentId(studentId);
+        FeedUserAction userAction = getUserAction(student, feed);
         return FeedResponse.from(feed, userAction);
     }
 
-    private FeedUserAction getUserAction(Long studentId, Feed feed) {
-        boolean isFeedOwner = studentId.equals(feed.getStudent().getId());
-        boolean isLiked = likeRepository.existsByStudentIdAndFeedId(studentId, feed.getId());
-        boolean isBookmarked = bookmarkRepository.existsByStudentIdAndFeedId(studentId, feed.getId());
+    private FeedUserAction getUserAction(Student student, Feed feed) {
+        boolean isFeedOwner = student.getId().equals(feed.getStudent().getId());
+        boolean isLiked = likeRepository.existsByStudentAndFeed(student, feed);
+        boolean isBookmarked = bookmarkRepository.existsByStudentAndFeed(student, feed);
         return FeedUserAction.of(isFeedOwner, isLiked, isBookmarked);
     }
 
@@ -167,8 +169,7 @@ public class FeedService {
                 pageable.getPageNumber(),
                 pageable.getPageSize()
         );
-        Student student = studentRepository.findById(studentInfo.id())
-                .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
+        Student student = findStudentByStudentId(studentInfo.id());
         Page<Feed> feeds = feedRepository.findAllByStudent(student, customPageable);
         List<FeedResponse> response = feeds.getContent().stream()
                 .map(feed -> createFeedResponse(feed, studentInfo.id()))
@@ -177,8 +178,7 @@ public class FeedService {
     }
 
     public FeedListResponse getBookmarkFeed(StudentInfo studentInfo, Pageable pageable) {
-        Student student = studentRepository.findById(studentInfo.id())
-                .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
+        Student student = findStudentByStudentId(studentInfo.id());
         Page<Bookmark> bookmarks = bookmarkRepository.findAllByStudent(student, pageable);
         Page<Feed> feeds = bookmarks.map(Bookmark::getFeed);
         List<FeedResponse> response = bookmarks.getContent().stream()
