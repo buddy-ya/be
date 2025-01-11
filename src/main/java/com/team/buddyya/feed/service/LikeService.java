@@ -6,6 +6,7 @@ import com.team.buddyya.feed.domain.Like;
 import com.team.buddyya.feed.dto.response.LikeResponse;
 import com.team.buddyya.feed.exception.FeedException;
 import com.team.buddyya.feed.exception.FeedExceptionType;
+import com.team.buddyya.feed.respository.FeedRepository;
 import com.team.buddyya.feed.respository.LikeRepository;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.exception.StudentException;
@@ -22,7 +23,7 @@ public class LikeService {
 
     private final LikeRepository likeRepository;
     private final StudentRepository studentRepository;
-    private final FeedService feedService;
+    private final FeedRepository feedRepository;
 
     public boolean existsByStudentIdAndFeedId(Long studentId, Long feedId) {
         return likeRepository.existsByStudentIdAndFeedId(studentId, feedId);
@@ -34,7 +35,8 @@ public class LikeService {
     }
 
     public LikeResponse toggleLike(StudentInfo studentInfo, Long feedId) {
-        Feed feed = feedService.findFeedByFeedId(feedId);
+        Feed feed = feedRepository.findById(feedId)
+                .orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND));
         boolean isLiked = existsByStudentIdAndFeedId(studentInfo.id(), feedId);
         if (isLiked) {
             Like like = findLikeByStudentIdAndFeedId(studentInfo.id(), feedId);

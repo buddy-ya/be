@@ -7,6 +7,7 @@ import com.team.buddyya.feed.dto.response.BookmarkResponse;
 import com.team.buddyya.feed.exception.FeedException;
 import com.team.buddyya.feed.exception.FeedExceptionType;
 import com.team.buddyya.feed.respository.BookmarkRepository;
+import com.team.buddyya.feed.respository.FeedRepository;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.exception.StudentException;
 import com.team.buddyya.student.exception.StudentExceptionType;
@@ -22,7 +23,7 @@ public class BookmarkService {
 
     private final BookmarkRepository bookmarkRepository;
     private final StudentRepository studentRepository;
-    private final FeedService feedService;
+    private final FeedRepository feedRepository;
 
     public boolean existsByStudentIdAndFeedId(Long studentId, Long feedId) {
         return bookmarkRepository.existsByStudentIdAndFeedId(studentId, feedId);
@@ -34,7 +35,8 @@ public class BookmarkService {
     }
 
     public BookmarkResponse toggleBookmark(StudentInfo studentInfo, Long feedId) {
-        Feed feed = feedService.findFeedByFeedId(feedId);
+        Feed feed = feedRepository.findById(feedId)
+                .orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND));
         boolean isBookmarked = existsByStudentIdAndFeedId(studentInfo.id(), feedId);
         if (isBookmarked) {
             Bookmark bookmark = findByStudentIdAndFeedId(studentInfo.id(), feedId);

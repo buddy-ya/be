@@ -17,14 +17,15 @@ import org.springframework.web.multipart.MultipartFile;
 @Transactional
 @RequiredArgsConstructor
 public class FeedImageService {
+
     private final S3UploadService s3UploadService;
     private final FeedImageRepository feedImageRepository;
 
-    public void uploadFeedImages(List<FeedImage> images){
+    public void uploadFeedImages(List<FeedImage> images) {
         feedImageRepository.saveAll(images);
     }
 
-    public void deleteFeedImages(Feed feed){
+    public void deleteFeedImages(Feed feed) {
         feedImageRepository.deleteByFeed(feed);
     }
 

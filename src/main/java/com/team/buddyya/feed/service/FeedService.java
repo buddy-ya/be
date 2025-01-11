@@ -1,7 +1,11 @@
 package com.team.buddyya.feed.service;
 
 import com.team.buddyya.auth.domain.StudentInfo;
-import com.team.buddyya.feed.domain.*;
+import com.team.buddyya.feed.domain.Bookmark;
+import com.team.buddyya.feed.domain.Category;
+import com.team.buddyya.feed.domain.Feed;
+import com.team.buddyya.feed.domain.FeedImage;
+import com.team.buddyya.feed.domain.FeedUserAction;
 import com.team.buddyya.feed.dto.request.feed.FeedCreateRequest;
 import com.team.buddyya.feed.dto.request.feed.FeedListRequest;
 import com.team.buddyya.feed.dto.request.feed.FeedUpdateRequest;
@@ -17,6 +21,7 @@ import com.team.buddyya.student.exception.StudentException;
 import com.team.buddyya.student.exception.StudentExceptionType;
 import com.team.buddyya.student.repository.StudentRepository;
 import jakarta.transaction.Transactional;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,8 +29,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @Service
 @Transactional
@@ -41,7 +44,7 @@ public class FeedService {
     private final BookmarkRepository bookmarkRepository;
     private final FeedImageService feedImageService;
 
-    public Feed findFeedByFeedId(Long feedId) {
+    private Feed findFeedByFeedId(Long feedId) {
         return feedRepository.findById(feedId)
                 .orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND));
     }

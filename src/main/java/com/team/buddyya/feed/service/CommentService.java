@@ -12,6 +12,7 @@ import com.team.buddyya.feed.dto.response.comment.CommentUpdateResponse;
 import com.team.buddyya.feed.exception.FeedException;
 import com.team.buddyya.feed.exception.FeedExceptionType;
 import com.team.buddyya.feed.respository.CommentRepository;
+import com.team.buddyya.feed.respository.FeedRepository;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.exception.StudentException;
 import com.team.buddyya.student.exception.StudentExceptionType;
@@ -26,17 +27,21 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CommentService {
 
+    private final FeedRepository feedRepository;
     private final CommentRepository commentRepository;
-    private final FeedService feedService;
     private final StudentRepository studentRepository;
 
-    public Comment findCommentByCommentId(Long commentId) {
+    private Feed findFeedByFeedId(Long feedId) {
+        return feedRepository.findById(feedId).orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND));
+    }
+
+    private Comment findCommentByCommentId(Long commentId) {
         return commentRepository.findById(commentId)
                 .orElseThrow(() -> new FeedException(FeedExceptionType.COMMENT_NOT_FOUND));
     }
 
     public List<CommentResponse> getComments(StudentInfo studentInfo, Long feedId) {
-        Feed feed = feedService.findFeedByFeedId(feedId);
+        Feed feed = findFeedByFeedId(feedId);
         List<CommentInfo> commentInfos = feed.getComments().stream()
                 .map(comment -> CommentInfo.of(comment, feed.getStudent().getId(), studentInfo.id()))
                 .toList();
@@ -48,7 +53,7 @@ public class CommentService {
     public CommentCreateResponse createComment(StudentInfo studentInfo, Long feedId, CommentCreateRequest request) {
         Student student = studentRepository.findById(studentInfo.id())
                 .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
-        Feed feed = feedService.findFeedByFeedId(feedId);
+        Feed feed = findFeedByFeedId(feedId);
         Comment comment = Comment.builder()
                 .student(student)
                 .feed(feed)
@@ -61,16 +66,16 @@ public class CommentService {
 
     public CommentUpdateResponse updateComment(StudentInfo studentInfo, Long feedId, Long commentId,
                                                CommentUpdateRequest request) {
-        Feed feed = feedService.findFeedByFeedId(feedId);
+        Feed feed = findFeedByFeedId(feedId);
         Comment comment = findCommentByCommentId(commentId);
         validateCommentOwner(studentInfo.id(), comment);
         comment.updateComment(request.content());
-        CommentInfo commentInfo = CommentInfo.of(comment, comment.getFeed().getStudent().getId(), studentInfo.id());
+        CommentInfo commentInfo = CommentInfo.of(comment, feed.getStudent().getId(), studentInfo.id());
         return CommentUpdateResponse.from(commentInfo);
     }
 
     public void deleteComment(StudentInfo studentInfo, Long feedId, Long commentId) {
-        Feed feed = feedService.findFeedByFeedId(feedId);
+        Feed feed = findFeedByFeedId(feedId);
         Comment comment = findCommentByCommentId(commentId);
         validateCommentOwner(studentInfo.id(), comment);
         commentRepository.delete(comment);
