@@ -12,9 +12,9 @@ import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.exception.StudentException;
 import com.team.buddyya.student.exception.StudentExceptionType;
 import com.team.buddyya.student.repository.StudentRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
@@ -25,11 +25,13 @@ public class LikeService {
     private final StudentRepository studentRepository;
     private final FeedRepository feedRepository;
 
-    private boolean existsByStudentAndFeed(Student student, Feed feed) {
+    @Transactional(readOnly = true)
+    boolean existsByStudentAndFeed(Student student, Feed feed) {
         return likeRepository.existsByStudentAndFeed(student, feed);
     }
 
-    private Like findLikeByStudentAndFeed(Student student, Feed feed) {
+    @Transactional(readOnly = true)
+    Like findLikeByStudentAndFeed(Student student, Feed feed) {
         return likeRepository.findByStudentAndFeed(student, feed)
                 .orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_LIKED));
     }
@@ -37,7 +39,6 @@ public class LikeService {
     public LikeResponse toggleLike(StudentInfo studentInfo, Long feedId) {
         Feed feed = feedRepository.findById(feedId)
                 .orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND));
-
         Student student = studentRepository.findById(studentInfo.id())
                 .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
         boolean isLiked = existsByStudentAndFeed(student, feed);

@@ -1,7 +1,14 @@
 package com.team.buddyya.chatting.domain;
 
 import com.team.buddyya.student.domain.Student;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,11 +29,11 @@ public class ChatroomStudent {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chatroom_id")
-    private Chatroom chatRoom;
+    private Chatroom chatroom;
 
     @Builder
     public ChatroomStudent(Student student, Chatroom chatroom) {
         this.student = student;
-        this.chatRoom = chatroom;
+        this.chatroom = chatroom;
     }
 }

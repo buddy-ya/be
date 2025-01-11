@@ -12,9 +12,9 @@ import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.exception.StudentException;
 import com.team.buddyya.student.exception.StudentExceptionType;
 import com.team.buddyya.student.repository.StudentRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
@@ -25,11 +25,13 @@ public class BookmarkService {
     private final StudentRepository studentRepository;
     private final FeedRepository feedRepository;
 
-    public boolean existsByStudentAndFeed(Student student, Feed feed) {
+    @Transactional(readOnly = true)
+    boolean existsByStudentAndFeed(Student student, Feed feed) {
         return bookmarkRepository.existsByStudentAndFeed(student, feed);
     }
 
-    private Bookmark findByStudentAndFeed(Student student, Feed feed) {
+    @Transactional(readOnly = true)
+    Bookmark findByStudentAndFeed(Student student, Feed feed) {
         return bookmarkRepository.findByStudentAndFeed(student, feed)
                 .orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_BOOKMARKED));
     }

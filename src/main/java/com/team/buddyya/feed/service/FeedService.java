@@ -18,7 +18,6 @@ import com.team.buddyya.feed.respository.FeedRepository;
 import com.team.buddyya.feed.respository.LikeRepository;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.service.FindStudentService;
-import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,6 +25,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -42,15 +42,18 @@ public class FeedService {
     private final BookmarkRepository bookmarkRepository;
     private final FeedImageService feedImageService;
 
-    private Feed findFeedByFeedId(Long feedId) {
+    @Transactional(readOnly = true)
+    Feed findFeedByFeedId(Long feedId) {
         return feedRepository.findById(feedId)
                 .orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND));
     }
 
-    private Student findStudentByStudentId(Long studentId) {
+    @Transactional(readOnly = true)
+    Student findStudentByStudentId(Long studentId) {
         return findStudentService.findByStudentId(studentId);
     }
 
+    @Transactional(readOnly = true)
     public FeedListResponse getFeeds(StudentInfo studentInfo, Pageable pageable, FeedListRequest request) {
         String keyword = request.keyword();
         if (keyword == null || keyword.isBlank()) {
@@ -67,6 +70,13 @@ public class FeedService {
         return FeedListResponse.from(response, feeds);
     }
 
+    @Transactional(readOnly = true)
+    public FeedResponse getFeed(StudentInfo studentInfo, Long feedId) {
+        Feed feed = findFeedByFeedId(feedId);
+        return createFeedResponse(feed, studentInfo.id());
+    }
+
+    @Transactional(readOnly = true)
     public FeedListResponse getPopularFeeds(StudentInfo studentInfo, Pageable pageable) {
         Page<Feed> feeds = feedRepository.findByLikeCountGreaterThanEqual(LIKE_COUNT_THRESHOLD, pageable);
         List<FeedResponse> response = feeds.getContent().stream()
@@ -75,9 +85,53 @@ public class FeedService {
         return FeedListResponse.from(response, feeds);
     }
 
-    public FeedResponse getFeed(StudentInfo studentInfo, Long feedId) {
-        Feed feed = findFeedByFeedId(feedId);
-        return createFeedResponse(feed, studentInfo.id());
+    @Transactional(readOnly = true)
+    Page<Feed> getFeedsByCategory(FeedListRequest request, Pageable pageable) {
+        Category category = categoryService.getCategory(request.category());
+        Pageable customPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                getSortBy(category)
+        );
+        return feedRepository.findAllByCategoryName(category.getName(), customPageable);
+    }
+
+    @Transactional(readOnly = true)
+    public FeedListResponse getMyFeed(StudentInfo studentInfo, Pageable pageable) {
+        Pageable customPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize()
+        );
+        Student student = findStudentByStudentId(studentInfo.id());
+        Page<Feed> feeds = feedRepository.findAllByStudent(student, customPageable);
+        List<FeedResponse> response = feeds.getContent().stream()
+                .map(feed -> createFeedResponse(feed, studentInfo.id()))
+                .toList();
+        return FeedListResponse.from(response, feeds);
+    }
+
+    @Transactional(readOnly = true)
+    public FeedListResponse getBookmarkFeed(StudentInfo studentInfo, Pageable pageable) {
+        Student student = findStudentByStudentId(studentInfo.id());
+        Page<Bookmark> bookmarks = bookmarkRepository.findAllByStudent(student, pageable);
+        Page<Feed> feeds = bookmarks.map(Bookmark::getFeed);
+        List<FeedResponse> response = bookmarks.getContent().stream()
+                .map(bookmark -> createFeedResponse(bookmark.getFeed(), studentInfo.id()))
+                .toList();
+        return FeedListResponse.from(response, feeds);
+    }
+
+    @Transactional(readOnly = true)
+    Page<Feed> getFeedsByKeyword(String keyword, Pageable pageable) {
+        return feedRepository.findByTitleContainingOrContentContaining(keyword, keyword, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    FeedUserAction getUserAction(Student student, Feed feed) {
+        boolean isFeedOwner = student.getId().equals(feed.getStudent().getId());
+        boolean isLiked = likeRepository.existsByStudentAndFeed(student, feed);
+        boolean isBookmarked = bookmarkRepository.existsByStudentAndFeed(student, feed);
+        return FeedUserAction.of(isFeedOwner, isLiked, isBookmarked);
     }
 
     public void createFeed(StudentInfo studentInfo, FeedCreateRequest request) {
@@ -109,20 +163,6 @@ public class FeedService {
         feedRepository.delete(feed);
     }
 
-    private Page<Feed> getFeedsByCategory(FeedListRequest request, Pageable pageable) {
-        Category category = categoryService.getCategory(request.category());
-        Pageable customPageable = PageRequest.of(
-                pageable.getPageNumber(),
-                pageable.getPageSize(),
-                getSortBy(category)
-        );
-        return feedRepository.findAllByCategoryName(category.getName(), customPageable);
-    }
-
-    private Page<Feed> getFeedsByKeyword(String keyword, Pageable pageable) {
-        return feedRepository.findByTitleContainingOrContentContaining(keyword, keyword, pageable);
-    }
-
     private void validateFeedOwner(Long studentId, Feed feed) {
         if (!studentId.equals(feed.getStudent().getId())) {
             throw new FeedException(FeedExceptionType.NOT_FEED_OWNER);
@@ -133,13 +173,6 @@ public class FeedService {
         Student student = findStudentByStudentId(studentId);
         FeedUserAction userAction = getUserAction(student, feed);
         return FeedResponse.from(feed, userAction);
-    }
-
-    private FeedUserAction getUserAction(Student student, Feed feed) {
-        boolean isFeedOwner = student.getId().equals(feed.getStudent().getId());
-        boolean isLiked = likeRepository.existsByStudentAndFeed(student, feed);
-        boolean isBookmarked = bookmarkRepository.existsByStudentAndFeed(student, feed);
-        return FeedUserAction.of(isFeedOwner, isLiked, isBookmarked);
     }
 
     private void updateImages(Feed feed, List<MultipartFile> images) {
@@ -162,28 +195,5 @@ public class FeedService {
         return category.getName().equals("POPULAR")
                 ? Sort.by(Sort.Direction.DESC, "likeCount", "createdDate")
                 : Sort.by(Sort.Direction.DESC, "createdDate");
-    }
-
-    public FeedListResponse getMyFeed(StudentInfo studentInfo, Pageable pageable) {
-        Pageable customPageable = PageRequest.of(
-                pageable.getPageNumber(),
-                pageable.getPageSize()
-        );
-        Student student = findStudentByStudentId(studentInfo.id());
-        Page<Feed> feeds = feedRepository.findAllByStudent(student, customPageable);
-        List<FeedResponse> response = feeds.getContent().stream()
-                .map(feed -> createFeedResponse(feed, studentInfo.id()))
-                .toList();
-        return FeedListResponse.from(response, feeds);
-    }
-
-    public FeedListResponse getBookmarkFeed(StudentInfo studentInfo, Pageable pageable) {
-        Student student = findStudentByStudentId(studentInfo.id());
-        Page<Bookmark> bookmarks = bookmarkRepository.findAllByStudent(student, pageable);
-        Page<Feed> feeds = bookmarks.map(Bookmark::getFeed);
-        List<FeedResponse> response = bookmarks.getContent().stream()
-                .map(bookmark -> createFeedResponse(bookmark.getFeed(), studentInfo.id()))
-                .toList();
-        return FeedListResponse.from(response, feeds);
     }
 }

@@ -17,10 +17,10 @@ import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.exception.StudentException;
 import com.team.buddyya.student.exception.StudentExceptionType;
 import com.team.buddyya.student.repository.StudentRepository;
-import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
@@ -31,15 +31,18 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final StudentRepository studentRepository;
 
-    private Feed findFeedByFeedId(Long feedId) {
+    @Transactional(readOnly = true)
+    Feed findFeedByFeedId(Long feedId) {
         return feedRepository.findById(feedId).orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND));
     }
 
-    private Comment findCommentByCommentId(Long commentId) {
+    @Transactional(readOnly = true)
+    Comment findCommentByCommentId(Long commentId) {
         return commentRepository.findById(commentId)
                 .orElseThrow(() -> new FeedException(FeedExceptionType.COMMENT_NOT_FOUND));
     }
 
+    @Transactional(readOnly = true)
     public List<CommentResponse> getComments(StudentInfo studentInfo, Long feedId) {
         Feed feed = findFeedByFeedId(feedId);
         List<CommentInfo> commentInfos = feed.getComments().stream()

@@ -7,10 +7,10 @@ import com.team.buddyya.common.service.S3UploadService;
 import com.team.buddyya.feed.domain.Feed;
 import com.team.buddyya.feed.domain.FeedImage;
 import com.team.buddyya.feed.respository.FeedImageRepository;
-import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
