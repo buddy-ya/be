@@ -39,6 +39,8 @@ public class SecurityConfig {
                         .authenticationEntryPoint(authenticationEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler))
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/chat/**").permitAll()
+                        .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/onboarding", "/phone-auth/**",
                                 "/auth/reissue").permitAll()
                         .requestMatchers("/auth/fail", "/admin/**").hasAuthority("ROLE_ADMIN")

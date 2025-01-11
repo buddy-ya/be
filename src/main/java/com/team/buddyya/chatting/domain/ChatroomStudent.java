@@ -22,11 +22,11 @@ public class ChatroomStudent {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chatroom_id")
-    private Chatroom chatRoom;
+    private Chatroom chatroom;
 
     @Builder
     public ChatroomStudent(Student student, Chatroom chatroom) {
         this.student = student;
-        this.chatRoom = chatroom;
+        this.chatroom = chatroom;
     }
 }

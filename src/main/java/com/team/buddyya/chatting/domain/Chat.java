@@ -5,14 +5,12 @@ import com.team.buddyya.student.domain.Student;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Table(name = "chat")
 public class Chat extends CreatedTime {
 
     @Id
