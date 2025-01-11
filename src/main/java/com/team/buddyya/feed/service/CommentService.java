@@ -14,9 +14,7 @@ import com.team.buddyya.feed.exception.FeedExceptionType;
 import com.team.buddyya.feed.respository.CommentRepository;
 import com.team.buddyya.feed.respository.FeedRepository;
 import com.team.buddyya.student.domain.Student;
-import com.team.buddyya.student.exception.StudentException;
-import com.team.buddyya.student.exception.StudentExceptionType;
-import com.team.buddyya.student.repository.StudentRepository;
+import com.team.buddyya.student.service.FindStudentService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,7 +27,7 @@ public class CommentService {
 
     private final FeedRepository feedRepository;
     private final CommentRepository commentRepository;
-    private final StudentRepository studentRepository;
+    private final FindStudentService findStudentService;
 
     @Transactional(readOnly = true)
     Feed findFeedByFeedId(Long feedId) {
@@ -54,8 +52,7 @@ public class CommentService {
     }
 
     public CommentCreateResponse createComment(StudentInfo studentInfo, Long feedId, CommentCreateRequest request) {
-        Student student = studentRepository.findById(studentInfo.id())
-                .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
+        Student student = findStudentService.findByStudentId(studentInfo.id());
         Feed feed = findFeedByFeedId(feedId);
         Comment comment = Comment.builder()
                 .student(student)
