@@ -1,6 +1,6 @@
 package com.team.buddyya.chatting.domain;
 
-import com.team.buddyya.common.domain.BaseTime;
+import com.team.buddyya.common.domain.CreatedTime;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +12,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @Table(name = "chatroom")
-public class Chatroom extends BaseTime {
+public class Chatroom extends CreatedTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
