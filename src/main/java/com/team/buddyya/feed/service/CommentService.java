@@ -46,7 +46,7 @@ public class CommentService {
     public List<CommentResponse> getComments(StudentInfo studentInfo, Long feedId) {
         Feed feed = findFeedByFeedId(feedId);
         List<CommentInfo> commentInfos = feed.getComments().stream()
-                .map(comment -> CommentInfo.of(comment, feed.getStudent().getId(), studentInfo.id()))
+                .map(comment -> CommentInfo.from(comment, feed.getStudent().getId(), studentInfo.id()))
                 .toList();
         return commentInfos.stream()
                 .map(CommentResponse::from)
@@ -63,7 +63,7 @@ public class CommentService {
                 .content(request.content())
                 .build();
         commentRepository.save(comment);
-        CommentInfo commentInfo = CommentInfo.of(comment, feed.getStudent().getId(), studentInfo.id());
+        CommentInfo commentInfo = CommentInfo.from(comment, feed.getStudent().getId(), studentInfo.id());
         return CommentCreateResponse.from(commentInfo);
     }
 
@@ -73,7 +73,7 @@ public class CommentService {
         Comment comment = findCommentByCommentId(commentId);
         validateCommentOwner(studentInfo.id(), comment);
         comment.updateComment(request.content());
-        CommentInfo commentInfo = CommentInfo.of(comment, feed.getStudent().getId(), studentInfo.id());
+        CommentInfo commentInfo = CommentInfo.from(comment, feed.getStudent().getId(), studentInfo.id());
         return CommentUpdateResponse.from(commentInfo);
     }
 

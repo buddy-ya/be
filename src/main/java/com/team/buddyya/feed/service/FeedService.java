@@ -131,7 +131,7 @@ public class FeedService {
         boolean isFeedOwner = student.getId().equals(feed.getStudent().getId());
         boolean isLiked = likeRepository.existsByStudentAndFeed(student, feed);
         boolean isBookmarked = bookmarkRepository.existsByStudentAndFeed(student, feed);
-        return FeedUserAction.of(isFeedOwner, isLiked, isBookmarked);
+        return FeedUserAction.from(isFeedOwner, isLiked, isBookmarked);
     }
 
     public void createFeed(StudentInfo studentInfo, FeedCreateRequest request) {

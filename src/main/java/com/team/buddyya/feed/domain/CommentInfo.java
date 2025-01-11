@@ -6,7 +6,7 @@ public record CommentInfo(
         boolean isCommentOwner
 ) {
 
-    public static CommentInfo of(Comment comment, Long feedOwnerId, Long currentUserId) {
+    public static CommentInfo from(Comment comment, Long feedOwnerId, Long currentUserId) {
         return new CommentInfo(
                 comment,
                 feedOwnerId.equals(comment.getStudent().getId()),
