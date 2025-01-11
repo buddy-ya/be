@@ -3,14 +3,12 @@ package com.team.buddyya.chatting.domain;
 import com.team.buddyya.common.domain.CreatedTime;
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
-@NoArgsConstructor
 @Table(name = "chatroom")
 public class Chatroom extends CreatedTime {
 
