@@ -6,15 +6,18 @@ import static lombok.AccessLevel.PROTECTED;
 
 import com.team.buddyya.common.domain.BaseTime;
 import com.team.buddyya.student.domain.Student;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreRemove;
 import jakarta.persistence.Table;
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -42,6 +45,9 @@ public class Comment extends BaseTime {
 
     @Column(name = "like_count", nullable = false)
     private int likeCount;
+
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<CommentLike> commentLikes;
 
     @Builder
     public Comment(Student student, Feed feed, String content) {
