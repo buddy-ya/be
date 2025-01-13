@@ -17,6 +17,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreRemove;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
@@ -40,17 +41,27 @@ public class Comment extends BaseTime {
     @JoinColumn(name = "feed_id", nullable = false)
     private Feed feed;
 
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "parent_id")
+    private Comment parent;
+
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
     @Column(name = "like_count", nullable = false)
     private int likeCount;
 
+    @Column(nullable = false)
+    private int depth;
+
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Comment> children = new ArrayList<>();
+
     @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<CommentLike> commentLikes;
 
     @Builder
-    public Comment(Student student, Feed feed, String content) {
+    public Comment(Student student, Feed feed, String content, Comment parent, int depth) {
         this.student = student;
         this.feed = feed;
         this.content = content;
