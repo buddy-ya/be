@@ -3,9 +3,11 @@ package com.team.buddyya.feed.controller;
 import com.team.buddyya.auth.domain.CustomUserDetails;
 import com.team.buddyya.feed.dto.request.comment.CommentCreateRequest;
 import com.team.buddyya.feed.dto.request.comment.CommentUpdateRequest;
+import com.team.buddyya.feed.dto.response.LikeResponse;
 import com.team.buddyya.feed.dto.response.comment.CommentCreateResponse;
 import com.team.buddyya.feed.dto.response.comment.CommentResponse;
 import com.team.buddyya.feed.dto.response.comment.CommentUpdateResponse;
+import com.team.buddyya.feed.service.CommentLikeService;
 import com.team.buddyya.feed.service.CommentService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class CommentController {
 
     private final CommentService commentService;
+    private final CommentLikeService commentLikeService;
 
     @GetMapping
     public ResponseEntity<List<CommentResponse>> getComments(
@@ -59,5 +63,13 @@ public class CommentController {
                                               @PathVariable Long commentId) {
         commentService.deleteComment(userDetails.getStudentInfo(), feedId, commentId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{commentId}/like")
+    public ResponseEntity<LikeResponse> toggleCommentLike(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                          @PathVariable Long feedId,
+                                                          @PathVariable Long commentId) {
+        LikeResponse response = commentLikeService.toggleLike(userDetails.getStudentInfo(), commentId);
+        return ResponseEntity.ok(response);
     }
 }

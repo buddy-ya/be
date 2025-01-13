@@ -40,6 +40,9 @@ public class Comment extends BaseTime {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
+    @Column(name = "like_count", nullable = false)
+    private int likeCount;
+
     @Builder
     public Comment(Student student, Feed feed, String content) {
         this.student = student;
@@ -54,6 +57,14 @@ public class Comment extends BaseTime {
 
     public void updateComment(String content) {
         this.content = content;
+    }
+
+    public void increaseLikeCount() {
+        this.likeCount++;
+    }
+
+    public void decreaseLikeCount() {
+        this.likeCount--;
     }
 
     @PrePersist
