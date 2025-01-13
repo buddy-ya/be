@@ -51,20 +51,23 @@ public class Comment extends BaseTime {
     @Column(name = "like_count", nullable = false)
     private int likeCount;
 
-    @Column(nullable = false)
-    private int depth;
+    @Column(name = "deleted", nullable = false)
+    private boolean isDeleted;
 
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "parent")
     private List<Comment> children = new ArrayList<>();
 
     @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<CommentLike> commentLikes;
 
     @Builder
-    public Comment(Student student, Feed feed, String content, Comment parent, int depth) {
+    public Comment(Student student, Feed feed, String content, Comment parent) {
         this.student = student;
         this.feed = feed;
         this.content = content;
+        this.parent = parent;
+        this.likeCount = 0;
+        this.isDeleted = false;
     }
 
     public void setFeed(Feed feed) {

@@ -6,9 +6,7 @@ import com.team.buddyya.feed.domain.CommentInfo;
 import com.team.buddyya.feed.domain.Feed;
 import com.team.buddyya.feed.dto.request.comment.CommentCreateRequest;
 import com.team.buddyya.feed.dto.request.comment.CommentUpdateRequest;
-import com.team.buddyya.feed.dto.response.comment.CommentCreateResponse;
 import com.team.buddyya.feed.dto.response.comment.CommentResponse;
-import com.team.buddyya.feed.dto.response.comment.CommentUpdateResponse;
 import com.team.buddyya.feed.exception.FeedException;
 import com.team.buddyya.feed.exception.FeedExceptionType;
 import com.team.buddyya.feed.respository.CommentRepository;
@@ -51,27 +49,32 @@ public class CommentService {
                 .toList();
     }
 
-    public CommentCreateResponse createComment(StudentInfo studentInfo, Long feedId, CommentCreateRequest request) {
+    public CommentResponse createComment(StudentInfo studentInfo, Long feedId, CommentCreateRequest request) {
         Student student = findStudentService.findByStudentId(studentInfo.id());
         Feed feed = findFeedByFeedId(feedId);
+        Comment parent = null;
+        if (request.parentId() != null) {
+            parent = findCommentByCommentId(request.parentId());
+        }
         Comment comment = Comment.builder()
                 .student(student)
                 .feed(feed)
                 .content(request.content())
+                .parent(parent)
                 .build();
         commentRepository.save(comment);
         CommentInfo commentInfo = CommentInfo.from(comment, feed.getStudent().getId(), studentInfo.id());
-        return CommentCreateResponse.from(commentInfo);
+        return CommentResponse.from(commentInfo);
     }
 
-    public CommentUpdateResponse updateComment(StudentInfo studentInfo, Long feedId, Long commentId,
-                                               CommentUpdateRequest request) {
+    public CommentResponse updateComment(StudentInfo studentInfo, Long feedId, Long commentId,
+                                         CommentUpdateRequest request) {
         Feed feed = findFeedByFeedId(feedId);
         Comment comment = findCommentByCommentId(commentId);
         validateCommentOwner(studentInfo.id(), comment);
         comment.updateComment(request.content());
         CommentInfo commentInfo = CommentInfo.from(comment, feed.getStudent().getId(), studentInfo.id());
-        return CommentUpdateResponse.from(commentInfo);
+        return CommentResponse.from(commentInfo);
     }
 
     public void deleteComment(StudentInfo studentInfo, Long feedId, Long commentId) {
