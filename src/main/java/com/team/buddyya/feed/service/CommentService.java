@@ -12,33 +12,39 @@ import com.team.buddyya.feed.dto.response.comment.CommentUpdateResponse;
 import com.team.buddyya.feed.exception.FeedException;
 import com.team.buddyya.feed.exception.FeedExceptionType;
 import com.team.buddyya.feed.respository.CommentRepository;
+import com.team.buddyya.feed.respository.FeedRepository;
 import com.team.buddyya.student.domain.Student;
-import com.team.buddyya.student.exception.StudentException;
-import com.team.buddyya.student.exception.StudentExceptionType;
-import com.team.buddyya.student.repository.StudentRepository;
-import jakarta.transaction.Transactional;
+import com.team.buddyya.student.service.FindStudentService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class CommentService {
 
+    private final FeedRepository feedRepository;
     private final CommentRepository commentRepository;
-    private final FeedService feedService;
-    private final StudentRepository studentRepository;
+    private final FindStudentService findStudentService;
 
-    public Comment findCommentByCommentId(Long commentId) {
+    @Transactional(readOnly = true)
+    Feed findFeedByFeedId(Long feedId) {
+        return feedRepository.findById(feedId).orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND));
+    }
+
+    @Transactional(readOnly = true)
+    Comment findCommentByCommentId(Long commentId) {
         return commentRepository.findById(commentId)
                 .orElseThrow(() -> new FeedException(FeedExceptionType.COMMENT_NOT_FOUND));
     }
 
+    @Transactional(readOnly = true)
     public List<CommentResponse> getComments(StudentInfo studentInfo, Long feedId) {
-        Feed feed = feedService.findFeedByFeedId(feedId);
+        Feed feed = findFeedByFeedId(feedId);
         List<CommentInfo> commentInfos = feed.getComments().stream()
-                .map(comment -> CommentInfo.of(comment, feed.getStudent().getId(), studentInfo.id()))
+                .map(comment -> CommentInfo.from(comment, feed.getStudent().getId(), studentInfo.id()))
                 .toList();
         return commentInfos.stream()
                 .map(CommentResponse::from)
@@ -46,31 +52,30 @@ public class CommentService {
     }
 
     public CommentCreateResponse createComment(StudentInfo studentInfo, Long feedId, CommentCreateRequest request) {
-        Student student = studentRepository.findById(studentInfo.id())
-                .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
-        Feed feed = feedService.findFeedByFeedId(feedId);
+        Student student = findStudentService.findByStudentId(studentInfo.id());
+        Feed feed = findFeedByFeedId(feedId);
         Comment comment = Comment.builder()
                 .student(student)
                 .feed(feed)
                 .content(request.content())
                 .build();
         commentRepository.save(comment);
-        CommentInfo commentInfo = CommentInfo.of(comment, feed.getStudent().getId(), studentInfo.id());
+        CommentInfo commentInfo = CommentInfo.from(comment, feed.getStudent().getId(), studentInfo.id());
         return CommentCreateResponse.from(commentInfo);
     }
 
     public CommentUpdateResponse updateComment(StudentInfo studentInfo, Long feedId, Long commentId,
                                                CommentUpdateRequest request) {
-        Feed feed = feedService.findFeedByFeedId(feedId);
+        Feed feed = findFeedByFeedId(feedId);
         Comment comment = findCommentByCommentId(commentId);
         validateCommentOwner(studentInfo.id(), comment);
         comment.updateComment(request.content());
-        CommentInfo commentInfo = CommentInfo.of(comment, comment.getFeed().getStudent().getId(), studentInfo.id());
+        CommentInfo commentInfo = CommentInfo.from(comment, feed.getStudent().getId(), studentInfo.id());
         return CommentUpdateResponse.from(commentInfo);
     }
 
     public void deleteComment(StudentInfo studentInfo, Long feedId, Long commentId) {
-        Feed feed = feedService.findFeedByFeedId(feedId);
+        Feed feed = findFeedByFeedId(feedId);
         Comment comment = findCommentByCommentId(commentId);
         validateCommentOwner(studentInfo.id(), comment);
         commentRepository.delete(comment);

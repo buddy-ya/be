@@ -42,6 +42,11 @@ public class Like extends CreatedTime {
         this.student = student;
     }
 
+    public void setFeed(Feed feed) {
+        this.feed = feed;
+        feed.getLikes().add(this);
+    }
+
     @PrePersist
     private void prePersist() {
         feed.increaseLikeCount();

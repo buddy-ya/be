@@ -38,4 +38,9 @@ public class FeedImage extends CreatedTime {
         this.feed = feed;
         this.url = url;
     }
+
+    public void setFeed(Feed feed) {
+        this.feed = feed;
+        feed.getImages().add(this);
+    }
 }

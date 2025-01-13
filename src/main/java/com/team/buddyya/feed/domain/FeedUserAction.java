@@ -6,7 +6,7 @@ public record FeedUserAction(
         boolean isBookmarked
 ) {
 
-    public static FeedUserAction of(boolean isFeedOwner, boolean isLiked, boolean isBookmarked) {
+    public static FeedUserAction from(boolean isFeedOwner, boolean isLiked, boolean isBookmarked) {
         return new FeedUserAction(isFeedOwner, isLiked, isBookmarked);
     }
 }

@@ -39,4 +39,9 @@ public class Bookmark extends CreatedTime {
         this.feed = feed;
         this.student = student;
     }
+
+    public void setFeed(Feed feed) {
+        this.feed = feed;
+        feed.getBookmarks().add(this);
+    }
 }
