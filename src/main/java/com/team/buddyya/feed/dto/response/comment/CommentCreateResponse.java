@@ -10,6 +10,7 @@ public record CommentCreateResponse(
         String country,
         String university,
         String profileImageUrl,
+        int likeCount,
         LocalDateTime createdDate,
         boolean isFeedOwner,
         boolean isCommentOwner
@@ -23,6 +24,7 @@ public record CommentCreateResponse(
                 info.comment().getStudent().getCountry(),
                 info.comment().getStudent().getUniversity().getUniversityName(),
                 info.comment().getStudent().getProfileImage().getUrl(),
+                info.comment().getLikeCount(),
                 info.comment().getCreatedDate(),
                 info.isFeedOwner(),
                 info.isCommentOwner()

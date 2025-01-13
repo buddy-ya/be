@@ -1,7 +1,6 @@
 package com.team.buddyya.feed.dto.response.comment;
 
 import com.team.buddyya.feed.domain.CommentInfo;
-
 import java.time.LocalDateTime;
 
 
@@ -12,6 +11,7 @@ public record CommentUpdateResponse(
         String country,
         String university,
         String profileImageUrl,
+        int likeCount,
         LocalDateTime updatedDate,
         LocalDateTime createdDate,
         boolean isFeedOwner,
@@ -26,6 +26,7 @@ public record CommentUpdateResponse(
                 info.comment().getStudent().getCountry(),
                 info.comment().getStudent().getUniversity().getUniversityName(),
                 info.comment().getStudent().getProfileImage().getUrl(),
+                info.comment().getLikeCount(),
                 info.comment().getUpdatedDate(),
                 info.comment().getCreatedDate(),
                 info.isFeedOwner(),
