@@ -2,7 +2,7 @@ package com.team.buddyya.feed.service;
 
 import com.team.buddyya.auth.domain.StudentInfo;
 import com.team.buddyya.feed.domain.Feed;
-import com.team.buddyya.feed.domain.Like;
+import com.team.buddyya.feed.domain.FeedLike;
 import com.team.buddyya.feed.dto.response.LikeResponse;
 import com.team.buddyya.feed.exception.FeedException;
 import com.team.buddyya.feed.exception.FeedExceptionType;
@@ -29,7 +29,7 @@ public class LikeService {
     }
 
     @Transactional(readOnly = true)
-    Like findLikeByStudentAndFeed(Student student, Feed feed) {
+    FeedLike findLikeByStudentAndFeed(Student student, Feed feed) {
         return likeRepository.findByStudentAndFeed(student, feed)
                 .orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_LIKED));
     }
@@ -40,15 +40,15 @@ public class LikeService {
         Student student = findStudentService.findByStudentId(studentInfo.id());
         boolean isLiked = existsByStudentAndFeed(student, feed);
         if (isLiked) {
-            Like like = findLikeByStudentAndFeed(student, feed);
-            likeRepository.delete(like);
+            FeedLike feedLike = findLikeByStudentAndFeed(student, feed);
+            likeRepository.delete(feedLike);
             return LikeResponse.from(false, feed.getLikeCount());
         }
-        Like like = Like.builder()
+        FeedLike feedLike = FeedLike.builder()
                 .feed(feed)
                 .student(student)
                 .build();
-        likeRepository.save(like);
+        likeRepository.save(feedLike);
         return LikeResponse.from(true, feed.getLikeCount());
     }
 }

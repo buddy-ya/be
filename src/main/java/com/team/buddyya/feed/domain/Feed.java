@@ -63,7 +63,7 @@ public class Feed extends BaseTime {
     private List<FeedImage> images = new ArrayList<>();
 
     @OneToMany(mappedBy = "feed", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<Like> likes;
+    private List<FeedLike> feedLikes;
 
     @OneToMany(mappedBy = "feed", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Bookmark> bookmarks;
@@ -102,6 +102,6 @@ public class Feed extends BaseTime {
     }
 
     public void uploadFeedImages(List<FeedImage> images) {
-        this.images= images;
+        this.images = images;
     }
 }
