@@ -39,12 +39,11 @@ public class SecurityConfig {
                         .authenticationEntryPoint(authenticationEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/chat/**").permitAll()
-                        .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/ws/**", "/ws/chat/**").permitAll()
                         .requestMatchers("/onboarding", "/phone-auth/**",
                                 "/auth/reissue").permitAll()
                         .requestMatchers("/auth/fail", "/admin/**").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers("/auth/success", "/certification/**", "/feeds/**", "/mypage/**").hasAuthority("ROLE_STUDENT")
+                        .requestMatchers("/auth/success", "/certification/**", "/feeds/**", "/mypage/**", "/chat/**").hasAuthority("ROLE_STUDENT")
                         .anyRequest().authenticated()
                 );
         return http.build();

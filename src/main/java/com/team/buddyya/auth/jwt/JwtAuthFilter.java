@@ -51,4 +51,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             log.info("Security Context에 '{}' 인증 정보를 저장했습니다.", authenticationToken.getName());
         }
     }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getServletPath();
+        return path.startsWith("/ws/");
+    }
 }
