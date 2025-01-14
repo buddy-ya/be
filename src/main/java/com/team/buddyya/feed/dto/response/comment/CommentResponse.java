@@ -13,6 +13,7 @@ public record CommentResponse(
         String profileImageUrl,
         int likeCount,
         LocalDateTime createdDate,
+        boolean isDeleted,
         boolean isFeedOwner,
         boolean isCommentOwner,
         List<CommentResponse> replies
@@ -33,6 +34,7 @@ public record CommentResponse(
                 comment.getStudent().getProfileImage().getUrl(),
                 comment.getLikeCount(),
                 comment.getCreatedDate(),
+                comment.isDeleted(),
                 isFeedOwner,
                 isCommentOwner,
                 replies

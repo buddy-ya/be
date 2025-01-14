@@ -76,7 +76,13 @@ public class CommentService {
         Feed feed = findFeedByFeedId(feedId);
         Comment comment = findCommentByCommentId(commentId);
         validateCommentOwner(studentInfo.id(), comment);
-        commentRepository.delete(comment);
+        boolean hasChild = !comment.getChildren().isEmpty();
+        if (hasChild) {
+            comment.updateIsDeleted(true);
+            commentRepository.save(comment);
+        } else {
+            commentRepository.delete(comment);
+        }
     }
 
     private void validateCommentOwner(Long studentId, Comment comment) {
