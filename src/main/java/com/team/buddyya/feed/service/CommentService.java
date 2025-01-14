@@ -52,6 +52,9 @@ public class CommentService {
         Comment parent = null;
         if (request.parentId() != null) {
             parent = findCommentByCommentId(request.parentId());
+            if (parent.getParent() != null) {
+                throw new FeedException(FeedExceptionType.COMMENT_DEPTH_LIMIT);
+            }
         }
         Comment comment = Comment.builder()
                 .student(student)
