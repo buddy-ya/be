@@ -40,7 +40,9 @@ public class CommentService {
     @Transactional(readOnly = true)
     public List<CommentResponse> getComments(StudentInfo studentInfo, Long feedId) {
         Feed feed = findFeedByFeedId(feedId);
-        List<Comment> comments = feed.getComments();
+        List<Comment> comments = feed.getComments().stream()
+                .filter(comment -> comment.getParent() == null)
+                .toList();
         return comments.stream()
                 .map(comment -> CommentResponse.from(comment, feedId, studentInfo.id()))
                 .toList();
@@ -70,6 +72,9 @@ public class CommentService {
                                          CommentUpdateRequest request) {
         Feed feed = findFeedByFeedId(feedId);
         Comment comment = findCommentByCommentId(commentId);
+        if (comment.isDeleted()) {
+            throw new FeedException(FeedExceptionType.COMMENT_NOT_FOUND);
+        }
         validateCommentOwner(studentInfo.id(), comment);
         comment.updateComment(request.content());
         return CommentResponse.from(comment, feed.getStudent().getId(), studentInfo.id());
@@ -78,6 +83,9 @@ public class CommentService {
     public void deleteComment(StudentInfo studentInfo, Long feedId, Long commentId) {
         Feed feed = findFeedByFeedId(feedId);
         Comment comment = findCommentByCommentId(commentId);
+        if (comment.isDeleted()) {
+            throw new FeedException(FeedExceptionType.COMMENT_NOT_FOUND);
+        }
         validateCommentOwner(studentInfo.id(), comment);
         boolean hasChild = !comment.getChildren().isEmpty();
         if (hasChild) {

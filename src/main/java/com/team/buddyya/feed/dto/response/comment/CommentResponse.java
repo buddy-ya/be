@@ -21,7 +21,7 @@ public record CommentResponse(
 
     public static CommentResponse from(Comment comment, Long feedOwnerId, Long currentUserId) {
         boolean isFeedOwner = feedOwnerId.equals(comment.getStudent().getId());
-        boolean isCommentOwner = comment.getId().equals(currentUserId);
+        boolean isCommentOwner = currentUserId.equals(comment.getStudent().getId());
         List<CommentResponse> replies = comment.getChildren().stream()
                 .map(reply -> CommentResponse.from(reply, feedOwnerId, currentUserId))
                 .toList();
