@@ -38,21 +38,20 @@ public class CommentController {
     }
 
     @PostMapping
-    public ResponseEntity<CommentResponse> createComment(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                                         @PathVariable Long feedId,
-                                                         @RequestBody CommentCreateRequest request) {
-        CommentResponse response = commentService.createComment(userDetails.getStudentInfo(), feedId, request);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<Void> createComment(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                              @PathVariable Long feedId,
+                                              @RequestBody CommentCreateRequest request) {
+        commentService.createComment(userDetails.getStudentInfo(), feedId, request);
+        return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/{commentId}")
-    public ResponseEntity<CommentResponse> updateComment(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                                         @PathVariable Long feedId,
-                                                         @PathVariable Long commentId,
-                                                         @RequestBody CommentUpdateRequest request) {
-        CommentResponse response = commentService.updateComment(userDetails.getStudentInfo(), feedId, commentId,
-                request);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<Void> updateComment(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                              @PathVariable Long feedId,
+                                              @PathVariable Long commentId,
+                                              @RequestBody CommentUpdateRequest request) {
+        commentService.updateComment(userDetails.getStudentInfo(), feedId, commentId, request);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{commentId}")

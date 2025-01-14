@@ -48,7 +48,7 @@ public class CommentService {
                 .toList();
     }
 
-    public CommentResponse createComment(StudentInfo studentInfo, Long feedId, CommentCreateRequest request) {
+    public void createComment(StudentInfo studentInfo, Long feedId, CommentCreateRequest request) {
         Student student = findStudentService.findByStudentId(studentInfo.id());
         Feed feed = findFeedByFeedId(feedId);
         Comment parent = null;
@@ -65,11 +65,10 @@ public class CommentService {
                 .parent(parent)
                 .build();
         commentRepository.save(comment);
-        return CommentResponse.from(comment, feed.getStudent().getId(), studentInfo.id());
     }
 
-    public CommentResponse updateComment(StudentInfo studentInfo, Long feedId, Long commentId,
-                                         CommentUpdateRequest request) {
+    public void updateComment(StudentInfo studentInfo, Long feedId, Long commentId,
+                              CommentUpdateRequest request) {
         Feed feed = findFeedByFeedId(feedId);
         Comment comment = findCommentByCommentId(commentId);
         if (comment.isDeleted()) {
@@ -77,7 +76,6 @@ public class CommentService {
         }
         validateCommentOwner(studentInfo.id(), comment);
         comment.updateComment(request.content());
-        return CommentResponse.from(comment, feed.getStudent().getId(), studentInfo.id());
     }
 
     public void deleteComment(StudentInfo studentInfo, Long feedId, Long commentId) {
