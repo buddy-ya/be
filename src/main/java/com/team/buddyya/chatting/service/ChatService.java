@@ -1,18 +1,18 @@
 package com.team.buddyya.chatting.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.team.buddyya.auth.domain.StudentInfo;
 import com.team.buddyya.chatting.domain.Chat;
 import com.team.buddyya.chatting.domain.Chatroom;
 import com.team.buddyya.chatting.domain.ChatroomStudent;
 import com.team.buddyya.chatting.domain.MessageType;
-import com.team.buddyya.chatting.dto.request.ChatRequest;
+import com.team.buddyya.chatting.dto.request.ChatMessage;
 import com.team.buddyya.chatting.dto.request.CreateChatroomRequest;
 import com.team.buddyya.chatting.dto.response.CreateChatroomResponse;
 import com.team.buddyya.chatting.repository.ChatRepository;
 import com.team.buddyya.chatting.repository.ChatroomRepository;
 import com.team.buddyya.chatting.repository.ChatroomStudentRepository;
 import com.team.buddyya.student.domain.Student;
-import com.team.buddyya.student.repository.StudentRepository;
 import com.team.buddyya.student.service.FindStudentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,84 +33,82 @@ public class ChatService {
     private final ObjectMapper mapper;
     private final ChatroomRepository chatRoomRepository;
     private final FindStudentService findStudentService;
-    private final StudentRepository studentRepository;
     private final ChatRepository chatRepository;
     private final ChatroomStudentRepository chatroomStudentRepository;
     private final Map<Long, Set<WebSocketSession>> sessionsPerRoom = new HashMap<>();
 
-    public CreateChatroomResponse createOrGetChatRoom(CreateChatroomRequest request) {
-        Student student = findStudentService.findByStudentId(request.userId());
+    public CreateChatroomResponse createOrGetChatRoom(CreateChatroomRequest request, StudentInfo studentInfo) {
+        Student user = findStudentService.findByStudentId(studentInfo.id());
         Student buddy = findStudentService.findByStudentId(request.buddyId());
-
-        // 이미 존재하는 채팅방 확인
-        Optional<Chatroom> existingRoom = chatroomStudentRepository.findByStudents(student, buddy)
-                .map(ChatroomStudent::getChatroom);
-
+        Optional<Chatroom> existingRoom = chatRoomRepository.findByUserAndBuddyAndPostId(
+                studentInfo.id(), request.buddyId(), request.postId());
         if (existingRoom.isPresent()) {
-            return new CreateChatroomResponse(existingRoom.get().getId());
+            Chatroom room = existingRoom.get();
+            return CreateChatroomResponse.from(room, buddy);
         }
+        Chatroom newChatroom = createChatroom(request, user, buddy);
+        return CreateChatroomResponse.from(newChatroom, buddy);
+    }
 
-        // 새로운 채팅방 생성
-        Chatroom newChatroom = new Chatroom();
+    private Chatroom createChatroom(CreateChatroomRequest request, Student user, Student buddy) {
+        Chatroom newChatroom = Chatroom.builder()
+                .postId(request.postId())
+                .name(request.postName())
+                .build();
         chatRoomRepository.save(newChatroom);
-
-        // StudentChatRoom 엔티티 생성 및 저장
-        ChatroomStudent chatRoomStudent = ChatroomStudent.builder()
-                .student(student)
+        ChatroomStudent userChatroom = ChatroomStudent.builder()
+                .student(user)
                 .chatroom(newChatroom)
                 .build();
-        ChatroomStudent buddyChatRoom = ChatroomStudent.builder()
+        ChatroomStudent buddyChatroom = ChatroomStudent.builder()
                 .student(buddy)
                 .chatroom(newChatroom)
                 .build();
-
-        chatroomStudentRepository.save(chatRoomStudent);
-        chatroomStudentRepository.save(buddyChatRoom);
-
-        return new CreateChatroomResponse(newChatroom.getId());
+        chatroomStudentRepository.save(userChatroom);
+        chatroomStudentRepository.save(buddyChatroom);
+        return newChatroom;
     }
 
-    public void handleAction(WebSocketSession session, ChatRequest chatRequest) {
-        Chatroom chatRoom = chatRoomRepository.findById(chatRequest.roomId())
+    public void handleAction(WebSocketSession session, ChatMessage chatMessage) throws IllegalArgumentException {
+        Chatroom chatRoom = chatRoomRepository.findById(chatMessage.getRoomId())
                 .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
-
-        Student student = studentRepository.findById(chatRequest.studentId())
-                .orElseThrow(() -> new IllegalArgumentException("학생을 찾을 수 없습니다."));
-
-        if (chatRequest.type().equals(MessageType.ENTER)) {
+        if (chatMessage.getType().equals(MessageType.ENTER)) {
             sessionsPerRoom.computeIfAbsent(chatRoom.getId(), k -> new HashSet<>()).add(session);
-            sendMessageToRoom(chatRoom.getId(), chatRequest);
-        } else if (chatRequest.type().equals(MessageType.TALK)) {
-            saveMessage(chatRequest);
-            sendMessageToRoom(chatRoom.getId(), chatRequest);
+        } else if (chatMessage.getType().equals(MessageType.TALK)) {
+            saveMessage(chatMessage);
+            sendMessageToRoom(chatRoom.getId(), chatMessage, session);
         }
     }
 
-    public void saveMessage(ChatRequest chatRequest) {
-        Student sender = findStudentService.findByStudentId(chatRequest.studentId());
-        Chatroom chatroom = chatRoomRepository.findById(chatRequest.roomId())
+    public void saveMessage(ChatMessage chatMessage) {
+        Student sender = findStudentService.findByStudentId(chatMessage.getUserId());
+        Chatroom chatroom = chatRoomRepository.findById(chatMessage.getRoomId())
                 .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
-
         Chat chat = Chat.builder()
                 .chatroom(chatroom)
                 .student(sender)
-                .message(chatRequest.message())
+                .message(chatMessage.getMessage())
                 .build();
         chatRepository.save(chat);
     }
 
-    public <T> void sendMessageToRoom(Long roomId, T message) {
+    public void sendMessageToRoom(Long roomId, ChatMessage message, WebSocketSession senderSession) {
         Set<WebSocketSession> sessions = sessionsPerRoom.get(roomId);
         if (sessions != null) {
-            sessions.parallelStream().forEach(session -> sendMessage(session, message));
+            sessions.removeIf(session -> !session.equals(senderSession) && !sendMessage(session, message));
         }
     }
 
-    public <T> void sendMessage(WebSocketSession session, T message) {
+    public boolean sendMessage(WebSocketSession session, ChatMessage message) {
         try {
             session.sendMessage(new TextMessage(mapper.writeValueAsString(message)));
+            return true;
         } catch (IOException e) {
-            log.error(e.getMessage(), e);
+            return false;
         }
+    }
+
+    public void removeSession(WebSocketSession session) {
+        sessionsPerRoom.values().forEach(sessions -> sessions.remove(session));
     }
 }
