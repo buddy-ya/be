@@ -7,13 +7,12 @@ import com.team.buddyya.feed.dto.response.BookmarkResponse;
 import com.team.buddyya.feed.exception.FeedException;
 import com.team.buddyya.feed.exception.FeedExceptionType;
 import com.team.buddyya.feed.respository.BookmarkRepository;
+import com.team.buddyya.feed.respository.FeedRepository;
 import com.team.buddyya.student.domain.Student;
-import com.team.buddyya.student.exception.StudentException;
-import com.team.buddyya.student.exception.StudentExceptionType;
-import com.team.buddyya.student.repository.StudentRepository;
-import jakarta.transaction.Transactional;
+import com.team.buddyya.student.service.FindStudentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
@@ -21,28 +20,30 @@ import org.springframework.stereotype.Service;
 public class BookmarkService {
 
     private final BookmarkRepository bookmarkRepository;
-    private final StudentRepository studentRepository;
-    private final FeedService feedService;
+    private final FindStudentService findStudentService;
+    private final FeedRepository feedRepository;
 
-    public boolean existsByStudentIdAndFeedId(Long studentId, Long feedId) {
-        return bookmarkRepository.existsByStudentIdAndFeedId(studentId, feedId);
+    @Transactional(readOnly = true)
+    boolean existsByStudentAndFeed(Student student, Feed feed) {
+        return bookmarkRepository.existsByStudentAndFeed(student, feed);
     }
 
-    private Bookmark findByStudentIdAndFeedId(Long studentId, Long feedId) {
-        return bookmarkRepository.findByStudentIdAndFeedId(studentId, feedId)
+    @Transactional(readOnly = true)
+    Bookmark findByStudentAndFeed(Student student, Feed feed) {
+        return bookmarkRepository.findByStudentAndFeed(student, feed)
                 .orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_BOOKMARKED));
     }
 
     public BookmarkResponse toggleBookmark(StudentInfo studentInfo, Long feedId) {
-        Feed feed = feedService.findFeedByFeedId(feedId);
-        boolean isBookmarked = existsByStudentIdAndFeedId(studentInfo.id(), feedId);
+        Feed feed = feedRepository.findById(feedId)
+                .orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND));
+        Student student = findStudentService.findByStudentId(studentInfo.id());
+        boolean isBookmarked = existsByStudentAndFeed(student, feed);
         if (isBookmarked) {
-            Bookmark bookmark = findByStudentIdAndFeedId(studentInfo.id(), feedId);
+            Bookmark bookmark = findByStudentAndFeed(student, feed);
             bookmarkRepository.delete(bookmark);
             return BookmarkResponse.from(false);
         }
-        Student student = studentRepository.findById(studentInfo.id())
-                .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
         Bookmark bookmark = Bookmark.builder()
                 .feed(feed)
                 .student(student)

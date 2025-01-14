@@ -47,6 +47,11 @@ public class Comment extends BaseTime {
         this.content = content;
     }
 
+    public void setFeed(Feed feed) {
+        this.feed = feed;
+        feed.getComments().add(this);
+    }
+
     public void updateComment(String content) {
         this.content = content;
     }
