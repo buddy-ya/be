@@ -1,7 +1,8 @@
 package com.team.buddyya.chatting.dto.request;
 
 public record CreateChatroomRequest(
-        Long userId,
-        Long buddyId
+        Long buddyId,
+        Long postId,
+        String postName
 ) {
 }
