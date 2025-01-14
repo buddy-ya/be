@@ -1,7 +1,8 @@
 package com.team.buddyya.feed.dto.response.comment;
 
-import com.team.buddyya.feed.domain.CommentInfo;
+import com.team.buddyya.feed.domain.Comment;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record CommentResponse(
         Long id,
@@ -13,21 +14,28 @@ public record CommentResponse(
         int likeCount,
         LocalDateTime createdDate,
         boolean isFeedOwner,
-        boolean isCommentOwner
+        boolean isCommentOwner,
+        List<CommentResponse> replies
 ) {
 
-    public static CommentResponse from(CommentInfo info) {
+    public static CommentResponse from(Comment comment, Long feedOwnerId, Long currentUserId) {
+        boolean isFeedOwner = feedOwnerId.equals(comment.getStudent().getId());
+        boolean isCommentOwner = comment.getId().equals(currentUserId);
+        List<CommentResponse> replies = comment.getChildren().stream()
+                .map(reply -> CommentResponse.from(reply, feedOwnerId, currentUserId))
+                .toList();
         return new CommentResponse(
-                info.comment().getId(),
-                info.comment().getContent(),
-                info.comment().getStudent().getName(),
-                info.comment().getStudent().getCountry(),
-                info.comment().getStudent().getUniversity().getUniversityName(),
-                info.comment().getStudent().getProfileImage().getUrl(),
-                info.comment().getLikeCount(),
-                info.comment().getCreatedDate(),
-                info.isFeedOwner(),
-                info.isCommentOwner()
+                comment.getId(),
+                comment.getContent(),
+                comment.getStudent().getName(),
+                comment.getStudent().getCountry(),
+                comment.getStudent().getUniversity().getUniversityName(),
+                comment.getStudent().getProfileImage().getUrl(),
+                comment.getLikeCount(),
+                comment.getCreatedDate(),
+                isFeedOwner,
+                isCommentOwner,
+                replies
         );
     }
 }

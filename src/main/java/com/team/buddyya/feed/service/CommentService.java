@@ -2,7 +2,6 @@ package com.team.buddyya.feed.service;
 
 import com.team.buddyya.auth.domain.StudentInfo;
 import com.team.buddyya.feed.domain.Comment;
-import com.team.buddyya.feed.domain.CommentInfo;
 import com.team.buddyya.feed.domain.Feed;
 import com.team.buddyya.feed.dto.request.comment.CommentCreateRequest;
 import com.team.buddyya.feed.dto.request.comment.CommentUpdateRequest;
@@ -41,11 +40,9 @@ public class CommentService {
     @Transactional(readOnly = true)
     public List<CommentResponse> getComments(StudentInfo studentInfo, Long feedId) {
         Feed feed = findFeedByFeedId(feedId);
-        List<CommentInfo> commentInfos = feed.getComments().stream()
-                .map(comment -> CommentInfo.from(comment, feed.getStudent().getId(), studentInfo.id()))
-                .toList();
-        return commentInfos.stream()
-                .map(CommentResponse::from)
+        List<Comment> comments = feed.getComments();
+        return comments.stream()
+                .map(comment -> CommentResponse.from(comment, feedId, studentInfo.id()))
                 .toList();
     }
 
@@ -63,8 +60,7 @@ public class CommentService {
                 .parent(parent)
                 .build();
         commentRepository.save(comment);
-        CommentInfo commentInfo = CommentInfo.from(comment, feed.getStudent().getId(), studentInfo.id());
-        return CommentResponse.from(commentInfo);
+        return CommentResponse.from(comment, feed.getStudent().getId(), studentInfo.id());
     }
 
     public CommentResponse updateComment(StudentInfo studentInfo, Long feedId, Long commentId,
@@ -73,8 +69,7 @@ public class CommentService {
         Comment comment = findCommentByCommentId(commentId);
         validateCommentOwner(studentInfo.id(), comment);
         comment.updateComment(request.content());
-        CommentInfo commentInfo = CommentInfo.from(comment, feed.getStudent().getId(), studentInfo.id());
-        return CommentResponse.from(commentInfo);
+        return CommentResponse.from(comment, feed.getStudent().getId(), studentInfo.id());
     }
 
     public void deleteComment(StudentInfo studentInfo, Long feedId, Long commentId) {
