@@ -3,12 +3,10 @@ package com.team.buddyya.chatting.domain;
 import com.team.buddyya.common.domain.CreatedTime;
 import com.team.buddyya.student.domain.Student;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Getter

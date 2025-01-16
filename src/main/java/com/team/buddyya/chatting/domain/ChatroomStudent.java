@@ -33,5 +33,13 @@ public class ChatroomStudent {
         this.chatroom = chatroom;
         this.unreadCount = 0;
     }
+
+    public void increaseUnreadCount() {
+        this.unreadCount++;
+    }
+
+    public void resetUnreadCount() {
+        this.unreadCount = 0;
+    }
 }
 

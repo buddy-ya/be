@@ -8,6 +8,8 @@ import com.team.buddyya.chatting.domain.ChatroomStudent;
 import com.team.buddyya.chatting.domain.MessageType;
 import com.team.buddyya.chatting.dto.request.ChatMessage;
 import com.team.buddyya.chatting.dto.request.CreateChatroomRequest;
+import com.team.buddyya.chatting.dto.response.ChatMessageListResponse;
+import com.team.buddyya.chatting.dto.response.ChatMessageResponse;
 import com.team.buddyya.chatting.dto.response.ChatRoomResponse;
 import com.team.buddyya.chatting.dto.response.CreateChatroomResponse;
 import com.team.buddyya.chatting.repository.ChatRepository;
@@ -17,6 +19,8 @@ import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.service.FindStudentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.socket.TextMessage;
@@ -77,12 +81,12 @@ public class ChatService {
         if (chatMessage.getType().equals(MessageType.ENTER)) {
             sessionsPerRoom.computeIfAbsent(chatRoom.getId(), k -> new HashSet<>()).add(session);
         } else if (chatMessage.getType().equals(MessageType.TALK)) {
-            saveMessage(chatMessage);
+            saveMessageAndHandleUnreadCount(chatMessage, session);
             sendMessageToRoom(chatRoom.getId(), chatMessage, session);
         }
     }
 
-    public void saveMessage(ChatMessage chatMessage) {
+    private void saveMessageAndHandleUnreadCount(ChatMessage chatMessage, WebSocketSession senderSession) {
         Student sender = findStudentService.findByStudentId(chatMessage.getUserId());
         Chatroom chatroom = chatRoomRepository.findById(chatMessage.getRoomId())
                 .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
@@ -93,6 +97,24 @@ public class ChatService {
                 .build();
         chatroom.updateLastMessage(chatMessage.getMessage());
         chatRepository.save(chat);
+        updateUnreadCountForChatroom(chatroom, senderSession);
+    }
+
+    private void updateUnreadCountForChatroom(Chatroom chatroom, WebSocketSession senderSession) {
+        Set<WebSocketSession> sessions = sessionsPerRoom.getOrDefault(chatroom.getId(), Collections.emptySet());
+        Long senderId = (Long) senderSession.getAttributes().get("userId");
+        for (ChatroomStudent chatroomStudent : chatroom.getChatroomStudents()) {
+            Long receiverId = chatroomStudent.getStudent().getId();
+            if (!senderId.equals(receiverId) && !isReceiverConnected(sessions, receiverId)) {
+                chatroomStudent.increaseUnreadCount();
+                chatroomStudentRepository.save(chatroomStudent);
+            }
+        }
+    }
+
+    private boolean isReceiverConnected(Set<WebSocketSession> sessions, Long receiverId) {
+        return sessions.stream()
+                .anyMatch(session -> receiverId.equals(session.getAttributes().get("userId")));
     }
 
     public void sendMessageToRoom(Long roomId, ChatMessage message, WebSocketSession senderSession) {
@@ -132,7 +154,6 @@ public class ChatService {
             return ChatRoomResponse.from(chatroom, chatroomStudent, null);
         }
         return ChatRoomResponse.from(chatroom, chatroomStudent, buddy.getProfileImage().getUrl());
-
     }
 
     private Student getBuddyFromChatroom(Student student, Chatroom chatroom) {
@@ -141,5 +162,29 @@ public class ChatService {
                 .filter(s -> !s.getId().equals(student.getId()))
                 .findFirst()
                 .orElse(null);
+    }
+
+    public ChatMessageListResponse getChatMessages(Long chatroomId, StudentInfo studentInfo, Pageable pageable) {
+        Chatroom chatroom = chatRoomRepository.findById(chatroomId)
+                .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
+        Student student = findStudentService.findByStudentId(studentInfo.id());
+        Page<Chat> chats = chatRepository.findByChatroom(chatroom, pageable);
+        resetUnreadCountForStudent(chatroom, student);
+        Page<ChatMessageResponse> pages = chats.map(chat -> new ChatMessageResponse(
+                chat.getStudent().getId(),
+                chat.getMessage(),
+                chat.getCreatedDate()
+        ));
+        return ChatMessageListResponse.from(pages);
+    }
+
+    private void resetUnreadCountForStudent(Chatroom chatroom, Student student) {
+        chatroom.getChatroomStudents().stream()
+                .filter(cs -> cs.getStudent().equals(student))
+                .findFirst()
+                .ifPresent(chatroomStudent -> {
+                    chatroomStudent.resetUnreadCount();
+                    chatroomStudentRepository.save(chatroomStudent);
+                });
     }
 }
