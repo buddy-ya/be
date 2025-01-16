@@ -29,8 +29,10 @@ public class CertificationController {
     @PostMapping("/email/send")
     public ResponseEntity<CertificationResponse> sendEmail(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                            @RequestBody EmailCertificationRequest emailCertificationRequest) {
-        return ResponseEntity.ok(
-                certificationService.certificateEmail(userDetails.getStudentInfo(), emailCertificationRequest));
+
+        String generatedCode = certificationService.sendEmail(userDetails.getStudentInfo(), emailCertificationRequest);
+        CertificationResponse response = certificationService.saveCode(emailCertificationRequest.email(), generatedCode);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/email/verify-code")
