@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,21 +22,28 @@ public class Chatroom extends CreatedTime {
 
     private String name;
 
+    private String lastMessage;
+
+    private LocalDateTime lastMessageTime;
+
     @OneToMany(mappedBy = "chatroom", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChatroomStudent> chatroomStudents;
 
     @OneToMany(mappedBy = "chatroom", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Chat> chats;
 
-    public Chatroom() {
-        this.chatroomStudents = new ArrayList<>();
-        this.chats = new ArrayList<>();
-    }
-
     @Builder
     public Chatroom(Long postId, String name) {
-        this();
+        this.chatroomStudents = new ArrayList<>();
+        this.chats = new ArrayList<>();
+        lastMessage = null;
+        lastMessageTime = null;
         this.postId = postId;
         this.name = name;
+    }
+
+    public void updateLastMessage(String message) {
+        this.lastMessage = message;
+        this.lastMessageTime = LocalDateTime.now();
     }
 }

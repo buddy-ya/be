@@ -8,6 +8,7 @@ import com.team.buddyya.chatting.domain.ChatroomStudent;
 import com.team.buddyya.chatting.domain.MessageType;
 import com.team.buddyya.chatting.dto.request.ChatMessage;
 import com.team.buddyya.chatting.dto.request.CreateChatroomRequest;
+import com.team.buddyya.chatting.dto.response.ChatRoomResponse;
 import com.team.buddyya.chatting.dto.response.CreateChatroomResponse;
 import com.team.buddyya.chatting.repository.ChatRepository;
 import com.team.buddyya.chatting.repository.ChatroomRepository;
@@ -23,6 +24,7 @@ import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -89,6 +91,7 @@ public class ChatService {
                 .student(sender)
                 .message(chatMessage.getMessage())
                 .build();
+        chatroom.updateLastMessage(chatMessage.getMessage());
         chatRepository.save(chat);
     }
 
@@ -110,5 +113,33 @@ public class ChatService {
 
     public void removeSession(WebSocketSession session) {
         sessionsPerRoom.values().forEach(sessions -> sessions.remove(session));
+    }
+
+    public List<ChatRoomResponse> readChatRooms(StudentInfo studentInfo) {
+        Student student = findStudentService.findByStudentId(studentInfo.id());
+        List<ChatRoomResponse> chatroomResponses = student.getChatroomStudents().stream()
+                .map(chatroomStudent -> createChatRoomResponse(chatroomStudent, student))
+                .filter(chatRoomResponse -> chatRoomResponse.lastMessageTime() != null)
+                .sorted(Comparator.comparing(ChatRoomResponse::lastMessageTime).reversed())
+                .collect(Collectors.toList());
+        return chatroomResponses;
+    }
+
+    private ChatRoomResponse createChatRoomResponse(ChatroomStudent chatroomStudent, Student student) {
+        Chatroom chatroom = chatroomStudent.getChatroom();
+        Student buddy = getBuddyFromChatroom(student, chatroom);
+        if (buddy == null) {
+            return ChatRoomResponse.from(chatroom, chatroomStudent, null);
+        }
+        return ChatRoomResponse.from(chatroom, chatroomStudent, buddy.getProfileImage().getUrl());
+
+    }
+
+    private Student getBuddyFromChatroom(Student student, Chatroom chatroom) {
+        return chatroom.getChatroomStudents().stream()
+                .map(ChatroomStudent::getStudent)
+                .filter(s -> !s.getId().equals(student.getId()))
+                .findFirst()
+                .orElse(null);
     }
 }
