@@ -3,14 +3,9 @@ package com.team.buddyya.student.controller;
 import com.team.buddyya.auth.domain.CustomUserDetails;
 import com.team.buddyya.feed.dto.response.feed.FeedListResponse;
 import com.team.buddyya.feed.service.FeedService;
-import com.team.buddyya.student.dto.request.MyPageUpdateInterestsRequest;
-import com.team.buddyya.student.dto.request.MyPageUpdateLanguagesRequest;
-import com.team.buddyya.student.dto.request.MyPageUpdateNameRequest;
+import com.team.buddyya.student.dto.request.MyPageUpdateRequest;
 import com.team.buddyya.student.dto.request.OnBoardingRequest;
-import com.team.buddyya.student.dto.response.MyPageResponse;
-import com.team.buddyya.student.dto.response.MyPageUpdateResponse;
-import com.team.buddyya.student.dto.response.OnBoardingResponse;
-import com.team.buddyya.student.dto.response.UserPageResponse;
+import com.team.buddyya.student.dto.response.*;
 import com.team.buddyya.student.service.MyPageService;
 import com.team.buddyya.student.service.OnBoardingService;
 import com.team.buddyya.student.service.StudentService;
@@ -25,35 +20,35 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
-public class UsersController {
+public class UserController {
 
     private final OnBoardingService onBoardingService;
     private final StudentService studentService;
     private final MyPageService myPageService;
     private final FeedService feedService;
 
-    @PostMapping("/signup")
+    @PostMapping
     public ResponseEntity<OnBoardingResponse> onboard(@RequestBody OnBoardingRequest request) {
         OnBoardingResponse response = onBoardingService.onboard(request);
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/update/interests")
-    public ResponseEntity<MyPageUpdateResponse> updateInterests(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                                                @RequestBody MyPageUpdateInterestsRequest request) {
-        return ResponseEntity.ok(myPageService.updateInterests(userDetails.getStudentInfo(), request));
+    @GetMapping
+    public ResponseEntity<UserProfileResponse> getMyProfile(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.ok(myPageService.getMyProfile(userDetails.getStudentInfo()));
     }
 
-    @PatchMapping("/update/languages")
-    public ResponseEntity<MyPageUpdateResponse> updateLanguages(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                                                @RequestBody MyPageUpdateLanguagesRequest request) {
-        return ResponseEntity.ok(myPageService.updateLanguages(userDetails.getStudentInfo(), request));
+    @GetMapping("/{studentId}")
+    public ResponseEntity<UserProfileResponse> getUserProfile(@PathVariable("studentId") Long studentId) {
+        return ResponseEntity.ok(myPageService.getUserProfile(studentId));
     }
 
-    @PatchMapping("/update/name")
-    public ResponseEntity<MyPageUpdateResponse> updateName(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                                           @RequestBody MyPageUpdateNameRequest request) {
-        return ResponseEntity.ok(myPageService.updateName(userDetails.getStudentInfo(), request));
+    @PatchMapping
+    public ResponseEntity<MyPageUpdateResponse> updateUser(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody MyPageUpdateRequest request) {
+        MyPageUpdateResponse response = myPageService.updateUser(userDetails.getStudentInfo(), request);
+        return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/update/profile-default-image")
@@ -62,16 +57,6 @@ public class UsersController {
             @RequestParam String profileImageKey) {
         return ResponseEntity.ok(
                 myPageService.updateProfileDefaultImage(userDetails.getStudentInfo(), profileImageKey));
-    }
-
-    @GetMapping("/mypage")
-    public ResponseEntity<MyPageResponse> getMyPage(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        return ResponseEntity.ok(myPageService.getMyPage(userDetails.getStudentInfo()));
-    }
-
-    @GetMapping("/userpage/{studentId}")
-    public ResponseEntity<UserPageResponse> getUserPage(@PathVariable("studentId") Long studentId) {
-        return ResponseEntity.ok(myPageService.getUserPage(studentId));
     }
 
     @GetMapping("/myfeed")

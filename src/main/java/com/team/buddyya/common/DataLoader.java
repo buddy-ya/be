@@ -6,7 +6,7 @@ import com.team.buddyya.feed.domain.Feed;
 import com.team.buddyya.feed.respository.CategoryRepository;
 import com.team.buddyya.feed.respository.CommentRepository;
 import com.team.buddyya.feed.respository.FeedRepository;
-import com.team.buddyya.student.controller.UsersController;
+import com.team.buddyya.student.controller.UserController;
 import com.team.buddyya.student.domain.*;
 import com.team.buddyya.student.dto.request.OnBoardingRequest;
 import com.team.buddyya.student.dto.response.OnBoardingResponse;
@@ -28,7 +28,7 @@ public class DataLoader implements CommandLineRunner {
     private final LanguageRepository languageRepository;
     private final InterestRepository interestRepository;
     private final UniversityRepository universityRepository;
-    private final UsersController usersController;
+    private final UserController userController;
     private final CategoryRepository categoryRepository;
     private final FeedRepository feedRepository;
     private final CommentRepository commentRepository;
@@ -115,7 +115,7 @@ public class DataLoader implements CommandLineRunner {
                 )
         );
         mockRequests.forEach(request -> {
-            ResponseEntity<OnBoardingResponse> response = usersController.onboard(request);
+            ResponseEntity<OnBoardingResponse> response = userController.onboard(request);
         });
     }
 

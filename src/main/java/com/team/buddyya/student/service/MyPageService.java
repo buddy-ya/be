@@ -3,12 +3,11 @@ package com.team.buddyya.student.service;
 import com.team.buddyya.auth.domain.StudentInfo;
 import com.team.buddyya.certification.repository.StudentIdCardRepository;
 import com.team.buddyya.student.domain.Student;
-import com.team.buddyya.student.dto.request.MyPageUpdateInterestsRequest;
-import com.team.buddyya.student.dto.request.MyPageUpdateLanguagesRequest;
-import com.team.buddyya.student.dto.request.MyPageUpdateNameRequest;
-import com.team.buddyya.student.dto.response.MyPageResponse;
+import com.team.buddyya.student.dto.request.MyPageUpdateRequest;
 import com.team.buddyya.student.dto.response.MyPageUpdateResponse;
-import com.team.buddyya.student.dto.response.UserPageResponse;
+import com.team.buddyya.student.dto.response.UserProfileResponse;
+import com.team.buddyya.student.exception.StudentException;
+import com.team.buddyya.student.exception.StudentExceptionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,21 +25,29 @@ public class MyPageService {
     private final ProfileImageService profileImageService;
     private final StudentIdCardRepository studentIdCardRepository;
 
-    public MyPageUpdateResponse updateInterests(StudentInfo studentInfo, MyPageUpdateInterestsRequest request) {
+    public MyPageUpdateResponse updateUser(StudentInfo studentInfo, MyPageUpdateRequest request) {
         Student student = findStudentService.findByStudentId(studentInfo.id());
-        studentInterestService.updateStudentInterests(request.interests(), student);
-        return MyPageUpdateResponse.from(UPDATE_SUCCESS_MESSAGE);
-    }
 
-    public MyPageUpdateResponse updateLanguages(StudentInfo studentInfo, MyPageUpdateLanguagesRequest request) {
-        Student student = findStudentService.findByStudentId(studentInfo.id());
-        studentLanguageService.updateStudentLanguages(request.languages(), student);
-        return MyPageUpdateResponse.from(UPDATE_SUCCESS_MESSAGE);
-    }
+        switch (request.key()) {
+            case "interests":
+                studentInterestService.updateStudentInterests(request.values(), student);
+                break;
 
-    public MyPageUpdateResponse updateName(StudentInfo studentInfo, MyPageUpdateNameRequest request) {
-        Student student = findStudentService.findByStudentId(studentInfo.id());
-        student.updateName(request.name());
+            case "languages":
+                studentLanguageService.updateStudentLanguages(request.values(), student);
+                break;
+
+            case "name":
+                if (request.values().size() != 1) {
+                    throw new StudentException(StudentExceptionType.INVALID_NAME_UPDATE_REQUEST);
+                }
+                student.updateName(request.values().get(0));
+                break;
+
+            default:
+                throw new StudentException(StudentExceptionType.UNSUPPORTED_UPDATE_KEY);
+        }
+
         return MyPageUpdateResponse.from(UPDATE_SUCCESS_MESSAGE);
     }
 
@@ -51,16 +58,16 @@ public class MyPageService {
     }
 
     @Transactional(readOnly = true)
-    public MyPageResponse getMyPage(StudentInfo studentInfo) {
+    public UserProfileResponse getMyProfile(StudentInfo studentInfo) {
         Student student = findStudentService.findByStudentId(studentInfo.id());
         boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
                 .isPresent();
-        return MyPageResponse.from(student,isStudentIdCardRequested);
+        return UserProfileResponse.from(student, isStudentIdCardRequested);
     }
 
     @Transactional(readOnly = true)
-    public UserPageResponse getUserPage(long studentId) {
+    public UserProfileResponse getUserProfile(long studentId) {
         Student student = findStudentService.findByStudentId(studentId);
-        return UserPageResponse.from(student);
+        return UserProfileResponse.from(student);
     }
 }
