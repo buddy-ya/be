@@ -4,6 +4,7 @@ import com.team.buddyya.auth.domain.CustomUserDetails;
 import com.team.buddyya.chatting.dto.request.CreateChatroomRequest;
 import com.team.buddyya.chatting.dto.response.ChatMessageListResponse;
 import com.team.buddyya.chatting.dto.response.ChatRoomResponse;
+import com.team.buddyya.chatting.dto.response.ChatroomLeaveResponse;
 import com.team.buddyya.chatting.dto.response.CreateChatroomResponse;
 import com.team.buddyya.chatting.service.ChatService;
 import lombok.RequiredArgsConstructor;
@@ -46,10 +47,9 @@ public class ChatController {
     }
 
     @DeleteMapping("/{chatroomId}")
-    public ResponseEntity<String> leaveChatroom(
+    public ResponseEntity<ChatroomLeaveResponse> leaveChatroom(
             @PathVariable("chatroomId") Long chatroomId,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
-        chatService.leaveChatroom(chatroomId, userDetails.getStudentInfo());
-        return ResponseEntity.ok("채팅방을 성공적으로 나갔습니다.");
+        return ResponseEntity.ok(chatService.leaveChatroom(chatroomId, userDetails.getStudentInfo()));
     }
 }

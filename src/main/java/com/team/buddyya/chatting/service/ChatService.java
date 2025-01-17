@@ -8,10 +8,7 @@ import com.team.buddyya.chatting.domain.ChatroomStudent;
 import com.team.buddyya.chatting.domain.MessageType;
 import com.team.buddyya.chatting.dto.request.ChatMessage;
 import com.team.buddyya.chatting.dto.request.CreateChatroomRequest;
-import com.team.buddyya.chatting.dto.response.ChatMessageListResponse;
-import com.team.buddyya.chatting.dto.response.ChatMessageResponse;
-import com.team.buddyya.chatting.dto.response.ChatRoomResponse;
-import com.team.buddyya.chatting.dto.response.CreateChatroomResponse;
+import com.team.buddyya.chatting.dto.response.*;
 import com.team.buddyya.chatting.exception.ChatException;
 import com.team.buddyya.chatting.exception.ChatExceptionType;
 import com.team.buddyya.chatting.repository.ChatRepository;
@@ -40,6 +37,7 @@ import java.util.stream.Collectors;
 public class ChatService {
 
     private static final String ERROR_CHATROOM_NOT_FOUND = "채팅방을 찾을 수 없습니다.";
+    private static final String CHATROOM_LEAVE_SUCCESS_MESSAGE = "채팅방을 나갔습니다.";
 
     private final ObjectMapper mapper;
     private final ChatroomRepository chatRoomRepository;
@@ -185,12 +183,13 @@ public class ChatService {
         return ChatMessageListResponse.from(chatResponses);
     }
 
-    public void leaveChatroom(Long chatroomId, StudentInfo studentInfo) {
+    public ChatroomLeaveResponse leaveChatroom(Long chatroomId, StudentInfo studentInfo) {
         Chatroom chatroom = chatRoomRepository.findById(chatroomId)
                 .orElseThrow(() -> new ChatException(ChatExceptionType.CHATROOM_NOT_FOUND));
         ChatroomStudent chatroomStudent = chatroomStudentRepository.findByChatroomAndStudentId(chatroom, studentInfo.id())
                 .orElseThrow(() -> new ChatException(ChatExceptionType.USER_NOT_PART_OF_CHATROOM));
         chatroomStudent.updateLeaveTime();
         chatroomStudent.resetUnreadCount();
+        return ChatroomLeaveResponse.from(CHATROOM_LEAVE_SUCCESS_MESSAGE);
     }
 }
