@@ -44,4 +44,12 @@ public class ChatController {
         ChatMessageListResponse response = chatService.getChatMessages(chatroomId, userDetails.getStudentInfo(), pageable);
         return ResponseEntity.ok(response);
     }
+
+    @DeleteMapping("/{chatroomId}")
+    public ResponseEntity<String> leaveChatroom(
+            @PathVariable("chatroomId") Long chatroomId,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        chatService.leaveChatroom(chatroomId, userDetails.getStudentInfo());
+        return ResponseEntity.ok("채팅방을 성공적으로 나갔습니다.");
+    }
 }

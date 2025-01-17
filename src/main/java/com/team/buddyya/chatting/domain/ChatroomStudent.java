@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @NoArgsConstructor
@@ -27,11 +29,15 @@ public class ChatroomStudent {
     @Column(name = "unread_count")
     private int unreadCount;
 
+    @Column(name = "leave_time")
+    private LocalDateTime leaveTime;
+
     @Builder
     public ChatroomStudent(Student student, Chatroom chatroom) {
         this.student = student;
         this.chatroom = chatroom;
         this.unreadCount = 0;
+        this.leaveTime = LocalDateTime.now();
     }
 
     public void increaseUnreadCount() {
@@ -41,5 +47,11 @@ public class ChatroomStudent {
     public void resetUnreadCount() {
         this.unreadCount = 0;
     }
+
+    public void updateLeaveTime() {
+        this.leaveTime = LocalDateTime.now();
+    }
+
+
 }
 

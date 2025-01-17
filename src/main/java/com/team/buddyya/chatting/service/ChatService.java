@@ -27,6 +27,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -139,17 +140,21 @@ public class ChatService {
 
     public List<ChatRoomResponse> readChatRooms(StudentInfo studentInfo) {
         Student student = findStudentService.findByStudentId(studentInfo.id());
-        List<ChatRoomResponse> chatroomResponses = student.getChatroomStudents().stream()
-                .map(chatroomStudent -> createChatRoomResponse(chatroomStudent, student))
-                .filter(chatRoomResponse -> chatRoomResponse.lastMessageTime() != null)
-                .sorted(Comparator.comparing(ChatRoomResponse::lastMessageTime).reversed())
+        return student.getChatroomStudents().stream()
+                .map(chatroomStudent -> createChatRoomResponseIfRelevant(chatroomStudent))
+                .filter(Objects::nonNull)
+                .sorted((a, b) -> b.lastMessageTime().compareTo(a.lastMessageTime()))
                 .collect(Collectors.toList());
-        return chatroomResponses;
     }
 
-    private ChatRoomResponse createChatRoomResponse(ChatroomStudent chatroomStudent, Student student) {
+    private ChatRoomResponse createChatRoomResponseIfRelevant(ChatroomStudent chatroomStudent) {
         Chatroom chatroom = chatroomStudent.getChatroom();
-        Student buddy = getBuddyFromChatroom(student, chatroom);
+        LocalDateTime leaveTime = chatroomStudent.getLeaveTime();
+        LocalDateTime lastMessageTime = chatroom.getLastMessageTime();
+        if (lastMessageTime == null || lastMessageTime.isBefore(leaveTime)) {
+            return null;
+        }
+        Student buddy = getBuddyFromChatroom(chatroomStudent.getStudent(), chatroom);
         if (buddy == null) {
             return ChatRoomResponse.from(chatroom, chatroomStudent, null);
         }
@@ -167,24 +172,25 @@ public class ChatService {
     public ChatMessageListResponse getChatMessages(Long chatroomId, StudentInfo studentInfo, Pageable pageable) {
         Chatroom chatroom = chatRoomRepository.findById(chatroomId)
                 .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
-        Student student = findStudentService.findByStudentId(studentInfo.id());
-        Page<Chat> chats = chatRepository.findByChatroom(chatroom, pageable);
-        resetUnreadCountForStudent(chatroom, student);
-        Page<ChatMessageResponse> pages = chats.map(chat -> new ChatMessageResponse(
+        ChatroomStudent chatroomStudent = chatroomStudentRepository.findByChatroomAndStudentId(chatroom, studentInfo.id())
+                .orElseThrow(() -> new IllegalArgumentException("채팅방에 참여하지 않았습니다."));
+        LocalDateTime leaveTime = chatroomStudent.getLeaveTime();
+        Page<Chat> chats = chatRepository.findByChatroomAndCreatedDateAfter(chatroom, leaveTime, pageable);
+        chatroomStudent.resetUnreadCount();
+        Page<ChatMessageResponse> chatResponses = chats.map(chat -> new ChatMessageResponse(
                 chat.getStudent().getId(),
                 chat.getMessage(),
                 chat.getCreatedDate()
         ));
-        return ChatMessageListResponse.from(pages);
+        return ChatMessageListResponse.from(chatResponses);
     }
 
-    private void resetUnreadCountForStudent(Chatroom chatroom, Student student) {
-        chatroom.getChatroomStudents().stream()
-                .filter(cs -> cs.getStudent().equals(student))
-                .findFirst()
-                .ifPresent(chatroomStudent -> {
-                    chatroomStudent.resetUnreadCount();
-                    chatroomStudentRepository.save(chatroomStudent);
-                });
+    public void leaveChatroom(Long chatroomId, StudentInfo studentInfo) {
+        Chatroom chatroom = chatRoomRepository.findById(chatroomId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방입니다."));
+        ChatroomStudent chatroomStudent = chatroomStudentRepository.findByChatroomAndStudentId(chatroom, studentInfo.id())
+                .orElseThrow(() -> new IllegalArgumentException("채팅방에 참여하지 않았습니다."));
+        chatroomStudent.updateLeaveTime();
+        chatroomStudent.resetUnreadCount();
     }
 }
