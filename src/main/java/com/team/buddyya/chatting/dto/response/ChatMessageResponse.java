@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 public record ChatMessageResponse(
         Long senderId,
         String message,
-        Long messageId,
+        Long id,
         LocalDateTime createdDate
 ) {
 
