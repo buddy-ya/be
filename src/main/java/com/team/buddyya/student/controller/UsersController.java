@@ -6,9 +6,13 @@ import com.team.buddyya.feed.service.FeedService;
 import com.team.buddyya.student.dto.request.MyPageUpdateInterestsRequest;
 import com.team.buddyya.student.dto.request.MyPageUpdateLanguagesRequest;
 import com.team.buddyya.student.dto.request.MyPageUpdateNameRequest;
+import com.team.buddyya.student.dto.request.OnBoardingRequest;
 import com.team.buddyya.student.dto.response.MyPageResponse;
 import com.team.buddyya.student.dto.response.MyPageUpdateResponse;
+import com.team.buddyya.student.dto.response.OnBoardingResponse;
+import com.team.buddyya.student.dto.response.UserPageResponse;
 import com.team.buddyya.student.service.MyPageService;
+import com.team.buddyya.student.service.OnBoardingService;
 import com.team.buddyya.student.service.StudentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -16,26 +20,22 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/mypage")
+@RequestMapping("/users")
 @RequiredArgsConstructor
-public class MyPageController {
+public class UsersController {
 
+    private final OnBoardingService onBoardingService;
+    private final StudentService studentService;
     private final MyPageService myPageService;
     private final FeedService feedService;
-    private final StudentService studentService;
 
-    @GetMapping
-    public ResponseEntity<MyPageResponse> getMyPage(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        return ResponseEntity.ok(myPageService.getMyPage(userDetails.getStudentInfo()));
+    @PostMapping("/signup")
+    public ResponseEntity<OnBoardingResponse> onboard(@RequestBody OnBoardingRequest request) {
+        OnBoardingResponse response = onBoardingService.onboard(request);
+        return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/update/interests")
@@ -56,6 +56,24 @@ public class MyPageController {
         return ResponseEntity.ok(myPageService.updateName(userDetails.getStudentInfo(), request));
     }
 
+    @PatchMapping("/update/profile-default-image")
+    public ResponseEntity<MyPageUpdateResponse> updateProfileDefaultImage(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam String profileImageKey) {
+        return ResponseEntity.ok(
+                myPageService.updateProfileDefaultImage(userDetails.getStudentInfo(), profileImageKey));
+    }
+
+    @GetMapping("/mypage")
+    public ResponseEntity<MyPageResponse> getMyPage(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.ok(myPageService.getMyPage(userDetails.getStudentInfo()));
+    }
+
+    @GetMapping("/userpage/{studentId}")
+    public ResponseEntity<UserPageResponse> getUserPage(@PathVariable("studentId") Long studentId) {
+        return ResponseEntity.ok(myPageService.getUserPage(studentId));
+    }
+
     @GetMapping("/myfeed")
     public ResponseEntity<FeedListResponse> getMyFeed(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                       @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -66,14 +84,6 @@ public class MyPageController {
     public ResponseEntity<FeedListResponse> getBookmarkFeed(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                             @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(feedService.getBookmarkFeed(userDetails.getStudentInfo(), pageable));
-    }
-
-    @PatchMapping("/update/profile-default-image")
-    public ResponseEntity<MyPageUpdateResponse> updateProfileDefaultImage(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestParam String profileImageKey) {
-        return ResponseEntity.ok(
-                myPageService.updateProfileDefaultImage(userDetails.getStudentInfo(), profileImageKey));
     }
 
     @DeleteMapping("/delete")
