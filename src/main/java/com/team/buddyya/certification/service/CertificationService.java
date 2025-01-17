@@ -38,14 +38,14 @@ import org.springframework.web.multipart.MultipartFile;
 @Transactional
 public class CertificationService {
 
+    private static final int AUTH_CODE_MAX_RANGE = 1_000;
+
     private final FindStudentService findStudentService;
     private final StudentIdCardRepository studentIdCardRepository;
     private final StudentEmailRepository studentEmailRepository;
     private final S3UploadService s3UploadService;
     private final StudentService studentService;
-
     private final JavaMailSender javaMailSender;
-    private static final int AUTH_CODE_MAX_RANGE = 1_000;
 
     @Value("${GOOGLE_SMTP_EMAIL}")
     private String senderEmail;
@@ -60,11 +60,24 @@ public class CertificationService {
 
         message.setFrom(senderEmail);
         message.setRecipients(MimeMessage.RecipientType.TO, mail);
-        message.setSubject("이메일 인증");
-        String body = "";
-        body += "<h3>요청하신 인증 번호입니다.</h3>";
-        body += "<h1>" + number + "</h1>";
-        body += "<h3>감사합니다.</h3>";
+        message.setSubject("[버디야] 대학교 인증을 위한 인증번호를 안내 드립니다.");
+
+        String body = """
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+                <h1 style="text-align: center; color: #333;">대학교 이메일 인증 안내</h1>
+                <p style="font-size: 16px; color: #555;">안녕하세요, <b>고객님</b></p>
+                <p style="font-size: 16px; color: #555;">
+                    아래 발급된 이메일 인증번호를 복사하거나 직접 입력하여 인증을 완료해주세요.
+                </p>
+                <div style="text-align: center; margin: 20px 0;">
+                    <span style="display: inline-block; font-size: 24px; color: #0073e6; font-weight: bold; padding: 10px 20px; border: 1px dashed #0073e6; border-radius: 5px;">
+                        """ + number + """
+                    </span>
+                </div>
+                <p style="font-size: 16px; color: #555; text-align: center;">감사합니다.</p>
+            </div>
+            """;
+
         message.setText(body, "UTF-8", "html");
 
         return message;
