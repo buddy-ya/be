@@ -105,7 +105,7 @@ public class CertificationService {
     public CertificationResponse certificateEmailCode(StudentInfo studentInfo, EmailCodeRequest codeRequest) {
         StudentEmail studentEmail = studentEmailRepository.findByEmail(codeRequest.email())
                 .orElseThrow(() -> new CertificateException(CertificateExceptionType.STUDENT_EMAIL_NOT_FOUND));
-        if (!codeRequest.email().equals(studentEmail.getAuthenticationCode())) {
+        if (!codeRequest.code().equals(studentEmail.getAuthenticationCode())) {
             throw new CertificateException(CertificateExceptionType.CODE_MISMATCH);
         }
         Student student = findStudentService.findByStudentId(studentInfo.id());
