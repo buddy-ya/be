@@ -11,13 +11,9 @@ public record MyPageResponse(
         String university,
         String gender,
         String profileImageUrl,
-
         Boolean isCertificated,
-
         Boolean isStudentIdCardRequested,
-
         Boolean isKorean,
-
         List<String> majors,
         List<String> languages,
         List<String> interests
