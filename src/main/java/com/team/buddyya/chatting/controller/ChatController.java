@@ -40,7 +40,7 @@ public class ChatController {
     public ResponseEntity<ChatMessageListResponse> getChatMessages(
             @PathVariable("chatroomId") Long chatroomId,
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @PageableDefault(size = 30, sort = "createdDate", direction = Direction.DESC) Pageable pageable) {
+            @PageableDefault(size = 15, sort = "createdDate", direction = Direction.DESC) Pageable pageable) {
         ChatMessageListResponse response = chatService.getChatMessages(chatroomId, userDetails.getStudentInfo(), pageable);
         return ResponseEntity.ok(response);
     }

@@ -14,6 +14,7 @@ public class ChatMessage {
     private Long roomId;
     private Long userId;
     private String message;
+    private Long tempId;
     private LocalDateTime time;
 
     public void setTime(LocalDateTime time) {

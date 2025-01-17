@@ -48,7 +48,7 @@ public class ChatService {
         Student user = findStudentService.findByStudentId(studentInfo.id());
         Student buddy = findStudentService.findByStudentId(request.buddyId());
         Optional<Chatroom> existingRoom = chatRoomRepository.findByUserAndBuddyAndPostId(
-                studentInfo.id(), request.buddyId(), request.postId());
+                studentInfo.id(), request.buddyId(), request.feedId());
         if (existingRoom.isPresent()) {
             Chatroom room = existingRoom.get();
             return CreateChatroomResponse.from(room, buddy);
@@ -59,8 +59,8 @@ public class ChatService {
 
     private Chatroom createChatroom(CreateChatroomRequest request, Student user, Student buddy) {
         Chatroom newChatroom = Chatroom.builder()
-                .postId(request.postId())
-                .name(request.postName())
+                .postId(request.feedId())
+                .name(request.feedName())
                 .build();
         chatRoomRepository.save(newChatroom);
         ChatroomStudent userChatroom = ChatroomStudent.builder()
@@ -177,11 +177,7 @@ public class ChatService {
         LocalDateTime leaveTime = chatroomStudent.getLeaveTime();
         Page<Chat> chats = chatRepository.findByChatroomAndCreatedDateAfter(chatroom, leaveTime, pageable);
         chatroomStudent.resetUnreadCount();
-        Page<ChatMessageResponse> chatResponses = chats.map(chat -> new ChatMessageResponse(
-                chat.getStudent().getId(),
-                chat.getMessage(),
-                chat.getCreatedDate()
-        ));
+        Page<ChatMessageResponse> chatResponses = chats.map(ChatMessageResponse::from);
         return ChatMessageListResponse.from(chatResponses);
     }
 
