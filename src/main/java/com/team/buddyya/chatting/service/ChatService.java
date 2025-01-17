@@ -12,6 +12,8 @@ import com.team.buddyya.chatting.dto.response.ChatMessageListResponse;
 import com.team.buddyya.chatting.dto.response.ChatMessageResponse;
 import com.team.buddyya.chatting.dto.response.ChatRoomResponse;
 import com.team.buddyya.chatting.dto.response.CreateChatroomResponse;
+import com.team.buddyya.chatting.exception.ChatException;
+import com.team.buddyya.chatting.exception.ChatExceptionType;
 import com.team.buddyya.chatting.repository.ChatRepository;
 import com.team.buddyya.chatting.repository.ChatroomRepository;
 import com.team.buddyya.chatting.repository.ChatroomStudentRepository;
@@ -36,6 +38,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional
 public class ChatService {
+
+    private static final String ERROR_CHATROOM_NOT_FOUND = "채팅방을 찾을 수 없습니다.";
 
     private final ObjectMapper mapper;
     private final ChatroomRepository chatRoomRepository;
@@ -78,7 +82,7 @@ public class ChatService {
 
     public void handleAction(WebSocketSession session, ChatMessage chatMessage) throws IllegalArgumentException {
         Chatroom chatRoom = chatRoomRepository.findById(chatMessage.getRoomId())
-                .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException(ERROR_CHATROOM_NOT_FOUND));
         if (chatMessage.getType().equals(MessageType.ENTER)) {
             sessionsPerRoom.computeIfAbsent(chatRoom.getId(), k -> new HashSet<>()).add(session);
         } else if (chatMessage.getType().equals(MessageType.TALK)) {
@@ -90,7 +94,7 @@ public class ChatService {
     private void saveMessageAndHandleUnreadCount(ChatMessage chatMessage, WebSocketSession senderSession) {
         Student sender = findStudentService.findByStudentId(chatMessage.getUserId());
         Chatroom chatroom = chatRoomRepository.findById(chatMessage.getRoomId())
-                .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException(ERROR_CHATROOM_NOT_FOUND));
         Chat chat = Chat.builder()
                 .chatroom(chatroom)
                 .student(sender)
@@ -141,13 +145,13 @@ public class ChatService {
     public List<ChatRoomResponse> readChatRooms(StudentInfo studentInfo) {
         Student student = findStudentService.findByStudentId(studentInfo.id());
         return student.getChatroomStudents().stream()
-                .map(chatroomStudent -> createChatRoomResponseIfRelevant(chatroomStudent))
+                .map(chatroomStudent -> createChatroomResponseIfValid(chatroomStudent))
                 .filter(Objects::nonNull)
                 .sorted((a, b) -> b.lastMessageTime().compareTo(a.lastMessageTime()))
                 .collect(Collectors.toList());
     }
 
-    private ChatRoomResponse createChatRoomResponseIfRelevant(ChatroomStudent chatroomStudent) {
+    private ChatRoomResponse createChatroomResponseIfValid(ChatroomStudent chatroomStudent) {
         Chatroom chatroom = chatroomStudent.getChatroom();
         LocalDateTime leaveTime = chatroomStudent.getLeaveTime();
         LocalDateTime lastMessageTime = chatroom.getLastMessageTime();
@@ -171,9 +175,9 @@ public class ChatService {
 
     public ChatMessageListResponse getChatMessages(Long chatroomId, StudentInfo studentInfo, Pageable pageable) {
         Chatroom chatroom = chatRoomRepository.findById(chatroomId)
-                .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
+                .orElseThrow(() -> new ChatException(ChatExceptionType.CHATROOM_NOT_FOUND));
         ChatroomStudent chatroomStudent = chatroomStudentRepository.findByChatroomAndStudentId(chatroom, studentInfo.id())
-                .orElseThrow(() -> new IllegalArgumentException("채팅방에 참여하지 않았습니다."));
+                .orElseThrow(() -> new ChatException(ChatExceptionType.USER_NOT_PART_OF_CHATROOM));
         LocalDateTime leaveTime = chatroomStudent.getLeaveTime();
         Page<Chat> chats = chatRepository.findByChatroomAndCreatedDateAfter(chatroom, leaveTime, pageable);
         chatroomStudent.resetUnreadCount();
@@ -183,9 +187,9 @@ public class ChatService {
 
     public void leaveChatroom(Long chatroomId, StudentInfo studentInfo) {
         Chatroom chatroom = chatRoomRepository.findById(chatroomId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방입니다."));
+                .orElseThrow(() -> new ChatException(ChatExceptionType.CHATROOM_NOT_FOUND));
         ChatroomStudent chatroomStudent = chatroomStudentRepository.findByChatroomAndStudentId(chatroom, studentInfo.id())
-                .orElseThrow(() -> new IllegalArgumentException("채팅방에 참여하지 않았습니다."));
+                .orElseThrow(() -> new ChatException(ChatExceptionType.USER_NOT_PART_OF_CHATROOM));
         chatroomStudent.updateLeaveTime();
         chatroomStudent.resetUnreadCount();
     }
