@@ -183,13 +183,13 @@ public class ChatService {
         return ChatMessageListResponse.from(chatResponses);
     }
 
-    public ChatroomLeaveResponse leaveChatroom(Long chatroomId, StudentInfo studentInfo) {
+    public LeaveChatroomResponse leaveChatroom(Long chatroomId, StudentInfo studentInfo) {
         Chatroom chatroom = chatRoomRepository.findById(chatroomId)
                 .orElseThrow(() -> new ChatException(ChatExceptionType.CHATROOM_NOT_FOUND));
         ChatroomStudent chatroomStudent = chatroomStudentRepository.findByChatroomAndStudentId(chatroom, studentInfo.id())
                 .orElseThrow(() -> new ChatException(ChatExceptionType.USER_NOT_PART_OF_CHATROOM));
         chatroomStudent.updateLeaveTime();
         chatroomStudent.resetUnreadCount();
-        return ChatroomLeaveResponse.from(CHATROOM_LEAVE_SUCCESS_MESSAGE);
+        return LeaveChatroomResponse.from(CHATROOM_LEAVE_SUCCESS_MESSAGE);
     }
 }

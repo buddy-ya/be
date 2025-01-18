@@ -3,9 +3,9 @@ package com.team.buddyya.chatting.controller;
 import com.team.buddyya.auth.domain.CustomUserDetails;
 import com.team.buddyya.chatting.dto.request.CreateChatroomRequest;
 import com.team.buddyya.chatting.dto.response.ChatMessageListResponse;
-import com.team.buddyya.chatting.dto.response.ChatroomLeaveResponse;
 import com.team.buddyya.chatting.dto.response.ChatroomResponse;
 import com.team.buddyya.chatting.dto.response.CreateChatroomResponse;
+import com.team.buddyya.chatting.dto.response.LeaveChatroomResponse;
 import com.team.buddyya.chatting.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -39,18 +39,18 @@ public class ChatController {
         return ResponseEntity.ok(chatService.getChatRooms(userDetails.getStudentInfo()));
     }
 
-    @GetMapping("/{chatroomId}")
+    @GetMapping("/{roomId}")
     public ResponseEntity<ChatMessageListResponse> getChatMessages(
-            @PathVariable("chatroomId") Long chatroomId,
+            @PathVariable("roomId") Long chatroomId,
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PageableDefault(size = CHAT_MESSAGE_PAGE_SIZE, sort = "createdDate", direction = Direction.DESC) Pageable pageable) {
         ChatMessageListResponse response = chatService.getChatMessages(chatroomId, userDetails.getStudentInfo(), pageable);
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/{chatroomId}")
-    public ResponseEntity<ChatroomLeaveResponse> leaveChatroom(
-            @PathVariable("chatroomId") Long chatroomId,
+    @DeleteMapping("/{roomId}")
+    public ResponseEntity<LeaveChatroomResponse> leaveChatroom(
+            @PathVariable("roomId") Long chatroomId,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ResponseEntity.ok(chatService.leaveChatroom(chatroomId, userDetails.getStudentInfo()));
     }
