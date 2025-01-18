@@ -79,7 +79,7 @@ public class Student extends BaseTime {
     @OneToOne(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private StudentIdCard studentIdCard;
 
-    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<ChatroomStudent> chatroomStudents;
 
     @Builder

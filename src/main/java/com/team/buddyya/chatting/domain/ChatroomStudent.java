@@ -8,10 +8,12 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+import static lombok.AccessLevel.PROTECTED;
+
 @Entity
-@Getter
-@NoArgsConstructor
 @Table(name = "chatroom_student")
+@Getter
+@NoArgsConstructor(access = PROTECTED)
 public class ChatroomStudent {
 
     @Id

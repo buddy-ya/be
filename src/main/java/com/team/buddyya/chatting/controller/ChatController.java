@@ -3,8 +3,8 @@ package com.team.buddyya.chatting.controller;
 import com.team.buddyya.auth.domain.CustomUserDetails;
 import com.team.buddyya.chatting.dto.request.CreateChatroomRequest;
 import com.team.buddyya.chatting.dto.response.ChatMessageListResponse;
-import com.team.buddyya.chatting.dto.response.ChatRoomResponse;
 import com.team.buddyya.chatting.dto.response.ChatroomLeaveResponse;
+import com.team.buddyya.chatting.dto.response.ChatroomResponse;
 import com.team.buddyya.chatting.dto.response.CreateChatroomResponse;
 import com.team.buddyya.chatting.service.ChatService;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +23,8 @@ import static org.springframework.data.domain.Sort.Direction;
 @RequiredArgsConstructor
 public class ChatController {
 
+    private static final int CHAT_MESSAGE_PAGE_SIZE = 15;
+
     private final ChatService chatService;
 
     @PostMapping
@@ -33,15 +35,15 @@ public class ChatController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ChatRoomResponse>> readChatRooms(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        return ResponseEntity.ok(chatService.readChatRooms(userDetails.getStudentInfo()));
+    public ResponseEntity<List<ChatroomResponse>> getChatRooms(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.ok(chatService.getChatRooms(userDetails.getStudentInfo()));
     }
 
     @GetMapping("/{chatroomId}")
     public ResponseEntity<ChatMessageListResponse> getChatMessages(
             @PathVariable("chatroomId") Long chatroomId,
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @PageableDefault(size = 15, sort = "createdDate", direction = Direction.DESC) Pageable pageable) {
+            @PageableDefault(size = CHAT_MESSAGE_PAGE_SIZE, sort = "createdDate", direction = Direction.DESC) Pageable pageable) {
         ChatMessageListResponse response = chatService.getChatMessages(chatroomId, userDetails.getStudentInfo(), pageable);
         return ResponseEntity.ok(response);
     }

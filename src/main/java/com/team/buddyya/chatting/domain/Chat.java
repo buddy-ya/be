@@ -7,10 +7,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
+import static lombok.AccessLevel.PROTECTED;
+
 @Entity
-@Getter
 @Table(name = "chat")
+@Getter
+@NoArgsConstructor(access = PROTECTED)
 public class Chat extends CreatedTime {
 
     @Id

@@ -10,10 +10,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static lombok.AccessLevel.PROTECTED;
+
 @Entity
-@Getter
-@NoArgsConstructor
 @Table(name = "chatroom")
+@Getter
+@NoArgsConstructor(access = PROTECTED)
 public class Chatroom extends CreatedTime {
 
     @Id

@@ -140,7 +140,7 @@ public class ChatService {
         sessionsPerRoom.values().forEach(sessions -> sessions.remove(session));
     }
 
-    public List<ChatRoomResponse> readChatRooms(StudentInfo studentInfo) {
+    public List<ChatroomResponse> getChatRooms(StudentInfo studentInfo) {
         Student student = findStudentService.findByStudentId(studentInfo.id());
         return student.getChatroomStudents().stream()
                 .map(chatroomStudent -> createChatroomResponseIfValid(chatroomStudent))
@@ -149,7 +149,7 @@ public class ChatService {
                 .collect(Collectors.toList());
     }
 
-    private ChatRoomResponse createChatroomResponseIfValid(ChatroomStudent chatroomStudent) {
+    private ChatroomResponse createChatroomResponseIfValid(ChatroomStudent chatroomStudent) {
         Chatroom chatroom = chatroomStudent.getChatroom();
         LocalDateTime leaveTime = chatroomStudent.getLeaveTime();
         LocalDateTime lastMessageTime = chatroom.getLastMessageTime();
@@ -158,9 +158,9 @@ public class ChatService {
         }
         Student buddy = getBuddyFromChatroom(chatroomStudent.getStudent(), chatroom);
         if (buddy == null) {
-            return ChatRoomResponse.from(chatroom, chatroomStudent, null);
+            return ChatroomResponse.from(chatroom, chatroomStudent, null);
         }
-        return ChatRoomResponse.from(chatroom, chatroomStudent, buddy.getProfileImage().getUrl());
+        return ChatroomResponse.from(chatroom, chatroomStudent, buddy.getProfileImage().getUrl());
     }
 
     private Student getBuddyFromChatroom(Student student, Chatroom chatroom) {
