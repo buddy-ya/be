@@ -41,7 +41,7 @@ public class PhoneAuthenticationService {
     @Transactional(readOnly = true)
     public void verifyCode(String phoneNumber, String inputCode) {
         RegisteredPhone registeredPhone = registeredPhoneRepository.findByPhoneNumber(phoneNumber)
-                .orElseThrow(() -> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.CODE_MISMATCH));
+                .orElseThrow(() -> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.PHONE_NOT_FOUND));
         if (!inputCode.equals(registeredPhone.getAuthenticationCode())) {
             throw new PhoneAuthenticationException(PhoneAuthenticationExceptionType.CODE_MISMATCH);
         }
