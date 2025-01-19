@@ -53,7 +53,5 @@ public class ChatroomStudent {
     public void updateLeaveTime() {
         this.leaveTime = LocalDateTime.now();
     }
-
-
 }
 
