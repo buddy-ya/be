@@ -6,6 +6,7 @@ import java.util.List;
 
 public record CommentResponse(
         Long id,
+        Long userId,
         String content,
         String name,
         String country,
@@ -27,6 +28,7 @@ public record CommentResponse(
                 .toList();
         return new CommentResponse(
                 comment.getId(),
+                comment.getStudent().getId(),
                 comment.getContent(),
                 comment.getStudent().getName(),
                 comment.getStudent().getCountry(),

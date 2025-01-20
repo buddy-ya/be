@@ -8,6 +8,7 @@ import java.util.List;
 
 public record FeedResponse(
         Long id,
+        Long userId,
         String name,
         String country,
         String title,
@@ -26,6 +27,7 @@ public record FeedResponse(
     public static FeedResponse from(Feed feed, FeedUserAction userAction) {
         return new FeedResponse(
                 feed.getId(),
+                feed.getStudent().getId(),
                 feed.getStudent().getName(),
                 feed.getStudent().getCountry(),
                 feed.getTitle(),
