@@ -21,7 +21,7 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class EmailSendService {
 
-    private static final int AUTH_CODE_MAX_RANGE = 1_000;
+    private static final int AUTH_CODE_MAX_RANGE = 10_000;
 
     private final JavaMailSender javaMailSender;
     private final StudentService studentService;
