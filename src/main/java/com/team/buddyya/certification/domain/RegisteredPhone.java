@@ -8,10 +8,10 @@ import lombok.NoArgsConstructor;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.*;
 
-@Getter
-@Table(name = "registered_phone_number")
-@NoArgsConstructor(access = PROTECTED)
 @Entity
+@Table(name = "registered_phone_number")
+@Getter
+@NoArgsConstructor(access = PROTECTED)
 public class RegisteredPhone extends CreatedTime {
 
     @Id
