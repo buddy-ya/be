@@ -25,6 +25,8 @@ public class WebSocketAuthInterceptor implements HandshakeInterceptor {
     private static final String ERROR_INTERNAL_SERVER = "핸드셰이크 중 내부 서버 오류 발생";
     private static final String ERROR_INVALID_JWT = "유효하지 않은 JWT 토큰";
     private static final String ERROR_UNAUTHORIZED_ACCESS = "방에 대한 권한 없음: ";
+    private static final String ERROR_INVALID_AUTH_HEADER = "Authorization 헤더가 없거나 유효하지 않습니다";
+    private static final String ERROR_INVALID_PATH_VARIABLE = "경로가 잘못되었습니다: 마지막 변수를 찾을 수 없습니다";
 
     private final JwtUtils jwtUtils;
     private final ChatroomStudentRepository chatroomStudentRepository;
@@ -66,7 +68,7 @@ public class WebSocketAuthInterceptor implements HandshakeInterceptor {
     private String extractHeader(ServerHttpRequest request, String headerName) {
         String header = request.getHeaders().getFirst(headerName);
         if (header == null || !header.startsWith("Bearer ")) {
-            throw new IllegalArgumentException("Authorization header is missing or invalid");
+            throw new IllegalArgumentException(ERROR_INVALID_AUTH_HEADER);
         }
         return header;
     }
@@ -76,7 +78,7 @@ public class WebSocketAuthInterceptor implements HandshakeInterceptor {
                 .filter(segment -> !segment.isBlank())
                 .reduce((first, second) -> second)
                 .map(Long::valueOf)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid path: last variable not found"));
+                .orElseThrow(() -> new IllegalArgumentException(ERROR_INVALID_PATH_VARIABLE));
     }
 
     private void validateTokenAndAccess(String token, Long studentId, Long roomId) {

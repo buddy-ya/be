@@ -4,13 +4,12 @@ import com.team.buddyya.chatting.domain.Chatroom;
 import com.team.buddyya.student.domain.Student;
 
 public record CreateChatroomResponse(
-        Long chatroomId,
+        Long roomId,
         Long buddyId,
         String buddyName,
         String buddyCountry,
         String roomName,
-        String profileUrl,
-        Long postId
+        String profileUrl
 ) {
 
     public static CreateChatroomResponse from(Chatroom chatroom, Student buddy) {
@@ -20,8 +19,7 @@ public record CreateChatroomResponse(
                 buddy.getName(),
                 buddy.getCountry(),
                 chatroom.getName(),
-                buddy.getProfileImage().getUrl(),
-                chatroom.getPostId()
+                buddy.getProfileImage().getUrl()
         );
     }
 }
