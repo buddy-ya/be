@@ -8,6 +8,7 @@ import com.team.buddyya.certification.dto.response.CertificationResponse;
 import com.team.buddyya.certification.dto.response.CertificationStatusResponse;
 import com.team.buddyya.certification.dto.response.StudentIdCardResponse;
 import com.team.buddyya.certification.service.CertificationService;
+import com.team.buddyya.certification.service.EmailSendService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,12 +26,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class CertificationController {
 
     private final CertificationService certificationService;
+    private final EmailSendService emailSendService;
 
     @PostMapping("/email/send")
     public ResponseEntity<CertificationResponse> sendEmail(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                            @RequestBody EmailCertificationRequest emailCertificationRequest) {
-        return ResponseEntity.ok(
-                certificationService.certificateEmail(userDetails.getStudentInfo(), emailCertificationRequest));
+
+        String generatedCode = emailSendService.sendEmail(userDetails.getStudentInfo(), emailCertificationRequest);
+        CertificationResponse response = certificationService.saveCode(emailCertificationRequest.email(), generatedCode);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/email/verify-code")

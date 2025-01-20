@@ -6,26 +6,26 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
-import static lombok.AccessLevel.*;
+import static lombok.AccessLevel.PROTECTED;
 
-@Entity
-@Table(name = "registered_phone_number")
 @Getter
+@Table(name = "student_email")
 @NoArgsConstructor(access = PROTECTED)
-public class RegisteredPhone extends CreatedTime {
+@Entity
+public class StudentEmail extends CreatedTime {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @Column(length = 11, nullable = false, unique = true)
-    private String phoneNumber;
+    @Column(nullable = false, unique = true)
+    private String email;
 
-    @Column(length = 6, nullable = false, unique = true)
+    @Column(length = 4, nullable = false, unique = true)
     private String authenticationCode;
 
-    public RegisteredPhone(String phoneNumber, String authenticationCode) {
-        this.phoneNumber = phoneNumber;
+    public StudentEmail(String email, String authenticationCode) {
+        this.email = email;
         this.authenticationCode = authenticationCode;
     }
 
