@@ -5,7 +5,9 @@ import com.team.buddyya.feed.dto.response.feed.FeedListResponse;
 import com.team.buddyya.feed.service.FeedService;
 import com.team.buddyya.student.dto.request.MyPageUpdateRequest;
 import com.team.buddyya.student.dto.request.OnBoardingRequest;
-import com.team.buddyya.student.dto.response.*;
+import com.team.buddyya.student.dto.response.MyPageUpdateResponse;
+import com.team.buddyya.student.dto.response.OnBoardingResponse;
+import com.team.buddyya.student.dto.response.UserProfileResponse;
 import com.team.buddyya.student.service.MyPageService;
 import com.team.buddyya.student.service.OnBoardingService;
 import com.team.buddyya.student.service.StudentService;
@@ -38,9 +40,9 @@ public class UserController {
         return ResponseEntity.ok(myPageService.getMyProfile(userDetails.getStudentInfo()));
     }
 
-    @GetMapping("/{studentId}")
-    public ResponseEntity<UserProfileResponse> getUserProfile(@PathVariable("studentId") Long studentId) {
-        return ResponseEntity.ok(myPageService.getUserProfile(studentId));
+    @GetMapping("/{userId}")
+    public ResponseEntity<UserProfileResponse> getUserProfile(@PathVariable("userId") Long userId) {
+        return ResponseEntity.ok(myPageService.getUserProfile(userId));
     }
 
     @PatchMapping

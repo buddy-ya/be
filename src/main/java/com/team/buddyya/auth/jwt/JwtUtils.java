@@ -42,7 +42,7 @@ public class JwtUtils {
 
     private String createToken(TokenInfoRequest context, long expiredTime) {
         Claims claims = Jwts.claims();
-        claims.put("studentId", context.studentId());
+        claims.put("studentId", context.userId());
         ZonedDateTime now = ZonedDateTime.now();
         ZonedDateTime tokenValidity = now.plusSeconds(expiredTime);
         return Jwts.builder()
@@ -78,7 +78,7 @@ public class JwtUtils {
 
     public Long getUserId(String token) {
         Claims claims = parseClaims(token);
-        Object studentId = claims.get("studentId");
+        Object studentId = claims.get("id");
         if (studentId instanceof Number) {
             return ((Number) studentId).longValue();
         }

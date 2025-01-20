@@ -6,12 +6,12 @@ import com.team.buddyya.chatting.domain.ChatroomStudent;
 import java.time.LocalDateTime;
 
 public record ChatroomResponse(
-        Long roomId,
-        String chatroomName,
+        Long id,
+        String name,
         int unreadCount,
-        String buddyProfileImage,
+        String profileImageUrl,
         String lastMessage,
-        LocalDateTime lastMessageTime
+        LocalDateTime lastMessageDate
 ) {
 
     public static ChatroomResponse from(Chatroom chatroom, ChatroomStudent chatroomStudent, String buddyProfileImage) {

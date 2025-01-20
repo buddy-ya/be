@@ -145,7 +145,7 @@ public class ChatService {
         return student.getChatroomStudents().stream()
                 .map(chatroomStudent -> createChatroomResponseIfValid(chatroomStudent))
                 .filter(Objects::nonNull)
-                .sorted((a, b) -> b.lastMessageTime().compareTo(a.lastMessageTime()))
+                .sorted((a, b) -> b.lastMessageDate().compareTo(a.lastMessageDate()))
                 .collect(Collectors.toList());
     }
 

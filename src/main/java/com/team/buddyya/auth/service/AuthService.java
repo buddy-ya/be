@@ -29,10 +29,10 @@ public class AuthService {
     public TokenReissueResponse reissueToken(TokenReissueRequest request) {
         jwtUtils.validateToken(request.refreshToken());
         Claims claims = jwtUtils.parseClaims(request.refreshToken());
-        Long studentId = claims.get("studentId", Long.class);
+        Long studentId = claims.get("id", Long.class);
         AuthToken authToken = authTokenRepository.findByStudentId(studentId)
                 .orElseThrow(() -> new AuthException(AuthExceptionType.REFRESH_TOKEN_NOT_FOUND));
-        if(!authToken.getRefreshToken().equals(request.refreshToken())) {
+        if (!authToken.getRefreshToken().equals(request.refreshToken())) {
             throw new AuthException(AuthExceptionType.INVALID_REFRESH_TOKEN);
         }
         if (isTokenExpiringWithinDays(claims)) {
