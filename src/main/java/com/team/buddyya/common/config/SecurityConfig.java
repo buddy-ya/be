@@ -5,6 +5,7 @@ import com.team.buddyya.auth.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -39,11 +40,12 @@ public class SecurityConfig {
                         .authenticationEntryPoint(authenticationEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler))
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(HttpMethod.POST, "/users").permitAll()
                         .requestMatchers("/ws/**", "/ws/chat/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/onboarding", "/phone-auth/**",
+                        .requestMatchers("/phone-auth/**",
                                 "/auth/reissue").permitAll()
                         .requestMatchers("/auth/fail", "/admin/**").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers("/auth/success", "/certification/**", "/feeds/**", "/mypage/**", "/chatroom/**").hasAuthority("ROLE_STUDENT")
+                        .requestMatchers("/users", "/auth/success", "/certification/**", "/feeds/**", "/chatrooms/**").hasAuthority("ROLE_STUDENT")
                         .anyRequest().authenticated()
                 );
         return http.build();

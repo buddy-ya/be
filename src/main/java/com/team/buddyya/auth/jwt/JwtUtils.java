@@ -78,7 +78,7 @@ public class JwtUtils {
 
     public Long getUserId(String token) {
         Claims claims = parseClaims(token);
-        Object studentId = claims.get("id");
+        Object studentId = claims.get("studentId");
         if (studentId instanceof Number) {
             return ((Number) studentId).longValue();
         }
