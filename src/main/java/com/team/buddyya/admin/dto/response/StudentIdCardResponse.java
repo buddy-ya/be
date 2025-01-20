@@ -4,7 +4,7 @@ import com.team.buddyya.certification.domain.StudentIdCard;
 
 public record StudentIdCardResponse(
         Long id,
-        Long studentId,
+        Long userId,
         String imageUrl
 ) {
 

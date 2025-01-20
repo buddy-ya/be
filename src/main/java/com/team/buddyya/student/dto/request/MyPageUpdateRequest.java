@@ -4,7 +4,7 @@ import java.util.List;
 
 
 public record MyPageUpdateRequest(
-        String key, // "interests", "languages", "name"
+        String key,
         List<String> values
 ) {
 }

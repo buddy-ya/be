@@ -5,17 +5,17 @@ import com.team.buddyya.chatting.domain.Chat;
 import java.time.LocalDateTime;
 
 public record ChatMessageResponse(
+        Long id,
         Long senderId,
         String message,
-        Long id,
         LocalDateTime createdDate
 ) {
 
     public static ChatMessageResponse from(Chat chat) {
         return new ChatMessageResponse(
+                chat.getId(),
                 chat.getStudent().getId(),
                 chat.getMessage(),
-                chat.getId(),
                 chat.getCreatedDate()
         );
     }
