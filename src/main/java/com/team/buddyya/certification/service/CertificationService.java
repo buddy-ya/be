@@ -38,8 +38,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Transactional
 public class CertificationService {
 
-    private static final int AUTH_CODE_MAX_RANGE = 1_000;
-
     private final FindStudentService findStudentService;
     private final StudentIdCardRepository studentIdCardRepository;
     private final StudentEmailRepository studentEmailRepository;
