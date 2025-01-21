@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public record UserProfileResponse(
+        Long id,
         String name,
         String country,
         String university,
@@ -21,6 +22,7 @@ public record UserProfileResponse(
 
     public static UserProfileResponse from(Student student, boolean isStudentIdCardRequested) {
         return new UserProfileResponse(
+                student.getId(),
                 student.getName(),
                 student.getCountry(),
                 student.getUniversity().getUniversityName(),
@@ -37,6 +39,7 @@ public record UserProfileResponse(
 
     public static UserProfileResponse from(Student student) {
         return new UserProfileResponse(
+                student.getId(),
                 student.getName(),
                 student.getCountry(),
                 student.getUniversity().getUniversityName(),
