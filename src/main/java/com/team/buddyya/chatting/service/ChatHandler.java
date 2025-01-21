@@ -45,6 +45,17 @@ public class ChatHandler extends TextWebSocketHandler {
     }
 
     @Override
+    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+        Long userId = (Long) session.getAttributes().get("userId");
+        Long roomId = (Long) session.getAttributes().get("roomId");
+        if (userId == null || roomId == null) {
+            session.close(CloseStatus.BAD_DATA);
+            return;
+        }
+        service.addSessionToRoom(roomId, session);
+    }
+
+    @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) {
         log.error("세션 {}의 전송 오류: {}", session.getId(), exception.getMessage());
         closeSession(session, ERROR_TRANSPORT);

@@ -87,9 +87,7 @@ public class ChatService {
     public void handleAction(WebSocketSession session, ChatMessage chatMessage) throws IllegalArgumentException {
         Chatroom chatRoom = chatRoomRepository.findById(chatMessage.getRoomId())
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_CHATROOM_NOT_FOUND));
-        if (chatMessage.getType().equals(MessageType.ENTER)) {
-            sessionsPerRoom.computeIfAbsent(chatRoom.getId(), k -> new HashSet<>()).add(session);
-        } else if (chatMessage.getType().equals(MessageType.TALK)) {
+        if (chatMessage.getType().equals(MessageType.TALK)) {
             saveMessageAndHandleUnreadCount(chatMessage);
             sendMessageToRoom(chatRoom.getId(), chatMessage);
         }
@@ -216,5 +214,9 @@ public class ChatService {
         sendMessageToRoom(roomId, chatMessage);
     }
 
+    public void addSessionToRoom(Long roomId, WebSocketSession session) {
+        sessionsPerRoom.computeIfAbsent(roomId, k -> new HashSet<>()).add(session);
+        log.info("Room ID {}에 새로운 세션 추가. 현재 세션 수: {}", roomId, sessionsPerRoom.get(roomId).size());
+    }
 }
 
