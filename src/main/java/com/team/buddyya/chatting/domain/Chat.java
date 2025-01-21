@@ -30,8 +30,12 @@ public class Chat extends CreatedTime {
     @Column(columnDefinition = "TEXT")
     private String message;
 
+    @Enumerated(EnumType.STRING)
+    private MessageType type;
+
     @Builder
-    public Chat(Chatroom chatroom, Student student, String message) {
+    public Chat(MessageType type, Chatroom chatroom, Student student, String message) {
+        this.type = type;
         this.chatroom = chatroom;
         this.student = student;
         this.message = message;
