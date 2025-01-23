@@ -189,6 +189,7 @@ public class ChatService {
                 .orElseThrow(() -> new ChatException(ChatExceptionType.CHATROOM_NOT_FOUND));
         ChatroomStudent chatroomStudent = chatroomStudentRepository.findByChatroomAndStudentId(chatroom, studentInfo.id())
                 .orElseThrow(() -> new ChatException(ChatExceptionType.USER_NOT_PART_OF_CHATROOM));
+        chatroomStudent.resetUnreadCount();
         Page<Chat> chats = chatRepository.findByChatroom(chatroom, pageable);
         Page<ChatMessageResponse> chatResponses = chats.map(ChatMessageResponse::from);
         return ChatMessageListResponse.from(chatResponses);
@@ -199,7 +200,7 @@ public class ChatService {
                 .orElseThrow(() -> new ChatException(ChatExceptionType.CHATROOM_NOT_FOUND));
         ChatroomStudent chatroomStudent = chatroomStudentRepository.findByChatroomAndStudentId(chatroom, studentInfo.id())
                 .orElseThrow(() -> new ChatException(ChatExceptionType.USER_NOT_PART_OF_CHATROOM));
-        chatroomStudent.updateLeave();
+        chatroomStudent.updateIsExited();
         return LeaveChatroomResponse.from(CHATROOM_LEAVE_SUCCESS_MESSAGE);
     }
 

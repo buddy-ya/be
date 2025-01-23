@@ -48,7 +48,7 @@ public class ChatroomStudent {
         this.unreadCount = 0;
     }
 
-    public void updateLeave() {
+    public void updateIsExited() {
         this.isExited = true;
     }
 }
