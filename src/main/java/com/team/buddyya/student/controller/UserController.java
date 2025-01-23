@@ -35,14 +35,10 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping
-    public ResponseEntity<UserProfileResponse> getMyProfile(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        return ResponseEntity.ok(myPageService.getMyProfile(userDetails.getStudentInfo()));
-    }
-
     @GetMapping("/{userId}")
-    public ResponseEntity<UserProfileResponse> getUserProfile(@PathVariable("userId") Long userId) {
-        return ResponseEntity.ok(myPageService.getUserProfile(userId));
+    public ResponseEntity<UserProfileResponse> getMyProfile(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                            @PathVariable("userId") Long userId) {
+        return ResponseEntity.ok(myPageService.getUserProfile(userDetails.getStudentInfo(), userId));
     }
 
     @PatchMapping
@@ -73,7 +69,7 @@ public class UserController {
         return ResponseEntity.ok(feedService.getBookmarkFeed(userDetails.getStudentInfo(), pageable));
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping
     public void deleteStudent(@AuthenticationPrincipal CustomUserDetails userDetails) {
         studentService.deleteStudent(userDetails.getStudentInfo());
     }

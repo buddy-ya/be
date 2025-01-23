@@ -58,16 +58,13 @@ public class MyPageService {
     }
 
     @Transactional(readOnly = true)
-    public UserProfileResponse getMyProfile(StudentInfo studentInfo) {
-        Student student = findStudentService.findByStudentId(studentInfo.id());
+    public UserProfileResponse getUserProfile(StudentInfo studentInfo, Long userId) {
+        Student student = findStudentService.findByStudentId(userId);
+        if(studentInfo.id()!=userId){
+            return UserProfileResponse.from(student);
+        }
         boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
                 .isPresent();
         return UserProfileResponse.from(student, isStudentIdCardRequested);
-    }
-
-    @Transactional(readOnly = true)
-    public UserProfileResponse getUserProfile(long studentId) {
-        Student student = findStudentService.findByStudentId(studentId);
-        return UserProfileResponse.from(student);
     }
 }
