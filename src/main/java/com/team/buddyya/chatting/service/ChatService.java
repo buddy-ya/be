@@ -69,7 +69,10 @@ public class ChatService {
     }
 
     private Chatroom createChatroom(Student user, Student buddy) {
-        Chatroom newChatroom = new Chatroom();
+        Chatroom newChatroom = Chatroom
+                .builder()
+                .createdTime(LocalDateTime.now())
+                .build();
         chatRoomRepository.save(newChatroom);
         ChatroomStudent userChatroom = ChatroomStudent.builder()
                 .student(user)
@@ -155,24 +158,23 @@ public class ChatService {
     public List<ChatroomResponse> getChatRooms(StudentInfo studentInfo) {
         Student student = findStudentService.findByStudentId(studentInfo.id());
         return student.getChatroomStudents().stream()
-                .map(chatroomStudent -> createChatroomResponseIfValid(chatroomStudent))
+                .filter(chatroomStudent -> !chatroomStudent.getIsLeft())
+                .map(chatroomStudent -> createChatroomResponse(chatroomStudent))
                 .filter(Objects::nonNull)
                 .sorted((a, b) -> b.lastMessageDate().compareTo(a.lastMessageDate()))
                 .collect(Collectors.toList());
     }
 
-    private ChatroomResponse createChatroomResponseIfValid(ChatroomStudent chatroomStudent) {
+    private ChatroomResponse createChatroomResponse(ChatroomStudent chatroomStudent) {
         Chatroom chatroom = chatroomStudent.getChatroom();
-        LocalDateTime leaveTime = chatroomStudent.getLeaveTime();
-        LocalDateTime lastMessageTime = chatroom.getLastMessageTime();
-        if (lastMessageTime == null || lastMessageTime.isBefore(leaveTime)) {
-            return null;
-        }
         Student buddy = getBuddyFromChatroom(chatroomStudent.getStudent(), chatroom);
         if (buddy == null) {
-            return ChatroomResponse.from(chatroom, chatroomStudent, null);
+            return ChatroomResponse.from(chatroom, null, chatroomStudent, null, true);
         }
-        return ChatroomResponse.from(chatroom, chatroomStudent, buddy.getProfileImage().getUrl());
+        boolean isBuddyLeft = chatroom.getChatroomStudents().stream()
+                .filter(cs -> !cs.getStudent().getId().equals(chatroomStudent.getStudent().getId()))
+                .anyMatch(ChatroomStudent::getIsLeft);
+        return ChatroomResponse.from(chatroom, buddy.getName(), chatroomStudent, buddy.getProfileImage().getUrl(), isBuddyLeft);
     }
 
     private Student getBuddyFromChatroom(Student student, Chatroom chatroom) {
@@ -188,9 +190,7 @@ public class ChatService {
                 .orElseThrow(() -> new ChatException(ChatExceptionType.CHATROOM_NOT_FOUND));
         ChatroomStudent chatroomStudent = chatroomStudentRepository.findByChatroomAndStudentId(chatroom, studentInfo.id())
                 .orElseThrow(() -> new ChatException(ChatExceptionType.USER_NOT_PART_OF_CHATROOM));
-        LocalDateTime leaveTime = chatroomStudent.getLeaveTime();
-        Page<Chat> chats = chatRepository.findByChatroomAndCreatedDateAfter(chatroom, leaveTime, pageable);
-        chatroomStudent.resetUnreadCount();
+        Page<Chat> chats = chatRepository.findByChatroom(chatroom, pageable);
         Page<ChatMessageResponse> chatResponses = chats.map(ChatMessageResponse::from);
         return ChatMessageListResponse.from(chatResponses);
     }
@@ -200,8 +200,7 @@ public class ChatService {
                 .orElseThrow(() -> new ChatException(ChatExceptionType.CHATROOM_NOT_FOUND));
         ChatroomStudent chatroomStudent = chatroomStudentRepository.findByChatroomAndStudentId(chatroom, studentInfo.id())
                 .orElseThrow(() -> new ChatException(ChatExceptionType.USER_NOT_PART_OF_CHATROOM));
-        chatroomStudent.updateLeaveTime();
-        chatroomStudent.resetUnreadCount();
+        chatroomStudent.updateLeave();
         return LeaveChatroomResponse.from(CHATROOM_LEAVE_SUCCESS_MESSAGE);
     }
 

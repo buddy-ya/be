@@ -33,11 +33,11 @@ public class Chatroom extends CreatedTime {
     private List<Chat> chats;
 
     @Builder
-    public Chatroom() {
+    public Chatroom(LocalDateTime createdTime) {
         this.chatroomStudents = new ArrayList<>();
         this.chats = new ArrayList<>();
         lastMessage = null;
-        lastMessageTime = null;
+        lastMessageTime = createdTime;
     }
 
     public void updateLastMessage(String message) {
