@@ -206,16 +206,12 @@ public class ChatService {
     }
 
     public void chatUploadImages(Long roomId, StudentInfo studentInfo, ChatImageRequest request) {
-        List<String> imageUrls = request.images()
-                .stream()
-                .map(image -> s3UploadService.uploadFile(CHAT_IMAGE.getDirectoryName(), image))
-                .collect(Collectors.toList());
-        String imageMessages = String.join(",", imageUrls);
+        String imageUrl = s3UploadService.uploadFile(CHAT_IMAGE.getDirectoryName(), request.image());
         ChatMessage chatMessage = ChatMessage.builder()
                 .type(MessageType.IMAGE)
                 .roomId(roomId)
                 .tempId(request.tempId())
-                .message(imageMessages)
+                .message(imageUrl)
                 .userId(studentInfo.id())
                 .time(LocalDateTime.now())
                 .build();
