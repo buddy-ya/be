@@ -22,10 +22,6 @@ public class Chatroom extends CreatedTime {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long postId;
-
-    private String name;
-
     private String lastMessage;
 
     private LocalDateTime lastMessageTime;
@@ -37,13 +33,11 @@ public class Chatroom extends CreatedTime {
     private List<Chat> chats;
 
     @Builder
-    public Chatroom(Long postId, String name) {
+    public Chatroom() {
         this.chatroomStudents = new ArrayList<>();
         this.chats = new ArrayList<>();
         lastMessage = null;
         lastMessageTime = null;
-        this.postId = postId;
-        this.name = name;
     }
 
     public void updateLastMessage(String message) {

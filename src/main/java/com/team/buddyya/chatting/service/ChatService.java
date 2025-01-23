@@ -45,7 +45,7 @@ public class ChatService {
     private static final String ERROR_CHATROOM_NOT_FOUND = "채팅방을 찾을 수 없습니다.";
     private static final String CHATROOM_LEAVE_SUCCESS_MESSAGE = "채팅방을 나갔습니다.";
     private static final String IMAGE_SENT_MESSAGE = "사진을 보냈습니다";
-    private static final long PONG_TIMEOUT = 30000;
+    private static final long PONG_TIMEOUT = 45000;
 
     private final ObjectMapper mapper;
     private final FindStudentService findStudentService;
@@ -59,21 +59,17 @@ public class ChatService {
     public CreateChatroomResponse createOrGetChatRoom(CreateChatroomRequest request, StudentInfo studentInfo) {
         Student user = findStudentService.findByStudentId(studentInfo.id());
         Student buddy = findStudentService.findByStudentId(request.buddyId());
-        Optional<Chatroom> existingRoom = chatRoomRepository.findByUserAndBuddyAndPostId(
-                studentInfo.id(), request.buddyId(), request.feedId());
+        Optional<Chatroom> existingRoom = chatRoomRepository.findByUserAndBuddy(user.getId(), buddy.getId());
         if (existingRoom.isPresent()) {
             Chatroom room = existingRoom.get();
-            return CreateChatroomResponse.from(room, buddy);
+            return CreateChatroomResponse.from(room, buddy, false);
         }
-        Chatroom newChatroom = createChatroom(request, user, buddy);
-        return CreateChatroomResponse.from(newChatroom, buddy);
+        Chatroom newChatroom = createChatroom(user, buddy);
+        return CreateChatroomResponse.from(newChatroom, buddy, true);
     }
 
-    private Chatroom createChatroom(CreateChatroomRequest request, Student user, Student buddy) {
-        Chatroom newChatroom = Chatroom.builder()
-                .postId(request.feedId())
-                .name(request.feedName())
-                .build();
+    private Chatroom createChatroom(Student user, Student buddy) {
+        Chatroom newChatroom = new Chatroom();
         chatRoomRepository.save(newChatroom);
         ChatroomStudent userChatroom = ChatroomStudent.builder()
                 .student(user)
@@ -291,7 +287,7 @@ public class ChatService {
     }
 
     public void updateLastPongTimestamp(WebSocketSession session) {
-        session.getAttributes().put("timeout", System.currentTimeMillis() + 45000);
+        session.getAttributes().put("timeout", System.currentTimeMillis() + PONG_TIMEOUT);
         log.info("세션 {}으로부터 PONG 수신. 만료 시간 갱신 완료.", session.getId());
     }
 }

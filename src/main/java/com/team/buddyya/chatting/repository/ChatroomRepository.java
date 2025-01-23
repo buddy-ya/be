@@ -11,7 +11,6 @@ public interface ChatroomRepository extends JpaRepository<Chatroom, Long> {
 
     @Query("SELECT c FROM Chatroom c " +
             "JOIN c.chatroomStudents s1 ON s1.student.id = :userId " +
-            "JOIN c.chatroomStudents s2 ON s2.student.id = :buddyId " +
-            "WHERE c.postId = :postId")
-    Optional<Chatroom> findByUserAndBuddyAndPostId(@Param("userId") Long userId, @Param("buddyId") Long buddyId, @Param("postId") Long postId);
+            "JOIN c.chatroomStudents s2 ON s2.student.id = :buddyId")
+    Optional<Chatroom> findByUserAndBuddy(@Param("userId") Long userId, @Param("buddyId") Long buddyId);
 }
