@@ -22,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.socket.TextMessage;
@@ -158,7 +157,7 @@ public class ChatService {
     public List<ChatroomResponse> getChatRooms(StudentInfo studentInfo) {
         Student student = findStudentService.findByStudentId(studentInfo.id());
         return student.getChatroomStudents().stream()
-                .filter(chatroomStudent -> !chatroomStudent.getIsLeft())
+                .filter(chatroomStudent -> !chatroomStudent.getIsExited())
                 .map(chatroomStudent -> createChatroomResponse(chatroomStudent))
                 .filter(Objects::nonNull)
                 .sorted((a, b) -> b.lastMessageDate().compareTo(a.lastMessageDate()))
@@ -171,10 +170,10 @@ public class ChatService {
         if (buddy == null) {
             return ChatroomResponse.from(chatroom, null, chatroomStudent, null, true);
         }
-        boolean isBuddyLeft = chatroom.getChatroomStudents().stream()
+        boolean isBuddyExited = chatroom.getChatroomStudents().stream()
                 .filter(cs -> !cs.getStudent().getId().equals(chatroomStudent.getStudent().getId()))
-                .anyMatch(ChatroomStudent::getIsLeft);
-        return ChatroomResponse.from(chatroom, buddy.getName(), chatroomStudent, buddy.getProfileImage().getUrl(), isBuddyLeft);
+                .anyMatch(ChatroomStudent::getIsExited);
+        return ChatroomResponse.from(chatroom, buddy.getName(), chatroomStudent, buddy.getProfileImage().getUrl(), isBuddyExited);
     }
 
     private Student getBuddyFromChatroom(Student student, Chatroom chatroom) {
@@ -223,7 +222,7 @@ public class ChatService {
         log.info("Room ID {}에 새로운 세션 추가. 현재 세션 수: {}", roomId, sessionsPerRoom.get(roomId).size());
     }
 
-    @Scheduled(fixedRate = 30000)
+    //    @Scheduled(fixedRate = 30000)
     public void sendPingMessages() {
         log.info("모든 WebSocket 세션에 Ping 메시지를 전송합니다.");
         long currentTime = System.currentTimeMillis();

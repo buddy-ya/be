@@ -12,10 +12,10 @@ public record ChatroomResponse(
         String profileImageUrl,
         String lastMessage,
         LocalDateTime lastMessageDate,
-        boolean isBuddyLeft
+        boolean isBuddyExited
 ) {
 
-    public static ChatroomResponse from(Chatroom chatroom, String name, ChatroomStudent chatroomStudent, String buddyProfileImage, boolean isBuddyLeft) {
-        return new ChatroomResponse(chatroom.getId(), name, chatroomStudent.getUnreadCount(), buddyProfileImage, chatroom.getLastMessage(), chatroom.getLastMessageTime(), isBuddyLeft);
+    public static ChatroomResponse from(Chatroom chatroom, String name, ChatroomStudent chatroomStudent, String buddyProfileImage, boolean isBuddyLeave) {
+        return new ChatroomResponse(chatroom.getId(), name, chatroomStudent.getUnreadCount(), buddyProfileImage, chatroom.getLastMessage(), chatroom.getLastMessageTime(), isBuddyLeave);
     }
 }

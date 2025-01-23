@@ -29,15 +29,15 @@ public class ChatroomStudent {
     @Column(name = "unread_count")
     private int unreadCount;
 
-    @Column(name = "left")
-    private Boolean isLeft;
+    @Column(name = "exited")
+    private Boolean isExited;
 
     @Builder
     public ChatroomStudent(Student student, Chatroom chatroom) {
         this.student = student;
         this.chatroom = chatroom;
         this.unreadCount = 0;
-        this.isLeft = false;
+        this.isExited = false;
     }
 
     public void increaseUnreadCount() {
@@ -49,7 +49,7 @@ public class ChatroomStudent {
     }
 
     public void updateLeave() {
-        this.isLeft = true;
+        this.isExited = true;
     }
 }
 
