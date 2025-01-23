@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.socket.TextMessage;
@@ -30,6 +31,7 @@ import org.springframework.web.socket.WebSocketSession;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static com.team.buddyya.common.domain.S3DirectoryName.CHAT_IMAGE;
@@ -43,6 +45,7 @@ public class ChatService {
     private static final String ERROR_CHATROOM_NOT_FOUND = "채팅방을 찾을 수 없습니다.";
     private static final String CHATROOM_LEAVE_SUCCESS_MESSAGE = "채팅방을 나갔습니다.";
     private static final String IMAGE_SENT_MESSAGE = "사진을 보냈습니다";
+    private static final long PONG_TIMEOUT = 30000;
 
     private final ObjectMapper mapper;
     private final FindStudentService findStudentService;
@@ -50,7 +53,8 @@ public class ChatService {
     private final ChatRepository chatRepository;
     private final ChatroomRepository chatRoomRepository;
     private final ChatroomStudentRepository chatroomStudentRepository;
-    private final Map<Long, Set<WebSocketSession>> sessionsPerRoom = new HashMap<>();
+    private final Map<Long, Set<WebSocketSession>> sessionsPerRoom = new ConcurrentHashMap<>();
+    private final Map<WebSocketSession, Long> lastPongTimestamps = new ConcurrentHashMap<>();
 
     public CreateChatroomResponse createOrGetChatRoom(CreateChatroomRequest request, StudentInfo studentInfo) {
         Student user = findStudentService.findByStudentId(studentInfo.id());
@@ -84,7 +88,7 @@ public class ChatService {
         return newChatroom;
     }
 
-    public void handleAction(WebSocketSession session, ChatMessage chatMessage) throws IllegalArgumentException {
+    public void handleAction(ChatMessage chatMessage) throws IllegalArgumentException {
         Chatroom chatRoom = chatRoomRepository.findById(chatMessage.getRoomId())
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_CHATROOM_NOT_FOUND));
         if (chatMessage.getType().equals(MessageType.TALK)) {
@@ -140,7 +144,16 @@ public class ChatService {
     }
 
     public void removeSession(WebSocketSession session) {
-        sessionsPerRoom.values().forEach(sessions -> sessions.remove(session));
+        Long roomId = (Long) session.getAttributes().get("roomId");
+        Set<WebSocketSession> sessions = sessionsPerRoom.get(roomId);
+        if (sessions != null) {
+            sessions.remove(session);
+            lastPongTimestamps.remove(session);
+            if (sessions.isEmpty()) {
+                sessionsPerRoom.remove(roomId);
+                log.info("Room ID {}에서 모든 세션이 종료되어 방 제거 완료.", roomId);
+            }
+        }
     }
 
     public List<ChatroomResponse> getChatRooms(StudentInfo studentInfo) {
@@ -218,5 +231,67 @@ public class ChatService {
         sessionsPerRoom.computeIfAbsent(roomId, k -> new HashSet<>()).add(session);
         log.info("Room ID {}에 새로운 세션 추가. 현재 세션 수: {}", roomId, sessionsPerRoom.get(roomId).size());
     }
-}
 
+    @Scheduled(fixedRate = 30000)
+    public void sendPingMessages() {
+        log.info("모든 WebSocket 세션에 Ping 메시지를 전송합니다.");
+        long currentTime = System.currentTimeMillis();
+        sessionsPerRoom.forEach((roomId, sessions) -> {
+            Set<WebSocketSession> invalidSessions;
+            try {
+                invalidSessions = handlePingAndValidateSessions(roomId, sessions, currentTime);
+            } catch (IOException e) {
+                log.error("PING 메시지 처리 중 에러 발생: {}", e.getMessage());
+                return;
+            }
+            cleanupInvalidSessions(roomId, sessions, invalidSessions);
+        });
+    }
+
+    private Set<WebSocketSession> handlePingAndValidateSessions(Long roomId, Set<WebSocketSession> sessions, long currentTime) throws IOException {
+        Set<WebSocketSession> invalidSessions = new HashSet<>();
+        for (WebSocketSession session : sessions) {
+            if (!session.isOpen()) {
+                invalidSessions.add(session);
+                continue;
+            }
+            session.sendMessage(new TextMessage("PING"));
+            if (isSessionTimedOut(session, currentTime)) {
+                invalidSessions.add(session);
+                log.warn("Room ID {}의 세션 {}이 만료로 제거됩니다.", roomId, session.getId());
+            }
+        }
+        return invalidSessions;
+    }
+
+    private boolean isSessionTimedOut(WebSocketSession session, long currentTime) {
+        Long timeout = (Long) session.getAttributes().get("timeout");
+        return timeout == null || currentTime > timeout;
+    }
+
+    private void cleanupInvalidSessions(Long roomId, Set<WebSocketSession> sessions, Set<WebSocketSession> invalidSessions) {
+        if (!invalidSessions.isEmpty()) {
+            invalidSessions.forEach(session -> closeAndRemoveSession(session));
+            sessions.removeAll(invalidSessions);
+            if (sessions.isEmpty()) {
+                sessionsPerRoom.remove(roomId);
+                log.info("Room ID {}에서 모든 세션이 종료되어 방 제거 완료.", roomId);
+            }
+            log.info("Room ID {}에서 {}개의 비정상 세션 제거 완료.", roomId, invalidSessions.size());
+        }
+    }
+
+    private void closeAndRemoveSession(WebSocketSession session) {
+        try {
+            session.close();
+        } catch (IOException e) {
+            log.error("세션 {} 닫기 실패. 에러: {}", session.getId(), e.getMessage());
+        }
+        lastPongTimestamps.remove(session);
+    }
+
+    public void updateLastPongTimestamp(WebSocketSession session) {
+        session.getAttributes().put("timeout", System.currentTimeMillis() + 45000);
+        log.info("세션 {}으로부터 PONG 수신. 만료 시간 갱신 완료.", session.getId());
+    }
+}

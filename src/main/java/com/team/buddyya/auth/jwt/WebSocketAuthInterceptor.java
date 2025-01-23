@@ -35,6 +35,7 @@ public class WebSocketAuthInterceptor implements HandshakeInterceptor {
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) {
         try {
             validateHandshake(request, attributes);
+            attributes.put("timeout", System.currentTimeMillis() + 40000);
             return true;
         } catch (IllegalArgumentException e) {
             log.warn("Handshake failed: {}", e.getMessage());
