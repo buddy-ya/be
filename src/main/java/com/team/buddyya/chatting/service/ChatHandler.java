@@ -32,9 +32,14 @@ public class ChatHandler extends TextWebSocketHandler {
         try {
             String payload = (String) message.getPayload();
             log.info("수신된 페이로드: {}", payload);
+            if ("PONG".equalsIgnoreCase(payload.trim())) {
+                service.updateLastPongTimestamp(session);
+                log.info("세션 {}으로부터 PONG 수신.", session.getId());
+                return;
+            }
             ChatMessage chatMessage = mapper.readValue(payload, ChatMessage.class);
             chatMessage.setTime(LocalDateTime.now());
-            service.handleAction(session, chatMessage);
+            service.handleAction(chatMessage);
         } catch (IllegalArgumentException e) {
             handleClientError(session, ERROR_INVALID_MESSAGE_FORMAT);
         } catch (IOException e) {
@@ -42,6 +47,17 @@ public class ChatHandler extends TextWebSocketHandler {
         } catch (Exception e) {
             handleServerError(session, ERROR_UNEXPECTED);
         }
+    }
+
+    @Override
+    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+        Long userId = (Long) session.getAttributes().get("userId");
+        Long roomId = (Long) session.getAttributes().get("roomId");
+        if (userId == null || roomId == null) {
+            session.close(CloseStatus.BAD_DATA);
+            return;
+        }
+        service.addSessionToRoom(roomId, session);
     }
 
     @Override

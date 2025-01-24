@@ -1,6 +1,7 @@
 package com.team.buddyya.chatting.dto.request;
 
 import com.team.buddyya.chatting.domain.MessageType;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -16,6 +17,16 @@ public class ChatMessage {
     private String message;
     private Long tempId;
     private LocalDateTime time;
+
+    @Builder
+    public ChatMessage(MessageType type, Long roomId, Long userId, String message, Long tempId, LocalDateTime time) {
+        this.type = type;
+        this.roomId = roomId;
+        this.userId = userId;
+        this.message = message;
+        this.tempId = tempId;
+        this.time = time;
+    }
 
     public void setTime(LocalDateTime time) {
         this.time = time;

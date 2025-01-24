@@ -21,6 +21,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class WebSocketAuthInterceptor implements HandshakeInterceptor {
 
+    private static final long SESSION_TIMEOUT = 45000;
     private static final String ERROR_UNAUTHORIZED = "권한 없음";
     private static final String ERROR_INTERNAL_SERVER = "핸드셰이크 중 내부 서버 오류 발생";
     private static final String ERROR_INVALID_JWT = "유효하지 않은 JWT 토큰";
@@ -35,6 +36,7 @@ public class WebSocketAuthInterceptor implements HandshakeInterceptor {
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) {
         try {
             validateHandshake(request, attributes);
+            attributes.put("timeout", System.currentTimeMillis() + SESSION_TIMEOUT);
             return true;
         } catch (IllegalArgumentException e) {
             log.warn("Handshake failed: {}", e.getMessage());

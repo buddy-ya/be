@@ -5,21 +5,21 @@ import com.team.buddyya.student.domain.Student;
 
 public record CreateChatroomResponse(
         Long id,
-        String name,
         Long buddyId,
-        String buddyName,
+        String name,
         String country,
-        String profileImageUrl
+        String profileImageUrl,
+        boolean isNew
 ) {
 
-    public static CreateChatroomResponse from(Chatroom chatroom, Student buddy) {
+    public static CreateChatroomResponse from(Chatroom chatroom, Student buddy, boolean isNew) {
         return new CreateChatroomResponse(
                 chatroom.getId(),
-                chatroom.getName(),
                 buddy.getId(),
                 buddy.getName(),
                 buddy.getCountry(),
-                buddy.getProfileImage().getUrl()
+                buddy.getProfileImage().getUrl(),
+                isNew
         );
     }
 }

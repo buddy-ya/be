@@ -1,6 +1,7 @@
 package com.team.buddyya.chatting.controller;
 
 import com.team.buddyya.auth.domain.CustomUserDetails;
+import com.team.buddyya.chatting.dto.request.ChatImageRequest;
 import com.team.buddyya.chatting.dto.request.CreateChatroomRequest;
 import com.team.buddyya.chatting.dto.response.ChatMessageListResponse;
 import com.team.buddyya.chatting.dto.response.ChatroomResponse;
@@ -53,5 +54,14 @@ public class ChatController {
             @PathVariable("roomId") Long chatroomId,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ResponseEntity.ok(chatService.leaveChatroom(chatroomId, userDetails.getStudentInfo()));
+    }
+
+
+    @PostMapping("/{roomId}/image")
+    public ResponseEntity<Void> uploadImages(@PathVariable("roomId") Long chatroomId,
+                                             @AuthenticationPrincipal CustomUserDetails userDetails,
+                                             @ModelAttribute ChatImageRequest request) {
+        chatService.chatUploadImage(chatroomId, userDetails.getStudentInfo(), request);
+        return ResponseEntity.ok().build();
     }
 }
