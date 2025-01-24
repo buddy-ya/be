@@ -204,7 +204,7 @@ public class ChatService {
         return LeaveChatroomResponse.from(CHATROOM_LEAVE_SUCCESS_MESSAGE);
     }
 
-    public void chatUploadImages(Long roomId, StudentInfo studentInfo, ChatImageRequest request) {
+    public void chatUploadImage(Long roomId, StudentInfo studentInfo, ChatImageRequest request) {
         String imageUrl = s3UploadService.uploadFile(CHAT_IMAGE.getDirectoryName(), request.image());
         ChatMessage chatMessage = ChatMessage.builder()
                 .type(MessageType.IMAGE)

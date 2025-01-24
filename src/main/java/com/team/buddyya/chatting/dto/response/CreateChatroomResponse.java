@@ -6,7 +6,7 @@ import com.team.buddyya.student.domain.Student;
 public record CreateChatroomResponse(
         Long id,
         Long buddyId,
-        String buddyName,
+        String name,
         String country,
         String profileImageUrl,
         boolean isNew

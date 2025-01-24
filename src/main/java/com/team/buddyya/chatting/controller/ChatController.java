@@ -57,11 +57,11 @@ public class ChatController {
     }
 
 
-    @PostMapping("/{roomId}/images")
+    @PostMapping("/{roomId}/image")
     public ResponseEntity<Void> uploadImages(@PathVariable("roomId") Long chatroomId,
                                              @AuthenticationPrincipal CustomUserDetails userDetails,
                                              @ModelAttribute ChatImageRequest request) {
-        chatService.chatUploadImages(chatroomId, userDetails.getStudentInfo(), request);
+        chatService.chatUploadImage(chatroomId, userDetails.getStudentInfo(), request);
         return ResponseEntity.ok().build();
     }
 }
