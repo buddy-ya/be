@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public enum UserProfileDefaultImage {
 
-    USER_PROFILE_DEFAULT_IMAGE("userProfileDefaultImage", "기본 이미지 url");
+    USER_PROFILE_DEFAULT_IMAGE("userProfileDefaultImage", "https://buddyya.s3.ap-northeast-2.amazonaws.com/default-profile-image/user_profile_default_image.png");
 
     private final String key;
     private final String url;
@@ -16,7 +16,14 @@ public enum UserProfileDefaultImage {
     }
 
     public static boolean isDefaultUserProfileImage(Student student) {
-        String studentProfileImageUrl = student.getProfileImage().getUrl();
-        return USER_PROFILE_DEFAULT_IMAGE.getUrl().equals(studentProfileImageUrl);
+        String userProfileImageUrl = student.getUserProfileImage();
+        return USER_PROFILE_DEFAULT_IMAGE.getUrl().equals(userProfileImageUrl);
+    }
+
+    public static String getDefaultOrUserProfileImageUrl(Student student) {
+        if (isDefaultUserProfileImage(student)) {
+            return student.getProfileImage().getUrl();
+        }
+        return student.getUserProfileImage();
     }
 }
