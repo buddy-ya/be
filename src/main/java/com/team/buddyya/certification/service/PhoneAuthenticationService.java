@@ -3,11 +3,13 @@ package com.team.buddyya.certification.service;
 import com.team.buddyya.auth.dto.request.TokenInfoRequest;
 import com.team.buddyya.auth.jwt.JwtUtils;
 import com.team.buddyya.certification.domain.RegisteredPhone;
-import com.team.buddyya.certification.dto.response.VerifyCodeResponse;
+import com.team.buddyya.certification.dto.response.ExistingMemberResponse;
+import com.team.buddyya.certification.dto.response.NewMemberResponse;
 import com.team.buddyya.certification.exception.PhoneAuthenticationException;
 import com.team.buddyya.certification.repository.RegisteredPhoneRepository;
 import com.team.buddyya.certification.dto.response.SendCodeResponse;
 import com.team.buddyya.certification.exception.PhoneAuthenticationExceptionType;
+import com.team.buddyya.certification.repository.StudentIdCardRepository;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,7 @@ public class PhoneAuthenticationService {
 
     private final RegisteredPhoneRepository registeredPhoneRepository;
     private final StudentRepository studentRepository;
+    private final StudentIdCardRepository studentIdCardRepository;
     private final JwtUtils jwtUtils;
 
     public SendCodeResponse saveCode(String phoneNumber, String generatedCode) {
@@ -47,14 +50,16 @@ public class PhoneAuthenticationService {
         }
     }
 
-    public VerifyCodeResponse checkMembership(String phoneNumber) {
+    public Object checkMembership(String phoneNumber) {
         Optional<Student> optionalStudent = studentRepository.findByPhoneNumber(phoneNumber);
         if (optionalStudent.isPresent()) {
             Student student = optionalStudent.get();
             String accessToken = jwtUtils.createAccessToken(new TokenInfoRequest(student.getId()));
             String refreshToken = jwtUtils.createRefreshToken(new TokenInfoRequest(student.getId()));
-            return new VerifyCodeResponse(phoneNumber, EXISTING_MEMBER, accessToken, refreshToken);
+            boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
+                    .isPresent();
+            return ExistingMemberResponse.from(student, isStudentIdCardRequested, phoneNumber, EXISTING_MEMBER, accessToken, refreshToken);
         }
-        return new VerifyCodeResponse(phoneNumber, NEW_MEMBER, null, null);
+        return new NewMemberResponse(phoneNumber, NEW_MEMBER);
     }
 }
