@@ -34,7 +34,7 @@ public class OnBoardingService {
         studentMajorService.createStudentMajors(request.majors(), student);
         studentInterestService.createStudentInterests(request.interests(), student);
         studentLanguageService.createStudentLanguages(request.languages(), student);
-        return OnBoardingResponse.from(accessToken, refreshToken);
+        return OnBoardingResponse.from(student,false,accessToken, refreshToken);
     }
 
     private String createAndSaveToken(Student student) {
