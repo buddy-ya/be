@@ -1,5 +1,8 @@
 package com.team.buddyya.notification.controller;
 
+import com.team.buddyya.notification.dto.FeedNotificationRequest;
+import com.team.buddyya.notification.dto.NotificationRequest;
+import com.team.buddyya.notification.dto.NotificationResponse;
 import com.team.buddyya.notification.service.PushNotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,7 +16,7 @@ public class PushNotificationController {
 
     private final PushNotificationService pushNotificationService;
 
-    // Push Token 저장
+    // 토큰 저장 API
     @PostMapping("/register")
     public ResponseEntity<String> registerPushToken(
             @RequestParam String userId,
@@ -22,17 +25,17 @@ public class PushNotificationController {
         return ResponseEntity.ok("Push token registered successfully");
     }
 
-    // 푸시 알림 전송
-    @PostMapping("/send")
-    public ResponseEntity<String> sendNotification(
-            @RequestParam String userId,
-            @RequestParam String title,
-            @RequestParam String body) {
-        try {
-            pushNotificationService.sendNotification(userId, title, body);
-            return ResponseEntity.ok("Notification sent successfully");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to send notification");
-        }
+    // 학생 인증, 매칭, 채팅 알림 API (RestTemplate 사용)
+    @PostMapping("/simple")
+    public ResponseEntity<NotificationResponse> sendSimpleNotification(@RequestBody NotificationRequest request) {
+        NotificationResponse response = pushNotificationService.sendSimpleNotification(request);
+        return ResponseEntity.ok(response);
+    }
+
+    // 피드 댓글/좋아요 알림 API (WebClient 사용)
+    @PostMapping("/feed")
+    public ResponseEntity<NotificationResponse> sendFeedNotification(@RequestBody FeedNotificationRequest request) {
+        NotificationResponse response = pushNotificationService.sendFeedNotification(request);
+        return ResponseEntity.ok(response);
     }
 }

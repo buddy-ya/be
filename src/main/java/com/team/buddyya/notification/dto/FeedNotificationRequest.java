@@ -5,8 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class PushNotificationRequest {
-    private String to;
-    private String title;
-    private String body;
+public class FeedNotificationRequest {
+    private Long feedId; // 피드 ID
+    private String message; // 알림 메시지
 }
