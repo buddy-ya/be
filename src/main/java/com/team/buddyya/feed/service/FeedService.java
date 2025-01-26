@@ -73,6 +73,7 @@ public class FeedService {
     @Transactional(readOnly = true)
     public FeedResponse getFeed(StudentInfo studentInfo, Long feedId) {
         Feed feed = findFeedByFeedId(feedId);
+        feed.increaseViewCount();
         return createFeedResponse(feed, studentInfo.id());
     }
 

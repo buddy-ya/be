@@ -44,6 +44,9 @@ public class Feed extends BaseTime {
     @Column(name = "comment_count", nullable = false)
     private int commentCount;
 
+    @Column(name = "view_count", nullable = false)
+    private int viewCount;
+
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "student_id", nullable = false)
     private Student student;
@@ -99,6 +102,10 @@ public class Feed extends BaseTime {
 
     public void decreaseCommentCount() {
         this.commentCount--;
+    }
+
+    public void increaseViewCount() {
+        this.viewCount++;
     }
 
     public void uploadFeedImages(List<FeedImage> images) {

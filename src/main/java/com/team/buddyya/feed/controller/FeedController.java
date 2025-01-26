@@ -44,13 +44,6 @@ public class FeedController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/popular")
-    public ResponseEntity<FeedListResponse> getPopularFeeds(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                                            @PageableDefault(size = 10, sort = "createdDate", direction = Direction.DESC) Pageable pageable) {
-        FeedListResponse response = feedService.getPopularFeeds(userDetails.getStudentInfo(), pageable);
-        return ResponseEntity.ok(response);
-    }
-
     @PostMapping
     public ResponseEntity<Void> createFeed(
             @AuthenticationPrincipal CustomUserDetails userDetails,
@@ -96,5 +89,12 @@ public class FeedController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long feedId) {
         return ResponseEntity.ok(bookmarkService.toggleBookmark(userDetails.getStudentInfo(), feedId));
+    }
+
+    @GetMapping("/popular")
+    public ResponseEntity<FeedListResponse> getPopularFeeds(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                            @PageableDefault(size = 10, sort = "createdDate", direction = Direction.DESC) Pageable pageable) {
+        FeedListResponse response = feedService.getPopularFeeds(userDetails.getStudentInfo(), pageable);
+        return ResponseEntity.ok(response);
     }
 }
