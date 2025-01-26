@@ -1,28 +1,28 @@
 package com.team.buddyya.notification.controller;
 
-import com.team.buddyya.notification.dto.FeedNotificationRequest;
-import com.team.buddyya.notification.dto.NotificationRequest;
-import com.team.buddyya.notification.dto.NotificationResponse;
+import com.team.buddyya.auth.domain.CustomUserDetails;
+import com.team.buddyya.notification.dto.request.FeedNotificationRequest;
+import com.team.buddyya.notification.dto.request.NotificationRequest;
+import com.team.buddyya.notification.dto.response.NotificationResponse;
+import com.team.buddyya.notification.dto.request.SaveTokenRequest;
 import com.team.buddyya.notification.service.PushNotificationService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/notifications")
+@RequestMapping("/notifications")
 @RequiredArgsConstructor
 public class PushNotificationController {
 
     private final PushNotificationService pushNotificationService;
 
-    // 토큰 저장 API
     @PostMapping("/register")
-    public ResponseEntity<String> registerPushToken(
-            @RequestParam String userId,
-            @RequestParam String token) {
-        pushNotificationService.savePushToken(userId, token);
-        return ResponseEntity.ok("Push token registered successfully");
+    public ResponseEntity<String> registerPushToken(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                    @RequestBody SaveTokenRequest request) {
+        pushNotificationService.savePushToken(userDetails.getStudentInfo().id(), request.token());
+        return ResponseEntity.ok("토큰이 정상적으로 저장되었습니다.");
     }
 
     // 학생 인증, 매칭, 채팅 알림 API (RestTemplate 사용)

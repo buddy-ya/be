@@ -1,92 +1,92 @@
 package com.team.buddyya.notification.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.team.buddyya.notification.domain.PushToken;
-import com.team.buddyya.notification.dto.FeedNotificationRequest;
-import com.team.buddyya.notification.dto.NotificationRequest;
-import com.team.buddyya.notification.dto.NotificationResponse;
+import com.team.buddyya.feed.domain.Feed;
+import com.team.buddyya.feed.exception.FeedException;
+import com.team.buddyya.feed.exception.FeedExceptionType;
+import com.team.buddyya.feed.respository.FeedRepository;
+import com.team.buddyya.notification.domain.ExpoToken;
+import com.team.buddyya.notification.domain.RequestNotification;
+import com.team.buddyya.notification.dto.request.FeedNotificationRequest;
+import com.team.buddyya.notification.dto.request.NotificationRequest;
+import com.team.buddyya.notification.dto.response.NotificationResponse;
+import com.team.buddyya.notification.exception.NotificationException;
+import com.team.buddyya.notification.exception.NotificationExceptionType;
 import com.team.buddyya.notification.repository.PushTokenRepository;
+import com.team.buddyya.student.domain.Student;
+import com.team.buddyya.student.service.FindStudentService;
 import lombok.RequiredArgsConstructor;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.io.IOException;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 @RequiredArgsConstructor
 public class PushNotificationService {
 
     private final PushTokenRepository pushTokenRepository;
-    private final CloseableHttpClient httpClient;
+    private final FeedRepository feedRepository;
+    private final FindStudentService findStudentService;
+    private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
+    private static final String NOTIFICATION_SUCCESS_MESSAGE = "Notification sent successfully.";
     private static final String EXPO_PUSH_URL = "https://exp.host/--/api/v2/push/send";
 
     // 토큰 저장
-    public void savePushToken(String userId, String token) {
+    public void savePushToken(Long userId, String token) {
+        Student student = findStudentService.findByStudentId(userId);
         pushTokenRepository.findByUserId(userId).ifPresentOrElse(
-                existing -> existing.setToken(token),
+                existingToken -> {
+                    existingToken.updateToken(token);
+                    pushTokenRepository.save(existingToken);
+                },
                 () -> {
-                    PushToken pushToken = new PushToken();
-                    pushToken.setUserId(userId);
-                    pushToken.setToken(token);
-                    pushTokenRepository.save(pushToken);
+                    ExpoToken newToken = ExpoToken.builder()
+                            .token(token)
+                            .student(student)
+                            .build();
+                    pushTokenRepository.save(newToken);
                 }
         );
     }
 
-    // 학생 인증, 매칭, 채팅 알림 전송 (RestTemplate 사용)
     public NotificationResponse sendSimpleNotification(NotificationRequest request) {
-        try {
-            String token = getUserToken(request.getUserId());
-            sendNotificationToToken(token, request.getMessage());
-            return new NotificationResponse(true, "Notification sent successfully");
-        } catch (Exception e) {
-            return new NotificationResponse(false, e.getMessage());
-        }
-    }
-
-    // 피드 댓글/좋아요 알림 전송 (WebClient 사용)
-    public NotificationResponse sendFeedNotification(FeedNotificationRequest request) {
-        try {
-            String token = getFeedAuthorToken(request.getFeedId());
-            sendNotificationToToken(token, request.getMessage());
-            return new NotificationResponse(true, "Notification sent successfully to feed author");
-        } catch (Exception e) {
-            return new NotificationResponse(false, e.getMessage());
-        }
-    }
-
-    // 유저 ID로 Expo Push Token 가져오기
-    private String getUserToken(String userId) {
-        return pushTokenRepository.findByUserId(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"))
+        String token = pushTokenRepository.findByUserId(request.userId())
+                .orElseThrow(() -> new NotificationException(NotificationExceptionType.TOKEN_NOT_FOUND))
                 .getToken();
+
+        sendNotificationToToken(token, request.message());
+        return NotificationResponse.from(NOTIFICATION_SUCCESS_MESSAGE);
     }
 
-    // 피드 작성자의 Expo Push Token 가져오기
-    private String getFeedAuthorToken(Long feedId) {
-        // 실제 구현에서는 FeedRepository에서 피드 작성자의 정보를 가져옴
-        // 여기선 간단히 예제를 위해 작성
-        return "ExponentPushToken[example1]";
+    public NotificationResponse sendFeedNotification(FeedNotificationRequest request) {
+        Feed feed = feedRepository.findById(request.feedId())
+                .orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND));
+        String token = pushTokenRepository.findByUserId(feed.getStudent().getId())
+                .orElseThrow(() -> new NotificationException(NotificationExceptionType.TOKEN_NOT_FOUND))
+                .getToken();
+        sendNotificationToToken(token, request.message());
+        return NotificationResponse.from(NOTIFICATION_SUCCESS_MESSAGE);
     }
 
-    // 알림 전송 로직
-    private void sendNotificationToToken(String token, String message) throws IOException {
-        String payload = objectMapper.writeValueAsString(new NotificationRequest(token, message));
-        HttpPost postRequest = new HttpPost(EXPO_PUSH_URL);
-        postRequest.setHeader("Content-Type", "application/json");
-        postRequest.setEntity(new StringEntity(payload));
+    private void sendNotificationToToken(String token, String message) {
+        try {
+            String payload = objectMapper.writeValueAsString(new RequestNotification(token, message));
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(org.springframework.http.MediaType.APPLICATION_JSON);
 
-        httpClient.execute(postRequest, response -> {
-            if (response.getCode() != HttpStatus.OK.value()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to send notification");
+            HttpEntity<String> request = new HttpEntity<>(payload, headers);
+            ResponseEntity<String> response = restTemplate.postForEntity(EXPO_PUSH_URL, request, String.class);
+
+            if (!response.getStatusCode().is2xxSuccessful()) {
+                throw new NotificationException(NotificationExceptionType.NOTIFICATION_SEND_FAILED);
             }
-            return null;
-        });
+        } catch (Exception e) {
+            throw new NotificationException(NotificationExceptionType.NOTIFICATION_SEND_FAILED);
+        }
     }
+
 }
