@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface PushTokenRepository extends JpaRepository<ExpoToken, Long> {
+public interface ExpoTokenRepository extends JpaRepository<ExpoToken, Long> {
     Optional<ExpoToken> findByUserId(Long userId);
 }

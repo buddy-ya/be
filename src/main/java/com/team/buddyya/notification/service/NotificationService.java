@@ -12,7 +12,7 @@ import com.team.buddyya.notification.dto.request.NotificationRequest;
 import com.team.buddyya.notification.dto.response.NotificationResponse;
 import com.team.buddyya.notification.exception.NotificationException;
 import com.team.buddyya.notification.exception.NotificationExceptionType;
-import com.team.buddyya.notification.repository.PushTokenRepository;
+import com.team.buddyya.notification.repository.ExpoTokenRepository;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.service.FindStudentService;
 import lombok.RequiredArgsConstructor;
@@ -25,9 +25,9 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 @RequiredArgsConstructor
-public class PushNotificationService {
+public class NotificationService {
 
-    private final PushTokenRepository pushTokenRepository;
+    private final ExpoTokenRepository expoTokenRepository;
     private final FeedRepository feedRepository;
     private final FindStudentService findStudentService;
     private final RestTemplate restTemplate;
@@ -41,23 +41,23 @@ public class PushNotificationService {
     // 토큰 저장
     public void savePushToken(Long userId, String token) {
         Student student = findStudentService.findByStudentId(userId);
-        pushTokenRepository.findByUserId(userId).ifPresentOrElse(
+        expoTokenRepository.findByUserId(userId).ifPresentOrElse(
                 existingToken -> {
                     existingToken.updateToken(token);
-                    pushTokenRepository.save(existingToken);
+                    expoTokenRepository.save(existingToken);
                 },
                 () -> {
                     ExpoToken newToken = ExpoToken.builder()
                             .token(token)
                             .student(student)
                             .build();
-                    pushTokenRepository.save(newToken);
+                    expoTokenRepository.save(newToken);
                 }
         );
     }
 
     public NotificationResponse sendSimpleNotification(NotificationRequest request) {
-        String token = pushTokenRepository.findByUserId(request.userId())
+        String token = expoTokenRepository.findByUserId(request.userId())
                 .orElseThrow(() -> new NotificationException(NotificationExceptionType.TOKEN_NOT_FOUND))
                 .getToken();
 
@@ -68,7 +68,7 @@ public class PushNotificationService {
     public NotificationResponse sendFeedNotification(FeedNotificationRequest request) {
         Feed feed = feedRepository.findById(request.feedId())
                 .orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND));
-        String token = pushTokenRepository.findByUserId(feed.getStudent().getId())
+        String token = expoTokenRepository.findByUserId(feed.getStudent().getId())
                 .orElseThrow(() -> new NotificationException(NotificationExceptionType.TOKEN_NOT_FOUND))
                 .getToken();
         sendNotificationToToken(token, request.message());
