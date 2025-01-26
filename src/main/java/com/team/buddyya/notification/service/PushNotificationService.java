@@ -16,6 +16,7 @@ import com.team.buddyya.notification.repository.PushTokenRepository;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.service.FindStudentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -32,8 +33,10 @@ public class PushNotificationService {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
-    private static final String NOTIFICATION_SUCCESS_MESSAGE = "Notification sent successfully.";
-    private static final String EXPO_PUSH_URL = "https://exp.host/--/api/v2/push/send";
+    private static final String NOTIFICATION_SUCCESS_MESSAGE = "알림이 성공적으로 전송되었습니다.";
+
+    @Value("${EXPO.API.URL}")
+    private String expoApiUrl;
 
     // 토큰 저장
     public void savePushToken(Long userId, String token) {
@@ -79,7 +82,7 @@ public class PushNotificationService {
             headers.setContentType(org.springframework.http.MediaType.APPLICATION_JSON);
 
             HttpEntity<String> request = new HttpEntity<>(payload, headers);
-            ResponseEntity<String> response = restTemplate.postForEntity(EXPO_PUSH_URL, request, String.class);
+            ResponseEntity<String> response = restTemplate.postForEntity(expoApiUrl, request, String.class);
 
             if (!response.getStatusCode().is2xxSuccessful()) {
                 throw new NotificationException(NotificationExceptionType.NOTIFICATION_SEND_FAILED);
