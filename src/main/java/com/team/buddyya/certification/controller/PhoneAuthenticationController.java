@@ -3,7 +3,7 @@ package com.team.buddyya.certification.controller;
 import com.team.buddyya.certification.dto.request.SendCodeRequest;
 import com.team.buddyya.certification.dto.request.VerifyCodeRequest;
 import com.team.buddyya.certification.dto.response.SendCodeResponse;
-import com.team.buddyya.certification.dto.response.ExistingMemberResponse;
+import com.team.buddyya.certification.dto.response.VerifyCodeResponse;
 import com.team.buddyya.certification.service.MessageSendService;
 import com.team.buddyya.certification.service.PhoneAuthenticationService;
 import lombok.RequiredArgsConstructor;
@@ -29,9 +29,9 @@ public class PhoneAuthenticationController {
     }
 
     @PostMapping("/verify-code")
-    public ResponseEntity<Object> verifyCode(@RequestBody VerifyCodeRequest verifyCodeRequest) {
+    public ResponseEntity<VerifyCodeResponse> verifyCode(@RequestBody VerifyCodeRequest verifyCodeRequest) {
         phoneAuthenticationService.verifyCode(verifyCodeRequest.phoneNumber(), verifyCodeRequest.code());
-        Object response = phoneAuthenticationService.checkMembership(verifyCodeRequest.phoneNumber());
+        VerifyCodeResponse response = phoneAuthenticationService.checkMembership(verifyCodeRequest.phoneNumber());
         return ResponseEntity.ok(response);
     }
 }

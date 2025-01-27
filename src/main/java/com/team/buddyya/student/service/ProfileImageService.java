@@ -21,6 +21,7 @@ public class ProfileImageService {
                 .student(student)
                 .url(randomImage.getUrl())
                 .build();
+        profileImage.setStudent(student);
         profileImageRepository.save(profileImage);
     }
 
