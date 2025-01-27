@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static jakarta.persistence.FetchType.LAZY;
@@ -62,13 +63,13 @@ public class Student extends BaseTime {
     private String email;
 
     @OneToMany(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<StudentMajor> majors;
+    private List<StudentMajor> majors = new ArrayList<>();
 
     @OneToMany(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<StudentLanguage> languages;
+    private List<StudentLanguage> languages = new ArrayList<>();
 
     @OneToMany(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<StudentInterest> interests;
+    private List<StudentInterest> interests = new ArrayList<>();
 
     @OneToOne(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private ProfileImage profileImage;

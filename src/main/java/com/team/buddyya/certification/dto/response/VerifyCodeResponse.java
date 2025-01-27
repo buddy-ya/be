@@ -5,7 +5,7 @@ import com.team.buddyya.student.domain.Student;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public record ExistingMemberResponse(
+public record VerifyCodeResponse(
         Long id,
         String name,
         String country,
@@ -23,8 +23,8 @@ public record ExistingMemberResponse(
         String accessToken,
         String refreshToken) {
 
-    public static ExistingMemberResponse from(Student student, Boolean isStudentIdCardRequested, String phoneNumber, String status, String accessToken, String refreshToken){
-        return new ExistingMemberResponse(
+    public static VerifyCodeResponse from(Student student, Boolean isStudentIdCardRequested, String phoneNumber, String status, String accessToken, String refreshToken) {
+        return new VerifyCodeResponse(
                 student.getId(),
                 student.getName(),
                 student.getCountry(),
@@ -40,7 +40,29 @@ public record ExistingMemberResponse(
                 phoneNumber,
                 status,
                 accessToken,
-                refreshToken);
+                refreshToken
+        );
+    }
+
+    public static VerifyCodeResponse fromNewMember(String phoneNumber, String status) {
+        return new VerifyCodeResponse(
+                null,  // id
+                null,  // name
+                null,  // country
+                null,  // university
+                null,  // gender
+                null,  // profileImageUrl
+                false, // isCertificated
+                false, // isStudentIdCardRequested
+                null,  // isKorean
+                null,  // majors
+                null,  // languages
+                null,  // interests
+                phoneNumber,
+                status,
+                null,  // accessToken
+                null   // refreshToken
+        );
     }
 
     private static List<String> convertToStringList(List<?> list) {
@@ -49,3 +71,4 @@ public record ExistingMemberResponse(
                 .collect(Collectors.toList());
     }
 }
+

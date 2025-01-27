@@ -25,10 +25,14 @@ public class StudentMajorService {
         majors.forEach(majorName -> {
             Major major = majorRepository.findByMajorName(majorName)
                     .orElseThrow(() -> new StudentException(StudentExceptionType.MAJOR_NOT_FOUND));
-            studentMajorRepository.save(StudentMajor.builder()
+            StudentMajor studentMajor = StudentMajor.builder()
                     .student(student)
                     .major(major)
-                    .build());
+                    .build();
+
+            studentMajor.setStudent(student);
+
+            studentMajorRepository.save(studentMajor);
         });
     }
 }
