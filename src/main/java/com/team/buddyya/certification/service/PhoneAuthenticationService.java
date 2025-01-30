@@ -3,13 +3,13 @@ package com.team.buddyya.certification.service;
 import com.team.buddyya.auth.dto.request.TokenInfoRequest;
 import com.team.buddyya.auth.jwt.JwtUtils;
 import com.team.buddyya.certification.domain.RegisteredPhone;
-import com.team.buddyya.certification.dto.response.VerifyCodeResponse;
 import com.team.buddyya.certification.exception.PhoneAuthenticationException;
 import com.team.buddyya.certification.repository.RegisteredPhoneRepository;
 import com.team.buddyya.certification.dto.response.SendCodeResponse;
 import com.team.buddyya.certification.exception.PhoneAuthenticationExceptionType;
 import com.team.buddyya.certification.repository.StudentIdCardRepository;
 import com.team.buddyya.student.domain.Student;
+import com.team.buddyya.student.dto.response.UserResponse;
 import com.team.buddyya.student.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -49,7 +49,7 @@ public class PhoneAuthenticationService {
         }
     }
 
-    public VerifyCodeResponse checkMembership(String phoneNumber) {
+    public UserResponse checkMembership(String phoneNumber) {
         Optional<Student> optionalStudent = studentRepository.findByPhoneNumber(phoneNumber);
 
         if (optionalStudent.isPresent()) {
@@ -57,9 +57,9 @@ public class PhoneAuthenticationService {
             String accessToken = jwtUtils.createAccessToken(new TokenInfoRequest(student.getId()));
             String refreshToken = jwtUtils.createRefreshToken(new TokenInfoRequest(student.getId()));
             boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student).isPresent();
-            return VerifyCodeResponse.from(student, isStudentIdCardRequested, phoneNumber, "EXISTING_MEMBER", accessToken, refreshToken);
+            return UserResponse.from(student, isStudentIdCardRequested, "EXISTING_MEMBER", accessToken, refreshToken);
         }
 
-        return VerifyCodeResponse.fromNewMember(phoneNumber, "NEW_MEMBER");
+        return UserResponse.from("NEW_MEMBER");
     }
 }

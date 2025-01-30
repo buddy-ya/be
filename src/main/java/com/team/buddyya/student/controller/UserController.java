@@ -7,11 +7,12 @@ import com.team.buddyya.student.dto.request.MyPageUpdateRequest;
 import com.team.buddyya.student.dto.request.OnBoardingRequest;
 import com.team.buddyya.student.dto.response.MyPageUpdateResponse;
 import com.team.buddyya.student.dto.response.OnBoardingResponse;
-import com.team.buddyya.student.dto.response.UserProfileResponse;
+import com.team.buddyya.student.dto.response.UserResponse;
 import com.team.buddyya.student.service.MyPageService;
 import com.team.buddyya.student.service.OnBoardingService;
 import com.team.buddyya.student.service.StudentService;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -30,14 +31,14 @@ public class UserController {
     private final FeedService feedService;
 
     @PostMapping
-    public ResponseEntity<OnBoardingResponse> onboard(@RequestBody OnBoardingRequest request) {
-        OnBoardingResponse response = onBoardingService.onboard(request);
+    public ResponseEntity<UserResponse> onboard(@RequestBody OnBoardingRequest request) {
+        UserResponse response = onBoardingService.onboard(request);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<UserProfileResponse> getMyProfile(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                                            @PathVariable("userId") Long userId) {
+    public ResponseEntity<UserResponse> getMyProfile(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                     @PathVariable("userId") Long userId) {
         return ResponseEntity.ok(myPageService.getUserProfile(userDetails.getStudentInfo(), userId));
     }
 

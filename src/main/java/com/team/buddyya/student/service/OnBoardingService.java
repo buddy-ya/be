@@ -7,7 +7,9 @@ import com.team.buddyya.auth.repository.AuthTokenRepository;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.dto.request.OnBoardingRequest;
 import com.team.buddyya.student.dto.response.OnBoardingResponse;
+import com.team.buddyya.student.dto.response.UserResponse;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +27,7 @@ public class OnBoardingService {
     private final AuthTokenRepository authTokenRepository;
     private final JwtUtils jwtUtils;
 
-    public OnBoardingResponse onboard(OnBoardingRequest request) {
+    public UserResponse onboard(OnBoardingRequest request) {
         Student student = studentService.createStudent(request);
         String accessToken = jwtUtils.createAccessToken(new TokenInfoRequest(student.getId()));
         String refreshToken = createAndSaveToken(student);
@@ -34,7 +36,7 @@ public class OnBoardingService {
         studentMajorService.createStudentMajors(request.majors(), student);
         studentInterestService.createStudentInterests(request.interests(), student);
         studentLanguageService.createStudentLanguages(request.languages(), student);
-        return OnBoardingResponse.from(student,false,accessToken, refreshToken);
+        return UserResponse.from(student,false,accessToken, refreshToken);
     }
 
     private String createAndSaveToken(Student student) {

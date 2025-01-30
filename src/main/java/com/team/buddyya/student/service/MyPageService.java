@@ -5,7 +5,7 @@ import com.team.buddyya.certification.repository.StudentIdCardRepository;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.dto.request.MyPageUpdateRequest;
 import com.team.buddyya.student.dto.response.MyPageUpdateResponse;
-import com.team.buddyya.student.dto.response.UserProfileResponse;
+import com.team.buddyya.student.dto.response.UserResponse;
 import com.team.buddyya.student.exception.StudentException;
 import com.team.buddyya.student.exception.StudentExceptionType;
 import lombok.RequiredArgsConstructor;
@@ -58,13 +58,13 @@ public class MyPageService {
     }
 
     @Transactional(readOnly = true)
-    public UserProfileResponse getUserProfile(StudentInfo studentInfo, Long userId) {
+    public UserResponse getUserProfile(StudentInfo studentInfo, Long userId) {
         Student student = findStudentService.findByStudentId(userId);
         if(studentInfo.id()!=userId){
-            return UserProfileResponse.from(student);
+            return UserResponse.from(student);
         }
         boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
                 .isPresent();
-        return UserProfileResponse.from(student, isStudentIdCardRequested);
+        return UserResponse.from(student, isStudentIdCardRequested);
     }
 }
