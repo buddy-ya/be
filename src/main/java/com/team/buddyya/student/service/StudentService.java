@@ -1,8 +1,6 @@
 package com.team.buddyya.student.service;
 
 import com.team.buddyya.auth.domain.StudentInfo;
-import com.team.buddyya.feed.respository.FeedRepository;
-import com.team.buddyya.feed.respository.LikeRepository;
 import com.team.buddyya.student.domain.Gender;
 import com.team.buddyya.student.domain.Role;
 import com.team.buddyya.student.domain.Student;
@@ -24,9 +22,7 @@ public class StudentService {
 
     private final StudentRepository studentRepository;
     private final UniversityRepository universityRepository;
-    private final FeedRepository feedRepository;
     private final FindStudentService findStudentService;
-    private final LikeRepository likeRepository;
 
     public Student createStudent(OnBoardingRequest request) {
         University university = universityRepository.findByUniversityName(request.university())
