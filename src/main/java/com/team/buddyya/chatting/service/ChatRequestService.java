@@ -9,6 +9,7 @@ import com.team.buddyya.chatting.repository.ChatRequestRepository;
 import com.team.buddyya.chatting.repository.ChatroomRepository;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.service.FindStudentService;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -20,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ChatRequestService {
 
-    private static final long EXPIRED_CHAT_REQUEST_TIME = 24 * 60 * 60 * 1000;
+    private static final long EXPIRED_CHAT_REQUEST_DAY = 1;
 
     private final ChatRequestRepository chatRequestRepository;
     private final ChatroomRepository chatroomRepository;
@@ -65,7 +66,10 @@ public class ChatRequestService {
 
     @Scheduled(fixedRate = 60 * 1000)
     private void deleteExpiredChatRequests() {
-        chatRequestRepository.deleteByCreatedDateBefore(System.currentTimeMillis() - EXPIRED_CHAT_REQUEST_TIME;);
+        LocalDateTime expirationTime = LocalDateTime.now().minusDays(EXPIRED_CHAT_REQUEST_DAY);
+        List<ChatRequest> expiredChatRequests = chatRequestRepository.findAllByCreatedDateBefore(expirationTime);
+        // TO DO: 포인트 환급 등 진행
+        chatRequestRepository.deleteByCreatedDateBefore(expirationTime);
     }
 
     private void validateChatRequest(Student sender, Student receiver) {
