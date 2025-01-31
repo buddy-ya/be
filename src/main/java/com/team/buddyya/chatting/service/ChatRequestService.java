@@ -6,6 +6,7 @@ import com.team.buddyya.chatting.dto.response.ChatRequestResponse;
 import com.team.buddyya.chatting.exception.ChatException;
 import com.team.buddyya.chatting.exception.ChatExceptionType;
 import com.team.buddyya.chatting.repository.ChatRequestRepository;
+import com.team.buddyya.chatting.repository.ChatroomRepository;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.service.FindStudentService;
 import java.util.List;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ChatRequestService {
 
     private final ChatRequestRepository chatRequestRepository;
+    private final ChatroomRepository chatroomRepository;
     private final FindStudentService findStudentService;
 
     @Transactional(readOnly = true)
@@ -29,6 +31,18 @@ public class ChatRequestService {
                 .map(ChatRequestResponse::from)
                 .toList();
     }
+
+    @Transactional(readOnly = true)
+    public boolean isPendingChatRequest(Student sender, Student receiver) {
+        return chatRequestRepository.existsBySenderAndReceiver(sender, receiver)
+                || chatRequestRepository.existsBySenderAndReceiver(receiver, sender);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isAlreadyExistChatroom(Student sender, Student receiver) {
+        return chatroomRepository.findByUserAndBuddy(sender.getId(), receiver.getId()).isPresent();
+    }
+
 
     public void createChatRequest(CustomUserDetails userDetails, Long receiverId) {
         Student sender = findStudentService.findByStudentId(userDetails.getStudentInfo().id());

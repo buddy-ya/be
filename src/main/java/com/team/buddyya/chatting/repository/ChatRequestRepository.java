@@ -7,5 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ChatRequestRepository extends JpaRepository<ChatRequest, Long> {
 
-    List<ChatRequest> findAllByReceiver(Student student);
+    List<ChatRequest> findAllByReceiver(Student receiver);
+
+    boolean existsBySenderAndReceiver(Student sender, Student receiver);
 }
