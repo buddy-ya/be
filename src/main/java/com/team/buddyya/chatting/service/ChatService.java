@@ -34,7 +34,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static com.team.buddyya.common.domain.S3DirectoryName.CHAT_IMAGE;
-import static com.team.buddyya.student.domain.UserProfileDefaultImage.getDefaultOrUserProfileImageUrl;
+import static com.team.buddyya.student.domain.UserProfileDefaultImage.getChatroomProfileImage;
 
 @Slf4j
 @Service
@@ -174,7 +174,7 @@ public class ChatService {
         boolean isBuddyExited = chatroom.getChatroomStudents().stream()
                 .filter(cs -> !cs.getStudent().getId().equals(chatroomStudent.getStudent().getId()))
                 .anyMatch(ChatroomStudent::getIsExited);
-        String buddyProfileImage = getDefaultOrUserProfileImageUrl(buddy);
+        String buddyProfileImage = getChatroomProfileImage(buddy);
         return ChatroomResponse.from(chatroom, buddy.getName(), chatroomStudent, buddyProfileImage, isBuddyExited);
     }
 

@@ -3,7 +3,7 @@ package com.team.buddyya.chatting.dto.response;
 import com.team.buddyya.chatting.domain.Chatroom;
 import com.team.buddyya.student.domain.Student;
 
-import static com.team.buddyya.student.domain.UserProfileDefaultImage.getDefaultOrUserProfileImageUrl;
+import static com.team.buddyya.student.domain.UserProfileDefaultImage.getChatroomProfileImage;
 
 public record CreateChatroomResponse(
         Long id,
@@ -20,7 +20,7 @@ public record CreateChatroomResponse(
                 buddy.getId(),
                 buddy.getName(),
                 buddy.getCountry(),
-                getDefaultOrUserProfileImageUrl(buddy),
+                getChatroomProfileImage(buddy),
                 isNew
         );
     }

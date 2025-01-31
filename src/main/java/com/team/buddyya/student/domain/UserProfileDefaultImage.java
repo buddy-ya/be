@@ -16,14 +16,14 @@ public enum UserProfileDefaultImage {
     }
 
     public static boolean isDefaultUserProfileImage(Student student) {
-        String userProfileImageUrl = student.getUserProfileImage();
+        String userProfileImageUrl = student.getProfileImage().getUrl();
         return USER_PROFILE_DEFAULT_IMAGE.getUrl().equals(userProfileImageUrl);
     }
 
-    public static String getDefaultOrUserProfileImageUrl(Student student) {
+    public static String getChatroomProfileImage(Student student) {
         if (isDefaultUserProfileImage(student)) {
             return student.getProfileImage().getUrl();
         }
-        return student.getUserProfileImage();
+        return student.getCharacterProfileImage();
     }
 }

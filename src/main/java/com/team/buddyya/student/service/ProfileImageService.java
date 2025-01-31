@@ -29,9 +29,10 @@ public class ProfileImageService {
 
     public void updateUserProfileImage(Student student, String imageUrl) {
         if (isDefaultUserProfileImage(student) == false) {
-            s3UploadService.deleteFile(PROFILE_IMAGE.getDirectoryName(), student.getUserProfileImage());
+            s3UploadService.deleteFile(PROFILE_IMAGE.getDirectoryName(), student.getProfileImage().getUrl());
         }
-        student.updateUserProfileImage(imageUrl);
+        ProfileImage profileImage = student.getProfileImage();
+        profileImage.updateUrl(imageUrl);
     }
 }
 

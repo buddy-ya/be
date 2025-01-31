@@ -50,7 +50,7 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/update/profile-image")
+    @PatchMapping("/profile-image")
     public ResponseEntity<MyPageUpdateResponse> updateProfileDefaultImage(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam("isDefault") boolean isDefault,

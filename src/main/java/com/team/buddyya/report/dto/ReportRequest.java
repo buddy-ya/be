@@ -4,8 +4,8 @@ import com.team.buddyya.report.domain.ReportType;
 
 public record ReportRequest(
         ReportType type,
-        Long targetId,
+        Long reportedId,
         Long reportedUserId,
-        String reason
+        String content
 ) {
 }

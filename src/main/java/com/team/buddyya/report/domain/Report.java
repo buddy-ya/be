@@ -23,7 +23,7 @@ public class Report {
     private ReportType type;
 
     @Column(nullable = false)
-    private Long targetId;
+    private Long reportedId;
 
     @Column(nullable = false)
     private Long reporterId;
@@ -32,14 +32,14 @@ public class Report {
     private Long reportedUserId;
 
     @Column(columnDefinition = "TEXT")
-    private String reason;
+    private String content;
 
     @Builder
-    public Report(ReportType type, Long targetId, Long reporterId, Long reportedUserId, String reason) {
+    public Report(ReportType type, Long reportedId, Long reporterId, Long reportedUserId, String content) {
         this.type = type;
-        this.targetId = targetId;
+        this.reportedId = reportedId;
         this.reporterId = reporterId;
         this.reportedUserId = reportedUserId;
-        this.reason = reason;
+        this.content = content;
     }
 }

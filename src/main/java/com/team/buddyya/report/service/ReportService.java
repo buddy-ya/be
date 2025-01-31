@@ -18,10 +18,10 @@ public class ReportService {
     public void createReport(StudentInfo studentInfo, ReportRequest request) {
         Report report = Report.builder()
                 .type(request.type())
-                .targetId(request.targetId())
+                .reportedId(request.reportedId())
                 .reporterId(studentInfo.id())
                 .reportedUserId(request.reportedUserId())
-                .reason(request.reason())
+                .content(request.content())
                 .build();
         reportRepository.save(report);
     }
