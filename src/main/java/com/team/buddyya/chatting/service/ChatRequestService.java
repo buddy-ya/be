@@ -11,6 +11,7 @@ import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.service.FindStudentService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @RequiredArgsConstructor
 public class ChatRequestService {
+
+    private static final long EXPIRED_CHAT_REQUEST_TIME = 24 * 60 * 60 * 1000;
 
     private final ChatRequestRepository chatRequestRepository;
     private final ChatroomRepository chatroomRepository;
@@ -58,6 +61,11 @@ public class ChatRequestService {
     public void deleteChatRequest(CustomUserDetails userDetails, Long chatRequestId) {
         Student sender = findStudentService.findByStudentId(userDetails.getStudentInfo().id());
         chatRequestRepository.deleteById(chatRequestId);
+    }
+
+    @Scheduled(fixedRate = 60 * 1000)
+    private void deleteExpiredChatRequests() {
+        chatRequestRepository.deleteByCreatedDateBefore(System.currentTimeMillis() - EXPIRED_CHAT_REQUEST_TIME;);
     }
 
     private void validateChatRequest(Student sender, Student receiver) {
