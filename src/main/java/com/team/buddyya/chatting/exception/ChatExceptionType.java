@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 
 public enum ChatExceptionType implements BaseExceptionType {
 
+    SELF_CHAT_REQUEST_NOT_ALLOWED(5002, HttpStatus.BAD_REQUEST, "본인에게 채팅 요청을 할 수 없습니다."),
     CHATROOM_NOT_FOUND(5001, HttpStatus.NOT_FOUND, "채팅방을 찾을 수 없습니다."),
     USER_NOT_PART_OF_CHATROOM(5002, HttpStatus.FORBIDDEN, "사용자가 채팅방에 속해 있지 않습니다.");
 
