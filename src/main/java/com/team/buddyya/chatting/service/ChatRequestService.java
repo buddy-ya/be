@@ -33,7 +33,7 @@ public class ChatRequestService {
     }
 
     @Transactional(readOnly = true)
-    public boolean isPendingChatRequest(Student sender, Student receiver) {
+    public boolean isAlreadyExistChatRequest(Student sender, Student receiver) {
         return chatRequestRepository.existsBySenderAndReceiver(sender, receiver)
                 || chatRequestRepository.existsBySenderAndReceiver(receiver, sender);
     }
@@ -43,13 +43,10 @@ public class ChatRequestService {
         return chatroomRepository.findByUserAndBuddy(sender.getId(), receiver.getId()).isPresent();
     }
 
-
     public void createChatRequest(CustomUserDetails userDetails, Long receiverId) {
         Student sender = findStudentService.findByStudentId(userDetails.getStudentInfo().id());
         Student receiver = findStudentService.findByStudentId(receiverId);
-        if (sender.getId().equals(receiverId)) {
-            throw new ChatException(ChatExceptionType.SELF_CHAT_REQUEST_NOT_ALLOWED);
-        }
+        validateChatRequest(sender, receiver);
         ChatRequest chatRequest = ChatRequest
                 .builder()
                 .sender(sender)
@@ -61,5 +58,17 @@ public class ChatRequestService {
     public void deleteChatRequest(CustomUserDetails userDetails, Long chatRequestId) {
         Student sender = findStudentService.findByStudentId(userDetails.getStudentInfo().id());
         chatRequestRepository.deleteById(chatRequestId);
+    }
+
+    private void validateChatRequest(Student sender, Student receiver) {
+        if (sender.getId().equals(receiver.getId())) {
+            throw new ChatException(ChatExceptionType.SELF_CHAT_REQUEST_NOT_ALLOWED);
+        }
+        if (isAlreadyExistChatRequest(sender, receiver)) {
+            throw new ChatException(ChatExceptionType.CHAT_REQUEST_ALREADY_EXISTS);
+        }
+        if (isAlreadyExistChatroom(sender, receiver)) {
+            throw new ChatException(ChatExceptionType.CHATROOM_ALREADY_EXISTS);
+        }
     }
 }
