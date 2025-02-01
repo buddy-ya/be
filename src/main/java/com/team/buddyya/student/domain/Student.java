@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.team.buddyya.student.domain.UserProfileDefaultImage.USER_PROFILE_DEFAULT_IMAGE;
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
@@ -74,6 +75,9 @@ public class Student extends BaseTime {
     @OneToOne(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private ProfileImage profileImage;
 
+    @Column(name = "character_profile_image")
+    private String characterProfileImage;
+
     @OneToOne(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private AuthToken authToken;
 
@@ -95,6 +99,7 @@ public class Student extends BaseTime {
         this.gender = gender;
         this.isCertificated = false;
         this.studentNumber = null;
+        this.characterProfileImage = USER_PROFILE_DEFAULT_IMAGE.getUrl();
     }
 
     public void updateIsCertificated(boolean isCertificated) {
