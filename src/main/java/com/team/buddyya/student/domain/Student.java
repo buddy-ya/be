@@ -64,13 +64,13 @@ public class Student extends BaseTime {
     private String email;
 
     @OneToMany(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<StudentMajor> majors = new ArrayList<>();
+    private List<StudentMajor> majors;
 
     @OneToMany(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<StudentLanguage> languages = new ArrayList<>();
+    private List<StudentLanguage> languages;
 
     @OneToMany(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<StudentInterest> interests = new ArrayList<>();
+    private List<StudentInterest> interests;
 
     @OneToOne(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private ProfileImage profileImage;
@@ -97,6 +97,9 @@ public class Student extends BaseTime {
         this.role = role;
         this.university = university;
         this.gender = gender;
+        this.majors =  new ArrayList<>();
+        this.languages = new ArrayList<>();
+        this.interests = new ArrayList<>();
         this.isCertificated = false;
         this.studentNumber = null;
         this.characterProfileImage = USER_PROFILE_DEFAULT_IMAGE.getUrl();
