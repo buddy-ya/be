@@ -7,7 +7,6 @@ import com.team.buddyya.student.dto.request.MyPageUpdateRequest;
 import com.team.buddyya.student.dto.request.OnBoardingRequest;
 import com.team.buddyya.student.dto.response.UserResponse;
 import com.team.buddyya.student.dto.request.UpdateProfileImageRequest;
-import com.team.buddyya.student.service.MyPageService;
 import com.team.buddyya.student.service.OnBoardingService;
 import com.team.buddyya.student.service.StudentService;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +24,6 @@ public class UserController {
 
     private final OnBoardingService onBoardingService;
     private final StudentService studentService;
-    private final MyPageService myPageService;
     private final FeedService feedService;
 
     @PostMapping
@@ -37,14 +35,14 @@ public class UserController {
     @GetMapping("/{userId}")
     public ResponseEntity<UserResponse> getMyProfile(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                      @PathVariable("userId") Long userId) {
-        return ResponseEntity.ok(myPageService.getUserProfile(userDetails.getStudentInfo(), userId));
+        return ResponseEntity.ok(studentService.getUserInfo(userDetails.getStudentInfo(), userId));
     }
 
     @PatchMapping
     public ResponseEntity<UserResponse> updateUser(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody MyPageUpdateRequest request) {
-        UserResponse response = myPageService.updateUser(userDetails.getStudentInfo(), request);
+        UserResponse response = studentService.updateUser(userDetails.getStudentInfo(), request);
         return ResponseEntity.ok(response);
     }
 
@@ -54,7 +52,7 @@ public class UserController {
             @RequestParam("isDefault") boolean isDefault,
             @ModelAttribute UpdateProfileImageRequest request) {
         return ResponseEntity.ok(
-                myPageService.updateUserProfileImage(userDetails.getStudentInfo(), isDefault, request));
+                studentService.updateUserProfileImage(userDetails.getStudentInfo(), isDefault, request));
     }
 
     @GetMapping("/myfeed")
