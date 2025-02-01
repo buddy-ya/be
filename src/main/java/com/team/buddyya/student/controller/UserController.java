@@ -5,6 +5,7 @@ import com.team.buddyya.feed.dto.response.feed.FeedListResponse;
 import com.team.buddyya.feed.service.FeedService;
 import com.team.buddyya.student.dto.request.MyPageUpdateRequest;
 import com.team.buddyya.student.dto.request.OnBoardingRequest;
+import com.team.buddyya.student.dto.request.UpdateProfileImageRequest;
 import com.team.buddyya.student.dto.response.MyPageUpdateResponse;
 import com.team.buddyya.student.dto.response.OnBoardingResponse;
 import com.team.buddyya.student.dto.response.UserProfileResponse;
@@ -49,12 +50,13 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/update/profile-default-image")
+    @PatchMapping("/profile-image")
     public ResponseEntity<MyPageUpdateResponse> updateProfileDefaultImage(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestParam String profileImageKey) {
+            @RequestParam("isDefault") boolean isDefault,
+            @ModelAttribute UpdateProfileImageRequest request) {
         return ResponseEntity.ok(
-                myPageService.updateProfileDefaultImage(userDetails.getStudentInfo(), profileImageKey));
+                myPageService.updateUserProfileImage(userDetails.getStudentInfo(), isDefault, request));
     }
 
     @GetMapping("/myfeed")
