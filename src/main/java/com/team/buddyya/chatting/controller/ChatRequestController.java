@@ -22,17 +22,17 @@ public class ChatRequestController {
 
     private final ChatRequestService chatRequestService;
 
-    @GetMapping
-    public ResponseEntity<List<ChatRequestResponse>> getChatRequests(
-            @AuthenticationPrincipal CustomUserDetails userDetails) {
-        return ResponseEntity.ok(chatRequestService.getChatRequests(userDetails));
-    }
-
     @GetMapping("/{receiverId}")
     public ResponseEntity<ChatRequestInfoResponse> getChatRequestInfo(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long receiverId) {
         return ResponseEntity.ok(chatRequestService.getChatRequestInfo(userDetails, receiverId));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ChatRequestResponse>> getChatRequests(
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.ok(chatRequestService.getChatRequests(userDetails));
     }
 
     @PostMapping("/{receiverId}")
