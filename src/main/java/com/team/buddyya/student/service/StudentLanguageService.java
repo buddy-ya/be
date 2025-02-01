@@ -25,15 +25,20 @@ public class StudentLanguageService {
         languages.forEach(languageName -> {
             Language language = languageRepository.findByLanguageName(languageName)
                     .orElseThrow(() -> new StudentException(StudentExceptionType.LANGUAGE_NOT_FOUND));
-            studentLanguageRepository.save(StudentLanguage.builder()
+            StudentLanguage studentLanguage = StudentLanguage.builder()
                     .student(student)
                     .language(language)
-                    .build());
+                    .build();
+
+            studentLanguage.setStudent(student);
+
+            studentLanguageRepository.save(studentLanguage);
         });
     }
 
     public void updateStudentLanguages(List<String> languages, Student student) {
+        student.getLanguages().clear();
         studentLanguageRepository.deleteByStudent(student);
-        createStudentLanguages((languages), student);
+        createStudentLanguages(languages, student);
     }
 }

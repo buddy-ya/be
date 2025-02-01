@@ -20,6 +20,7 @@ public class AvatarService {
                 .isNotificationEnabled(request.isNotificationEnabled())
                 .student(student)
                 .build();
+        avatar.setStudent(student);
         avatarRepository.save(avatar);
     }
 }
