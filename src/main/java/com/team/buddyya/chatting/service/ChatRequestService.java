@@ -65,7 +65,7 @@ public class ChatRequestService {
     }
 
     @Scheduled(fixedRate = 60 * 1000)
-    private void deleteExpiredChatRequests() {
+    public void deleteExpiredChatRequests() {
         LocalDateTime expirationTime = LocalDateTime.now().minusDays(EXPIRED_CHAT_REQUEST_DAY);
         List<ChatRequest> expiredChatRequests = chatRequestRepository.findAllByCreatedDateBefore(expirationTime);
         // TO DO: 포인트 환급 등 진행
