@@ -5,6 +5,7 @@ import com.team.buddyya.notification.dto.request.FeedNotificationRequest;
 import com.team.buddyya.notification.dto.request.NotificationRequest;
 import com.team.buddyya.notification.dto.response.NotificationResponse;
 import com.team.buddyya.notification.dto.request.SaveTokenRequest;
+import com.team.buddyya.notification.dto.response.SaveTokenResponse;
 import com.team.buddyya.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,10 +20,9 @@ public class NotificationController {
     private final NotificationService notificationService;
 
     @PostMapping("/save-token")
-    public ResponseEntity<String> registerPushToken(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                                    @RequestBody SaveTokenRequest request) {
-        notificationService.savePushToken(userDetails.getStudentInfo().id(), request.token());
-        return ResponseEntity.ok("토큰이 정상적으로 저장되었습니다.");
+    public ResponseEntity<SaveTokenResponse> registerPushToken(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                               @RequestBody SaveTokenRequest request) {
+        return ResponseEntity.ok(notificationService.savePushToken(userDetails.getStudentInfo().id(), request.token()));
     }
 
     @PostMapping("/simple")
