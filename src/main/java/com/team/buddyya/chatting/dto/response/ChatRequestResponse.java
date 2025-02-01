@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 public record ChatRequestResponse(
         Long id,
         Long senderId,
+        String university,
         String name,
         String country,
         String profileImageUrl,
@@ -16,6 +17,7 @@ public record ChatRequestResponse(
         return new ChatRequestResponse(
                 chatRequest.getId(),
                 chatRequest.getSender().getId(),
+                chatRequest.getSender().getUniversity().getUniversityName(),
                 chatRequest.getSender().getName(),
                 chatRequest.getSender().getCountry(),
                 chatRequest.getSender().getProfileImage().getUrl(),
