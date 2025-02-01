@@ -37,6 +37,7 @@ public class StudentInterestService {
     }
 
     public void updateStudentInterests(List<String> interests, Student student) {
+        student.getInterests().clear();
         studentInterestRepository.deleteByStudent(student);
         createStudentInterests(interests, student);
     }

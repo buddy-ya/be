@@ -37,7 +37,8 @@ public class StudentLanguageService {
     }
 
     public void updateStudentLanguages(List<String> languages, Student student) {
+        student.getLanguages().clear();
         studentLanguageRepository.deleteByStudent(student);
-        createStudentLanguages((languages), student);
+        createStudentLanguages(languages, student);
     }
 }
