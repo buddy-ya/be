@@ -6,8 +6,7 @@ import org.springframework.http.HttpStatus;
 public enum NotificationExceptionType implements BaseExceptionType {
 
     TOKEN_NOT_FOUND(3001, HttpStatus.NOT_FOUND, "해당 유저의 토큰이 존재하지 않습니다."),
-    FEED_NOT_FOUND(3002, HttpStatus.NOT_FOUND, "Feed not found."),
-    NOTIFICATION_SEND_FAILED(3003, HttpStatus.BAD_REQUEST, "Failed to send notification.");
+    NOTIFICATION_SEND_FAILED(3002, HttpStatus.BAD_REQUEST, "알림을 보내는데 실패하였습니다.");
 
     private final int errorCode;
     private final HttpStatus httpStatus;
