@@ -1,4 +1,4 @@
 package com.team.buddyya.auth.dto.request;
 
-public record TokenInfoRequest(Long studentId) {
+public record TokenInfoRequest(Long userId) {
 }

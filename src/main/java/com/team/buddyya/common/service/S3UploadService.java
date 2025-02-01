@@ -45,7 +45,7 @@ public class S3UploadService {
 
     private String generateFileName(MultipartFile file) {
         String fileName = UUID.randomUUID().toString() + "-" + file.getOriginalFilename();
-        return fileName.replaceAll("\\s", "_");
+        return fileName.replaceAll("[\\s,]", "_");
     }
 
     public void deleteFile(String dir, String fileUrl) {

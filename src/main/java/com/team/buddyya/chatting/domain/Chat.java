@@ -2,22 +2,17 @@ package com.team.buddyya.chatting.domain;
 
 import com.team.buddyya.common.domain.CreatedTime;
 import com.team.buddyya.student.domain.Student;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import lombok.AllArgsConstructor;
+import jakarta.persistence.*;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
+import static lombok.AccessLevel.PROTECTED;
+
 @Entity
+@Table(name = "chat")
+@Getter
+@NoArgsConstructor(access = PROTECTED)
 public class Chat extends CreatedTime {
 
     @Id
@@ -35,8 +30,12 @@ public class Chat extends CreatedTime {
     @Column(columnDefinition = "TEXT")
     private String message;
 
+    @Enumerated(EnumType.STRING)
+    private MessageType type;
+
     @Builder
-    public Chat(Chatroom chatroom, Student student, String message) {
+    public Chat(MessageType type, Chatroom chatroom, Student student, String message) {
+        this.type = type;
         this.chatroom = chatroom;
         this.student = student;
         this.message = message;

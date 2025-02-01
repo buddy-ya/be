@@ -63,6 +63,9 @@ public class StudentService {
     public void deleteStudent(StudentInfo studentInfo) {
         Student student = findStudentService.findByStudentId(studentInfo.id());
         String randomPhoneNumber = "deleted_" + UUID.randomUUID().toString().substring(0, 3);
+        String randomEmail = "deleted_" + UUID.randomUUID().toString().substring(0, 4);
         student.updatePhoneNumber(randomPhoneNumber);
+        student.updateEmail(randomEmail);
+        student.updateIsCertificated(false);
     }
 }

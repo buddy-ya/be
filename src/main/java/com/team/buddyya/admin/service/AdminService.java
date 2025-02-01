@@ -41,7 +41,7 @@ public class AdminService {
     }
 
     public StudentVerificationResponse verifyStudentIdCard(StudentVerificationRequest request) {
-        Student student = findStudentService.findByStudentId(request.studentId());
+        Student student = findStudentService.findByStudentId(request.id());
         studentIdCardRepository.deleteByStudent(student);
         s3UploadService.deleteFile(STUDENT_ID_CARD.getDirectoryName(), request.imageUrl());
         if (request.studentNumber() == null) {

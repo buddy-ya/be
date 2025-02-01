@@ -1,7 +1,5 @@
 package com.team.buddyya.student.dto.response;
 
-import com.team.buddyya.student.domain.Student;
-
 public record OnBoardingResponse(
         String accessToken,
         String refreshToken

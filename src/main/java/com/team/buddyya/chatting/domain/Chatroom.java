@@ -1,25 +1,30 @@
 package com.team.buddyya.chatting.domain;
 
 import com.team.buddyya.common.domain.CreatedTime;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.Getter;
+
+import static lombok.AccessLevel.PROTECTED;
 
 @Entity
-@Getter
 @Table(name = "chatroom")
+@Getter
+@NoArgsConstructor(access = PROTECTED)
 public class Chatroom extends CreatedTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private String lastMessage;
+
+    private LocalDateTime lastMessageTime;
 
     @OneToMany(mappedBy = "chatroom", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChatroomStudent> chatroomStudents;
@@ -27,8 +32,16 @@ public class Chatroom extends CreatedTime {
     @OneToMany(mappedBy = "chatroom", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Chat> chats;
 
-    public Chatroom() {
+    @Builder
+    public Chatroom(LocalDateTime createdTime) {
         this.chatroomStudents = new ArrayList<>();
         this.chats = new ArrayList<>();
+        lastMessage = null;
+        lastMessageTime = createdTime;
+    }
+
+    public void updateLastMessage(String message) {
+        this.lastMessage = message;
+        this.lastMessageTime = LocalDateTime.now();
     }
 }

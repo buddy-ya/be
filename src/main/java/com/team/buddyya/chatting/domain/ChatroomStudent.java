@@ -1,22 +1,17 @@
 package com.team.buddyya.chatting.domain;
 
 import com.team.buddyya.student.domain.Student;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import static lombok.AccessLevel.PROTECTED;
+
 @Entity
-@Getter
-@NoArgsConstructor
 @Table(name = "chatroom_student")
+@Getter
+@NoArgsConstructor(access = PROTECTED)
 public class ChatroomStudent {
 
     @Id
@@ -31,9 +26,30 @@ public class ChatroomStudent {
     @JoinColumn(name = "chatroom_id")
     private Chatroom chatroom;
 
+    @Column(name = "unread_count")
+    private int unreadCount;
+
+    @Column(name = "exited")
+    private Boolean isExited;
+
     @Builder
     public ChatroomStudent(Student student, Chatroom chatroom) {
         this.student = student;
         this.chatroom = chatroom;
+        this.unreadCount = 0;
+        this.isExited = false;
+    }
+
+    public void increaseUnreadCount() {
+        this.unreadCount++;
+    }
+
+    public void resetUnreadCount() {
+        this.unreadCount = 0;
+    }
+
+    public void updateIsExited() {
+        this.isExited = true;
     }
 }
+

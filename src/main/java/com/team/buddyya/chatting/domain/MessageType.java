@@ -1,4 +1,5 @@
 package com.team.buddyya.chatting.domain;
 
-public class Report {
+public enum MessageType {
+    TALK, IMAGE
 }
