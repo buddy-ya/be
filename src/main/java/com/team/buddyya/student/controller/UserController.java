@@ -5,14 +5,11 @@ import com.team.buddyya.feed.dto.response.feed.FeedListResponse;
 import com.team.buddyya.feed.service.FeedService;
 import com.team.buddyya.student.dto.request.MyPageUpdateRequest;
 import com.team.buddyya.student.dto.request.OnBoardingRequest;
-import com.team.buddyya.student.dto.response.MyPageUpdateResponse;
-import com.team.buddyya.student.dto.response.OnBoardingResponse;
 import com.team.buddyya.student.dto.response.UserResponse;
 import com.team.buddyya.student.service.MyPageService;
 import com.team.buddyya.student.service.OnBoardingService;
 import com.team.buddyya.student.service.StudentService;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -43,15 +40,15 @@ public class UserController {
     }
 
     @PatchMapping
-    public ResponseEntity<MyPageUpdateResponse> updateUser(
+    public ResponseEntity<UserResponse> updateUser(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody MyPageUpdateRequest request) {
-        MyPageUpdateResponse response = myPageService.updateUser(userDetails.getStudentInfo(), request);
+        UserResponse response = myPageService.updateUser(userDetails.getStudentInfo(), request);
         return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/update/profile-default-image")
-    public ResponseEntity<MyPageUpdateResponse> updateProfileDefaultImage(
+    public ResponseEntity<UserResponse> updateProfileDefaultImage(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam String profileImageKey) {
         return ResponseEntity.ok(

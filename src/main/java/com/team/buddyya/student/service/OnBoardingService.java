@@ -6,10 +6,8 @@ import com.team.buddyya.auth.jwt.JwtUtils;
 import com.team.buddyya.auth.repository.AuthTokenRepository;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.dto.request.OnBoardingRequest;
-import com.team.buddyya.student.dto.response.OnBoardingResponse;
 import com.team.buddyya.student.dto.response.UserResponse;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

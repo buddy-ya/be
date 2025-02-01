@@ -9,7 +9,6 @@ import com.team.buddyya.feed.respository.FeedRepository;
 import com.team.buddyya.student.controller.UserController;
 import com.team.buddyya.student.domain.*;
 import com.team.buddyya.student.dto.request.OnBoardingRequest;
-import com.team.buddyya.student.dto.response.OnBoardingResponse;
 import com.team.buddyya.student.dto.response.UserResponse;
 import com.team.buddyya.student.repository.*;
 

@@ -4,7 +4,6 @@ import com.team.buddyya.auth.domain.StudentInfo;
 import com.team.buddyya.certification.repository.StudentIdCardRepository;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.dto.request.MyPageUpdateRequest;
-import com.team.buddyya.student.dto.response.MyPageUpdateResponse;
 import com.team.buddyya.student.dto.response.UserResponse;
 import com.team.buddyya.student.exception.StudentException;
 import com.team.buddyya.student.exception.StudentExceptionType;
@@ -25,7 +24,7 @@ public class MyPageService {
     private final ProfileImageService profileImageService;
     private final StudentIdCardRepository studentIdCardRepository;
 
-    public MyPageUpdateResponse updateUser(StudentInfo studentInfo, MyPageUpdateRequest request) {
+    public UserResponse updateUser(StudentInfo studentInfo, MyPageUpdateRequest request) {
         Student student = findStudentService.findByStudentId(studentInfo.id());
 
         switch (request.key()) {
@@ -48,13 +47,17 @@ public class MyPageService {
                 throw new StudentException(StudentExceptionType.UNSUPPORTED_UPDATE_KEY);
         }
 
-        return MyPageUpdateResponse.from(UPDATE_SUCCESS_MESSAGE);
+        boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
+                .isPresent();
+        return UserResponse.from(student, isStudentIdCardRequested);
     }
 
-    public MyPageUpdateResponse updateProfileDefaultImage(StudentInfo studentInfo, String profileImageKey) {
+    public UserResponse updateProfileDefaultImage(StudentInfo studentInfo, String profileImageKey) {
         Student student = findStudentService.findByStudentId(studentInfo.id());
         profileImageService.updateProfileDefaultImage(student, profileImageKey);
-        return MyPageUpdateResponse.from(UPDATE_SUCCESS_MESSAGE);
+        boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
+                .isPresent();
+        return UserResponse.from(student, isStudentIdCardRequested);
     }
 
     @Transactional(readOnly = true)
