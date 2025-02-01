@@ -29,7 +29,7 @@ public class OnBoardingService {
         Student student = studentService.createStudent(request);
         String accessToken = jwtUtils.createAccessToken(new TokenInfoRequest(student.getId()));
         String refreshToken = createAndSaveToken(student);
-        profileImageService.saveRandomProfileImage(student);
+        profileImageService.saveDefaultProfileImage(student);
         avatarService.createAvatar(request, student);
         studentMajorService.createStudentMajors(request.majors(), student);
         studentInterestService.createStudentInterests(request.interests(), student);

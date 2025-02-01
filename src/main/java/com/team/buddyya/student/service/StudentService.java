@@ -3,10 +3,7 @@ package com.team.buddyya.student.service;
 import com.team.buddyya.auth.domain.StudentInfo;
 import com.team.buddyya.certification.repository.StudentIdCardRepository;
 import com.team.buddyya.common.service.S3UploadService;
-import com.team.buddyya.student.domain.Gender;
-import com.team.buddyya.student.domain.Role;
-import com.team.buddyya.student.domain.Student;
-import com.team.buddyya.student.domain.University;
+import com.team.buddyya.student.domain.*;
 import com.team.buddyya.student.dto.request.MyPageUpdateRequest;
 import com.team.buddyya.student.dto.request.OnBoardingRequest;
 import com.team.buddyya.student.dto.request.UpdateProfileImageRequest;
@@ -40,6 +37,7 @@ public class StudentService {
     public Student createStudent(OnBoardingRequest request) {
         University university = universityRepository.findByUniversityName(request.university())
                 .orElseThrow(() -> new StudentException(StudentExceptionType.UNIVERSITY_NOT_FOUND));
+        CharacterProfileImage randomImage = CharacterProfileImage.getRandomProfileImage();
         Student student = Student.builder()
                 .name(request.name())
                 .phoneNumber(request.phoneNumber())
@@ -48,6 +46,7 @@ public class StudentService {
                 .role(Role.STUDENT)
                 .university(university)
                 .gender(Gender.fromValue(request.gender()))
+                .characterProfileImage(randomImage.getUrl())
                 .build();
         return studentRepository.save(student);
     }

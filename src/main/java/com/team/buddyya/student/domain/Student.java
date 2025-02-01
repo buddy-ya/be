@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.team.buddyya.student.domain.UserProfileDefaultImage.USER_PROFILE_DEFAULT_IMAGE;
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
@@ -89,7 +88,7 @@ public class Student extends BaseTime {
 
     @Builder
     public Student(String name, String phoneNumber, String country, Boolean isKorean, Role role, University university,
-                   Gender gender) {
+                   Gender gender,String characterProfileImage) {
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.country = country;
@@ -102,7 +101,7 @@ public class Student extends BaseTime {
         this.interests = new ArrayList<>();
         this.isCertificated = false;
         this.studentNumber = null;
-        this.characterProfileImage = USER_PROFILE_DEFAULT_IMAGE.getUrl();
+        this.characterProfileImage = characterProfileImage;
     }
 
     public void updateIsCertificated(boolean isCertificated) {
