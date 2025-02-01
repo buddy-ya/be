@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static jakarta.persistence.FetchType.LAZY;
@@ -74,6 +75,9 @@ public class Student extends BaseTime {
     @OneToOne(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private ProfileImage profileImage;
 
+    @Column(name = "character_profile_image")
+    private String characterProfileImage;
+
     @OneToOne(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private AuthToken authToken;
 
@@ -88,7 +92,7 @@ public class Student extends BaseTime {
 
     @Builder
     public Student(String name, String phoneNumber, String country, Boolean isKorean, Role role, University university,
-                   Gender gender) {
+                   Gender gender,String characterProfileImage) {
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.country = country;
@@ -96,8 +100,12 @@ public class Student extends BaseTime {
         this.role = role;
         this.university = university;
         this.gender = gender;
+        this.majors =  new ArrayList<>();
+        this.languages = new ArrayList<>();
+        this.interests = new ArrayList<>();
         this.isCertificated = false;
         this.studentNumber = null;
+        this.characterProfileImage = characterProfileImage;
     }
 
     public void updateIsCertificated(boolean isCertificated) {

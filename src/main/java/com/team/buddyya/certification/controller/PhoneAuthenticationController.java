@@ -3,9 +3,9 @@ package com.team.buddyya.certification.controller;
 import com.team.buddyya.certification.dto.request.SendCodeRequest;
 import com.team.buddyya.certification.dto.request.VerifyCodeRequest;
 import com.team.buddyya.certification.dto.response.SendCodeResponse;
-import com.team.buddyya.certification.dto.response.VerifyCodeResponse;
 import com.team.buddyya.certification.service.MessageSendService;
 import com.team.buddyya.certification.service.PhoneAuthenticationService;
+import com.team.buddyya.student.dto.response.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,9 +29,9 @@ public class PhoneAuthenticationController {
     }
 
     @PostMapping("/verify-code")
-    public ResponseEntity<VerifyCodeResponse> verifyCode(@RequestBody VerifyCodeRequest verifyCodeRequest) {
+    public ResponseEntity<UserResponse> verifyCode(@RequestBody VerifyCodeRequest verifyCodeRequest) {
         phoneAuthenticationService.verifyCode(verifyCodeRequest.phoneNumber(), verifyCodeRequest.code());
-        VerifyCodeResponse response = phoneAuthenticationService.checkMembership(verifyCodeRequest.phoneNumber());
+        UserResponse response = phoneAuthenticationService.checkMembership(verifyCodeRequest.phoneNumber());
         return ResponseEntity.ok(response);
     }
 }
