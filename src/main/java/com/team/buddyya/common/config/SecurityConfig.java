@@ -1,6 +1,10 @@
 package com.team.buddyya.common.config;
 
-import com.team.buddyya.auth.jwt.*;
+import com.team.buddyya.auth.jwt.CustomAccessDeniedHandler;
+import com.team.buddyya.auth.jwt.CustomAuthenticationEntryPoint;
+import com.team.buddyya.auth.jwt.JwtAuthFilter;
+import com.team.buddyya.auth.jwt.JwtExceptionFilter;
+import com.team.buddyya.auth.jwt.JwtUtils;
 import com.team.buddyya.auth.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -45,7 +49,8 @@ public class SecurityConfig {
                         .requestMatchers("/phone-auth/**",
                                 "/auth/reissue").permitAll()
                         .requestMatchers("/auth/fail", "/admin/**").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers("/users", "/auth/success", "/certification/**", "/feeds/**", "/chatrooms/**").hasAuthority("ROLE_STUDENT")
+                        .requestMatchers("/users", "/auth/success", "/certification/**", "/feeds/**", "/chatrooms/**",
+                                "/chat-requests/**").hasAuthority("ROLE_STUDENT")
                         .anyRequest().authenticated()
                 );
         return http.build();
