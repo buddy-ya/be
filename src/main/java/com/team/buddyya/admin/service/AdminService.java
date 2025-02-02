@@ -6,6 +6,7 @@ import com.team.buddyya.admin.dto.response.StudentIdCardResponse;
 import com.team.buddyya.admin.dto.response.StudentVerificationResponse;
 import com.team.buddyya.certification.repository.StudentIdCardRepository;
 import com.team.buddyya.common.service.S3UploadService;
+import com.team.buddyya.notification.service.NotificationService;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.service.FindStudentService;
 import com.team.buddyya.student.service.StudentService;
@@ -31,6 +32,7 @@ public class AdminService {
     private final FindStudentService findStudentService;
     private final StudentIdCardRepository studentIdCardRepository;
     private final S3UploadService s3UploadService;
+    private final NotificationService notificationService;
 
     @Transactional(readOnly = true)
     public StudentIdCardListResponse getStudentIdCards() {
@@ -45,12 +47,15 @@ public class AdminService {
         studentIdCardRepository.deleteByStudent(student);
         s3UploadService.deleteFile(STUDENT_ID_CARD.getDirectoryName(), request.imageUrl());
         if (request.studentNumber() == null) {
+            notificationService.sendAuthorizationNotification(student, false);
             return new StudentVerificationResponse(REQUEST_REJECTED_MESSAGE);
         }
         if (studentService.isDuplicateStudentNumber(request.studentNumber(), student.getUniversity())) {
+            notificationService.sendAuthorizationNotification(student, false);
             return new StudentVerificationResponse(ALREADY_REGISTERED_MESSAGE);
         }
         studentService.updateStudentCertification(student, request.studentNumber());
+        notificationService.sendAuthorizationNotification(student, true);
         return new StudentVerificationResponse(VERIFICATION_COMPLETED_MESSAGE);
     }
 }

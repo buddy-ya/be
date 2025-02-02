@@ -2,14 +2,8 @@ package com.team.buddyya.notification.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team.buddyya.feed.domain.Feed;
-import com.team.buddyya.feed.exception.FeedException;
-import com.team.buddyya.feed.exception.FeedExceptionType;
-import com.team.buddyya.feed.respository.FeedRepository;
 import com.team.buddyya.notification.domain.ExpoToken;
 import com.team.buddyya.notification.domain.RequestNotification;
-import com.team.buddyya.notification.dto.request.FeedNotificationRequest;
-import com.team.buddyya.notification.dto.request.NotificationRequest;
-import com.team.buddyya.notification.dto.response.NotificationResponse;
 import com.team.buddyya.notification.dto.response.SaveTokenResponse;
 import com.team.buddyya.notification.exception.NotificationException;
 import com.team.buddyya.notification.exception.NotificationExceptionType;
@@ -25,19 +19,35 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class NotificationService {
 
     private final ExpoTokenRepository expoTokenRepository;
-    private final FeedRepository feedRepository;
     private final FindStudentService findStudentService;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
-    private static final String NOTIFICATION_SUCCESS_MESSAGE = "알림이 성공적으로 전송되었습니다.";
     private static final String TOKEN_SAVE_SUCCESS_MESSAGE = "토큰이 성공적으로 저장되었습니다.";
+
+    private static final String FEED_TITLE_KR = "새로운 댓글이 달렸어요!";
+    private static final String FEED_TITLE_EN = "You have a new comment!";
+
+    private static final String AUTH_SUCCESS_TITLE_KR = "학생 인증이 성공했어요.";
+    private static final String AUTH_SUCCESS_TITLE_EN = "Your student verification was successful.";
+
+    private static final String AUTH_SUCCESS_BODY_KR = "이제 버디야의 모든 기능을 사용할 수 있어요.";
+    private static final String AUTH_SUCCESS_BODY_EN = "You can now use all features of Buddyya.";
+
+    private static final String AUTH_FAIL_TITLE_KR = "학생 인증에 실패했어요.";
+    private static final String AUTH_FAIL_TITLE_EN = "Your student verification failed.";
+
+    private static final String AUTH_FAIL_BODY_KR = "제출된 학생증 정보를 다시 확인하고 재시도해 주세요.";
+    private static final String AUTH_FAIL_BODY_EN = "Please check your student ID information and try again.";
 
     @Value("${EXPO.API.URL}")
     private String expoApiUrl;
@@ -64,31 +74,54 @@ public class NotificationService {
         expoTokenRepository.save(Token);
     }
 
-    public NotificationResponse sendSimpleNotification(NotificationRequest request) {
-        String token = expoTokenRepository.findByStudentId(request.userId())
-                .orElseThrow(() -> new NotificationException(NotificationExceptionType.TOKEN_NOT_FOUND))
-                .getToken();
-        sendNotificationToToken(token, request.message());
-        return NotificationResponse.from(NOTIFICATION_SUCCESS_MESSAGE);
+    public void sendFeedNotification(Feed feed, String commentContent) {
+        Student recipient = feed.getStudent();
+        String token = getTokenByUserId(recipient.getId());
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("feedId", feed.getId());
+        data.put("type", "FEED");
+
+        String title = recipient.getIsKorean() ? FEED_TITLE_KR : FEED_TITLE_EN;
+
+        RequestNotification notification = new RequestNotification(
+                token,
+                title,
+                commentContent,
+                data
+        );
+
+        sendToExpo(notification);
     }
 
-    public NotificationResponse sendFeedNotification(FeedNotificationRequest request) {
-        Feed feed = feedRepository.findById(request.feedId())
-                .orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND));
-        String token = expoTokenRepository.findByStudentId(feed.getStudent().getId())
-                .orElseThrow(() -> new NotificationException(NotificationExceptionType.TOKEN_NOT_FOUND))
-                .getToken();
-        sendNotificationToToken(token, request.message());
-        return NotificationResponse.from(NOTIFICATION_SUCCESS_MESSAGE);
+    public void sendAuthorizationNotification(Student student, boolean isSuccess) {
+        String token = getTokenByUserId(student.getId());
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("type", "AUTHORIZATION");
+
+        RequestNotification notification;
+        if (isSuccess) {
+            String title = student.getIsKorean() ? AUTH_SUCCESS_TITLE_KR : AUTH_SUCCESS_TITLE_EN;
+            String body = student.getIsKorean() ? AUTH_SUCCESS_BODY_KR : AUTH_SUCCESS_BODY_EN;
+            notification = new RequestNotification(token, title, body, data);
+        } else {
+            String title = student.getIsKorean() ? AUTH_FAIL_TITLE_KR : AUTH_FAIL_TITLE_EN;
+            String body = student.getIsKorean() ? AUTH_FAIL_BODY_KR : AUTH_FAIL_BODY_EN;
+            notification = new RequestNotification(token, title, body, data);
+        }
+
+        sendToExpo(notification);
     }
 
-    private void sendNotificationToToken(String token, String message) {
+    private void sendToExpo(RequestNotification notification) {
         try {
-            String payload = objectMapper.writeValueAsString(new RequestNotification(token, message));
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(org.springframework.http.MediaType.APPLICATION_JSON);
 
+            String payload = objectMapper.writeValueAsString(notification);
             HttpEntity<String> request = new HttpEntity<>(payload, headers);
+
             ResponseEntity<String> response = restTemplate.postForEntity(expoApiUrl, request, String.class);
 
             if (!response.getStatusCode().is2xxSuccessful()) {
@@ -99,4 +132,9 @@ public class NotificationService {
         }
     }
 
+    private String getTokenByUserId(Long userId) {
+        return expoTokenRepository.findByStudentId(userId)
+                .orElseThrow(() -> new NotificationException(NotificationExceptionType.TOKEN_NOT_FOUND))
+                .getToken();
+    }
 }
