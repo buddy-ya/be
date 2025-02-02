@@ -20,7 +20,7 @@ import java.util.List;
 import static org.springframework.data.domain.Sort.Direction;
 
 @RestController
-@RequestMapping("/chatrooms")
+@RequestMapping("/rooms")
 @RequiredArgsConstructor
 public class ChatController {
 
