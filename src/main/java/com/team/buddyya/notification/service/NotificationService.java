@@ -44,7 +44,7 @@ public class NotificationService {
 
     public SaveTokenResponse savePushToken(Long userId, String token) {
         Student student = findStudentService.findByStudentId(userId);
-        expoTokenRepository.findByUserId(userId).ifPresentOrElse(
+        expoTokenRepository.findByStudentId(userId).ifPresentOrElse(
                 existingToken -> updateExistingToken(existingToken, token),
                 () -> saveToken(student, token)
         );
@@ -65,7 +65,7 @@ public class NotificationService {
     }
 
     public NotificationResponse sendSimpleNotification(NotificationRequest request) {
-        String token = expoTokenRepository.findByUserId(request.userId())
+        String token = expoTokenRepository.findByStudentId(request.userId())
                 .orElseThrow(() -> new NotificationException(NotificationExceptionType.TOKEN_NOT_FOUND))
                 .getToken();
         sendNotificationToToken(token, request.message());
@@ -75,7 +75,7 @@ public class NotificationService {
     public NotificationResponse sendFeedNotification(FeedNotificationRequest request) {
         Feed feed = feedRepository.findById(request.feedId())
                 .orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND));
-        String token = expoTokenRepository.findByUserId(feed.getStudent().getId())
+        String token = expoTokenRepository.findByStudentId(feed.getStudent().getId())
                 .orElseThrow(() -> new NotificationException(NotificationExceptionType.TOKEN_NOT_FOUND))
                 .getToken();
         sendNotificationToToken(token, request.message());

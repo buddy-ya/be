@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface ExpoTokenRepository extends JpaRepository<ExpoToken, Long> {
-    Optional<ExpoToken> findByUserId(Long userId);
+    Optional<ExpoToken> findByStudentId(Long studentId);
 }
