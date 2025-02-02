@@ -4,6 +4,7 @@ import com.team.buddyya.auth.domain.AuthToken;
 import com.team.buddyya.certification.domain.StudentIdCard;
 import com.team.buddyya.chatting.domain.ChatroomStudent;
 import com.team.buddyya.common.domain.BaseTime;
+import com.team.buddyya.notification.domain.ExpoToken;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -82,6 +83,9 @@ public class Student extends BaseTime {
 
     @OneToOne(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private StudentIdCard studentIdCard;
+
+    @OneToOne(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private ExpoToken expoToken;
 
     @OneToMany(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<ChatroomStudent> chatroomStudents;
