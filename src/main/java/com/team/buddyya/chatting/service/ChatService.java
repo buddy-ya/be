@@ -155,6 +155,7 @@ public class ChatService {
         }
     }
 
+    @Transactional(readOnly = true)
     public List<ChatroomsResponse> getChatRooms(StudentInfo studentInfo) {
         Student student = findStudentService.findByStudentId(studentInfo.id());
         return student.getChatroomStudents().stream()
@@ -165,6 +166,7 @@ public class ChatService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public ChatroomResponse getChatroom(StudentInfo studentInfo, Long roomId) {
         Student student = findStudentService.findByStudentId(studentInfo.id());
         Chatroom chatroom = chatRoomRepository.findById(roomId)
