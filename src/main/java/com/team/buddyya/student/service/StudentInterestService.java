@@ -25,14 +25,19 @@ public class StudentInterestService {
         interests.forEach(interestName -> {
             Interest interest = interestRepository.findByInterestName(interestName)
                     .orElseThrow(() -> new StudentException(StudentExceptionType.INTEREST_NOT_FOUND));
-            studentInterestRepository.save(StudentInterest.builder()
+            StudentInterest studentInterest = StudentInterest.builder()
                     .student(student)
                     .interest(interest)
-                    .build());
+                    .build();
+
+            studentInterest.setStudent(student);
+
+            studentInterestRepository.save(studentInterest);
         });
     }
 
     public void updateStudentInterests(List<String> interests, Student student) {
+        student.getInterests().clear();
         studentInterestRepository.deleteByStudent(student);
         createStudentInterests(interests, student);
     }

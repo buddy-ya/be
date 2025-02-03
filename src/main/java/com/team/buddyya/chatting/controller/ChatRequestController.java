@@ -1,6 +1,7 @@
 package com.team.buddyya.chatting.controller;
 
 import com.team.buddyya.auth.domain.CustomUserDetails;
+import com.team.buddyya.chatting.dto.response.ChatRequestInfoResponse;
 import com.team.buddyya.chatting.dto.response.ChatRequestResponse;
 import com.team.buddyya.chatting.service.ChatRequestService;
 import java.util.List;
@@ -20,6 +21,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class ChatRequestController {
 
     private final ChatRequestService chatRequestService;
+
+    @GetMapping("/{receiverId}")
+    public ResponseEntity<ChatRequestInfoResponse> getChatRequestInfo(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long receiverId) {
+        return ResponseEntity.ok(chatRequestService.getChatRequestInfo(userDetails, receiverId));
+    }
 
     @GetMapping
     public ResponseEntity<List<ChatRequestResponse>> getChatRequests(

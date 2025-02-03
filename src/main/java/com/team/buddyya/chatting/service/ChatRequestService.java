@@ -2,6 +2,7 @@ package com.team.buddyya.chatting.service;
 
 import com.team.buddyya.auth.domain.CustomUserDetails;
 import com.team.buddyya.chatting.domain.ChatRequest;
+import com.team.buddyya.chatting.dto.response.ChatRequestInfoResponse;
 import com.team.buddyya.chatting.dto.response.ChatRequestResponse;
 import com.team.buddyya.chatting.exception.ChatException;
 import com.team.buddyya.chatting.exception.ChatExceptionType;
@@ -34,6 +35,15 @@ public class ChatRequestService {
         return chatRequests.stream()
                 .map(ChatRequestResponse::from)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public ChatRequestInfoResponse getChatRequestInfo(CustomUserDetails userDetails, Long receiverId) {
+        Student sender = findStudentService.findByStudentId(userDetails.getStudentInfo().id());
+        Student receiver = findStudentService.findByStudentId(receiverId);
+        boolean isAlreadyExistChatRequest = isAlreadyExistChatRequest(sender, receiver);
+        boolean isAlreadyExistChatroom = isAlreadyExistChatroom(sender, receiver);
+        return ChatRequestInfoResponse.from(isAlreadyExistChatRequest, isAlreadyExistChatroom);
     }
 
     @Transactional(readOnly = true)

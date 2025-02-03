@@ -44,6 +44,9 @@ public class Feed extends BaseTime {
     @Column(name = "comment_count", nullable = false)
     private int commentCount;
 
+    @Column(name = "view_count", nullable = false)
+    private int viewCount;
+
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "student_id", nullable = false)
     private Student student;
@@ -63,7 +66,7 @@ public class Feed extends BaseTime {
     private List<FeedImage> images = new ArrayList<>();
 
     @OneToMany(mappedBy = "feed", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<Like> likes;
+    private List<FeedLike> feedLikes;
 
     @OneToMany(mappedBy = "feed", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Bookmark> bookmarks;
@@ -77,6 +80,7 @@ public class Feed extends BaseTime {
         this.university = university;
         this.likeCount = 0;
         this.commentCount = 0;
+        this.viewCount = 0;
     }
 
     public void updateFeed(String title, String content, Category category) {
@@ -101,7 +105,11 @@ public class Feed extends BaseTime {
         this.commentCount--;
     }
 
+    public void increaseViewCount() {
+        this.viewCount++;
+    }
+
     public void uploadFeedImages(List<FeedImage> images) {
-        this.images= images;
+        this.images = images;
     }
 }

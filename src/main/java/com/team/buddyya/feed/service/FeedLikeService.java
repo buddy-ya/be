@@ -2,12 +2,12 @@ package com.team.buddyya.feed.service;
 
 import com.team.buddyya.auth.domain.StudentInfo;
 import com.team.buddyya.feed.domain.Feed;
-import com.team.buddyya.feed.domain.Like;
+import com.team.buddyya.feed.domain.FeedLike;
 import com.team.buddyya.feed.dto.response.LikeResponse;
 import com.team.buddyya.feed.exception.FeedException;
 import com.team.buddyya.feed.exception.FeedExceptionType;
+import com.team.buddyya.feed.respository.FeedLikeRepository;
 import com.team.buddyya.feed.respository.FeedRepository;
-import com.team.buddyya.feed.respository.LikeRepository;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.service.FindStudentService;
 import lombok.RequiredArgsConstructor;
@@ -17,20 +17,21 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class LikeService {
+public class
+FeedLikeService {
 
-    private final LikeRepository likeRepository;
+    private final FeedLikeRepository feedLikeRepository;
     private final FindStudentService findStudentService;
     private final FeedRepository feedRepository;
 
     @Transactional(readOnly = true)
     boolean existsByStudentAndFeed(Student student, Feed feed) {
-        return likeRepository.existsByStudentAndFeed(student, feed);
+        return feedLikeRepository.existsByStudentAndFeed(student, feed);
     }
 
     @Transactional(readOnly = true)
-    Like findLikeByStudentAndFeed(Student student, Feed feed) {
-        return likeRepository.findByStudentAndFeed(student, feed)
+    FeedLike findLikeByStudentAndFeed(Student student, Feed feed) {
+        return feedLikeRepository.findByStudentAndFeed(student, feed)
                 .orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_LIKED));
     }
 
@@ -40,15 +41,15 @@ public class LikeService {
         Student student = findStudentService.findByStudentId(studentInfo.id());
         boolean isLiked = existsByStudentAndFeed(student, feed);
         if (isLiked) {
-            Like like = findLikeByStudentAndFeed(student, feed);
-            likeRepository.delete(like);
+            FeedLike feedLike = findLikeByStudentAndFeed(student, feed);
+            feedLikeRepository.delete(feedLike);
             return LikeResponse.from(false, feed.getLikeCount());
         }
-        Like like = Like.builder()
+        FeedLike feedLike = FeedLike.builder()
                 .feed(feed)
                 .student(student)
                 .build();
-        likeRepository.save(like);
+        feedLikeRepository.save(feedLike);
         return LikeResponse.from(true, feed.getLikeCount());
     }
 }
