@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "feed_like")
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-public class Like extends CreatedTime {
+public class FeedLike extends CreatedTime {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -37,14 +37,14 @@ public class Like extends CreatedTime {
     private Student student;
 
     @Builder
-    public Like(Feed feed, Student student) {
+    public FeedLike(Feed feed, Student student) {
         this.feed = feed;
         this.student = student;
     }
 
     public void setFeed(Feed feed) {
         this.feed = feed;
-        feed.getLikes().add(this);
+        feed.getFeedLikes().add(this);
     }
 
     @PrePersist
