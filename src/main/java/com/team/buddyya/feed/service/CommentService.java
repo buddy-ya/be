@@ -10,6 +10,7 @@ import com.team.buddyya.feed.exception.FeedException;
 import com.team.buddyya.feed.exception.FeedExceptionType;
 import com.team.buddyya.feed.respository.CommentRepository;
 import com.team.buddyya.feed.respository.FeedRepository;
+import com.team.buddyya.notification.service.NotificationService;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.service.FindStudentService;
 import java.util.List;
@@ -25,6 +26,7 @@ public class CommentService {
     private final FeedRepository feedRepository;
     private final CommentRepository commentRepository;
     private final FindStudentService findStudentService;
+    private final NotificationService notificationService;
 
     @Transactional(readOnly = true)
     Feed findFeedByFeedId(Long feedId) {
@@ -65,6 +67,7 @@ public class CommentService {
                 .parent(parent)
                 .build();
         commentRepository.save(comment);
+        notificationService.sendFeedNotification(feed, request.content());
     }
 
     public void updateComment(StudentInfo studentInfo, Long feedId, Long commentId,
