@@ -3,10 +3,7 @@ package com.team.buddyya.chatting.controller;
 import com.team.buddyya.auth.domain.CustomUserDetails;
 import com.team.buddyya.chatting.dto.request.ChatImageRequest;
 import com.team.buddyya.chatting.dto.request.CreateChatroomRequest;
-import com.team.buddyya.chatting.dto.response.ChatMessageListResponse;
-import com.team.buddyya.chatting.dto.response.ChatroomResponse;
-import com.team.buddyya.chatting.dto.response.CreateChatroomResponse;
-import com.team.buddyya.chatting.dto.response.LeaveChatroomResponse;
+import com.team.buddyya.chatting.dto.response.*;
 import com.team.buddyya.chatting.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -20,7 +17,7 @@ import java.util.List;
 import static org.springframework.data.domain.Sort.Direction;
 
 @RestController
-@RequestMapping("/chatrooms")
+@RequestMapping("/rooms")
 @RequiredArgsConstructor
 public class ChatController {
 
@@ -41,6 +38,12 @@ public class ChatController {
     }
 
     @GetMapping("/{roomId}")
+    public ResponseEntity<ChatroomDetailResponse> getChatRoom(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                              @PathVariable("roomId") Long roomId) {
+        return ResponseEntity.ok(chatService.getChatroom(userDetails.getStudentInfo(), roomId));
+    }
+
+    @GetMapping("/{roomId}/chats")
     public ResponseEntity<ChatMessageListResponse> getChatMessages(
             @PathVariable("roomId") Long chatroomId,
             @AuthenticationPrincipal CustomUserDetails userDetails,
