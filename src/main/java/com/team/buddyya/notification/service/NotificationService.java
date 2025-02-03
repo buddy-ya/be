@@ -118,13 +118,35 @@ public class NotificationService {
     }
 
     private String getTitle(boolean isKorean, boolean isSuccess) {
-        return isSuccess ? (isKorean ? AUTH_SUCCESS_TITLE_KR : AUTH_SUCCESS_TITLE_EN)
-                : (isKorean ? AUTH_FAIL_TITLE_KR : AUTH_FAIL_TITLE_EN);
+        if (isSuccess) {
+            if (isKorean) {
+                return AUTH_SUCCESS_TITLE_KR;
+            } else {
+                return AUTH_SUCCESS_TITLE_EN;
+            }
+        } else {
+            if (isKorean) {
+                return AUTH_FAIL_TITLE_KR;
+            } else {
+                return AUTH_FAIL_TITLE_EN;
+            }
+        }
     }
 
     private String getBody(boolean isKorean, boolean isSuccess) {
-        return isSuccess ? (isKorean ? AUTH_SUCCESS_BODY_KR : AUTH_SUCCESS_BODY_EN)
-                : (isKorean ? AUTH_FAIL_BODY_KR : AUTH_FAIL_BODY_EN);
+        if (isSuccess) {
+            if (isKorean) {
+                return AUTH_SUCCESS_BODY_KR;
+            } else {
+                return AUTH_SUCCESS_BODY_EN;
+            }
+        } else {
+            if (isKorean) {
+                return AUTH_FAIL_BODY_KR;
+            } else {
+                return AUTH_FAIL_BODY_EN;
+            }
+        }
     }
 
     private void sendToExpo(RequestNotification notification) {
