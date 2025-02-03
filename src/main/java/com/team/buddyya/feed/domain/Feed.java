@@ -80,6 +80,7 @@ public class Feed extends BaseTime {
         this.university = university;
         this.likeCount = 0;
         this.commentCount = 0;
+        this.viewCount = 0;
     }
 
     public void updateFeed(String title, String content, Category category) {

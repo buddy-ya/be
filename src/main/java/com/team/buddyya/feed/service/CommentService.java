@@ -89,9 +89,9 @@ public class CommentService {
         if (hasChild) {
             comment.updateIsDeleted(true);
             commentRepository.save(comment);
-        } else {
-            commentRepository.delete(comment);
+            return;
         }
+        commentRepository.delete(comment);
     }
 
     private void validateCommentOwner(Long studentId, Comment comment) {
