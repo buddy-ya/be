@@ -3,6 +3,7 @@ package com.team.buddyya.feed.dto.response.feed;
 import com.team.buddyya.feed.domain.Feed;
 import com.team.buddyya.feed.domain.FeedImage;
 import com.team.buddyya.feed.domain.FeedUserAction;
+import com.team.buddyya.student.domain.UserProfileDefaultImage;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -18,13 +19,19 @@ public record FeedResponse(
         List<String> imageUrls,
         int likeCount,
         int commentCount,
+        int viewCount,
         boolean isFeedOwner,
         boolean isLiked,
         boolean isBookmarked,
+        boolean isProfileImageUpload,
+        boolean isDefaultProfile,
         LocalDateTime createdDate
 ) {
 
     public static FeedResponse from(Feed feed, FeedUserAction userAction) {
+        boolean isProfileImageUpload = UserProfileDefaultImage.isProfileImageUpload(feed.getStudent());
+        boolean isDefaultProfile = UserProfileDefaultImage.isDefaultUserProfileImage(feed.getStudent());
+
         return new FeedResponse(
                 feed.getId(),
                 feed.getStudent().getId(),
@@ -33,15 +40,18 @@ public record FeedResponse(
                 feed.getTitle(),
                 feed.getContent(),
                 feed.getStudent().getUniversity().getUniversityName(),
-                feed.getStudent().getProfileImage().getUrl(),
+                feed.getStudent().getCharacterProfileImage(),
                 feed.getImages().stream()
                         .map(FeedImage::getUrl)
                         .toList(),
                 feed.getLikeCount(),
                 feed.getCommentCount(),
+                feed.getViewCount(),
                 userAction.isFeedOwner(),
                 userAction.isLiked(),
                 userAction.isBookmarked(),
+                isProfileImageUpload,
+                isDefaultProfile,
                 feed.getCreatedDate()
         );
     }

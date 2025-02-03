@@ -14,8 +14,8 @@ import com.team.buddyya.feed.dto.response.feed.FeedResponse;
 import com.team.buddyya.feed.exception.FeedException;
 import com.team.buddyya.feed.exception.FeedExceptionType;
 import com.team.buddyya.feed.respository.BookmarkRepository;
+import com.team.buddyya.feed.respository.FeedLikeRepository;
 import com.team.buddyya.feed.respository.FeedRepository;
-import com.team.buddyya.feed.respository.LikeRepository;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.service.FindStudentService;
 import java.util.List;
@@ -38,7 +38,7 @@ public class FeedService {
     private final CategoryService categoryService;
     private final FeedRepository feedRepository;
     private final FindStudentService findStudentService;
-    private final LikeRepository likeRepository;
+    private final FeedLikeRepository feedLikeRepository;
     private final BookmarkRepository bookmarkRepository;
     private final FeedImageService feedImageService;
 
@@ -73,6 +73,7 @@ public class FeedService {
     @Transactional(readOnly = true)
     public FeedResponse getFeed(StudentInfo studentInfo, Long feedId) {
         Feed feed = findFeedByFeedId(feedId);
+        feed.increaseViewCount();
         return createFeedResponse(feed, studentInfo.id());
     }
 
@@ -129,7 +130,7 @@ public class FeedService {
     @Transactional(readOnly = true)
     FeedUserAction getUserAction(Student student, Feed feed) {
         boolean isFeedOwner = student.getId().equals(feed.getStudent().getId());
-        boolean isLiked = likeRepository.existsByStudentAndFeed(student, feed);
+        boolean isLiked = feedLikeRepository.existsByStudentAndFeed(student, feed);
         boolean isBookmarked = bookmarkRepository.existsByStudentAndFeed(student, feed);
         return FeedUserAction.from(isFeedOwner, isLiked, isBookmarked);
     }
