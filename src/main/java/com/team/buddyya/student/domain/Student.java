@@ -4,14 +4,15 @@ import com.team.buddyya.auth.domain.AuthToken;
 import com.team.buddyya.certification.domain.StudentIdCard;
 import com.team.buddyya.chatting.domain.ChatroomStudent;
 import com.team.buddyya.common.domain.BaseTime;
+import com.team.buddyya.notification.domain.ExpoToken;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import static com.team.buddyya.student.domain.UserProfileDefaultImage.USER_PROFILE_DEFAULT_IMAGE;
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
@@ -83,12 +84,15 @@ public class Student extends BaseTime {
     @OneToOne(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private StudentIdCard studentIdCard;
 
+    @OneToOne(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private ExpoToken expoToken;
+
     @OneToMany(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<ChatroomStudent> chatroomStudents;
 
     @Builder
     public Student(String name, String phoneNumber, String country, Boolean isKorean, Role role, University university,
-                   Gender gender) {
+                   Gender gender,String characterProfileImage) {
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.country = country;
@@ -96,9 +100,12 @@ public class Student extends BaseTime {
         this.role = role;
         this.university = university;
         this.gender = gender;
+        this.majors =  new ArrayList<>();
+        this.languages = new ArrayList<>();
+        this.interests = new ArrayList<>();
         this.isCertificated = false;
         this.studentNumber = null;
-        this.characterProfileImage = USER_PROFILE_DEFAULT_IMAGE.getUrl();
+        this.characterProfileImage = characterProfileImage;
     }
 
     public void updateIsCertificated(boolean isCertificated) {

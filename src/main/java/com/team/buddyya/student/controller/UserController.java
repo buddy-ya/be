@@ -5,11 +5,8 @@ import com.team.buddyya.feed.dto.response.feed.FeedListResponse;
 import com.team.buddyya.feed.service.FeedService;
 import com.team.buddyya.student.dto.request.MyPageUpdateRequest;
 import com.team.buddyya.student.dto.request.OnBoardingRequest;
+import com.team.buddyya.student.dto.response.UserResponse;
 import com.team.buddyya.student.dto.request.UpdateProfileImageRequest;
-import com.team.buddyya.student.dto.response.MyPageUpdateResponse;
-import com.team.buddyya.student.dto.response.OnBoardingResponse;
-import com.team.buddyya.student.dto.response.UserProfileResponse;
-import com.team.buddyya.student.service.MyPageService;
 import com.team.buddyya.student.service.OnBoardingService;
 import com.team.buddyya.student.service.StudentService;
 import lombok.RequiredArgsConstructor;
@@ -27,36 +24,35 @@ public class UserController {
 
     private final OnBoardingService onBoardingService;
     private final StudentService studentService;
-    private final MyPageService myPageService;
     private final FeedService feedService;
 
     @PostMapping
-    public ResponseEntity<OnBoardingResponse> onboard(@RequestBody OnBoardingRequest request) {
-        OnBoardingResponse response = onBoardingService.onboard(request);
+    public ResponseEntity<UserResponse> onboard(@RequestBody OnBoardingRequest request) {
+        UserResponse response = onBoardingService.onboard(request);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<UserProfileResponse> getMyProfile(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                                            @PathVariable("userId") Long userId) {
-        return ResponseEntity.ok(myPageService.getUserProfile(userDetails.getStudentInfo(), userId));
+    public ResponseEntity<UserResponse> getMyProfile(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                     @PathVariable("userId") Long userId) {
+        return ResponseEntity.ok(studentService.getUserInfo(userDetails.getStudentInfo(), userId));
     }
 
     @PatchMapping
-    public ResponseEntity<MyPageUpdateResponse> updateUser(
+    public ResponseEntity<UserResponse> updateUser(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody MyPageUpdateRequest request) {
-        MyPageUpdateResponse response = myPageService.updateUser(userDetails.getStudentInfo(), request);
+        UserResponse response = studentService.updateUser(userDetails.getStudentInfo(), request);
         return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/profile-image")
-    public ResponseEntity<MyPageUpdateResponse> updateProfileDefaultImage(
+    public ResponseEntity<UserResponse> updateProfileDefaultImage(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam("isDefault") boolean isDefault,
             @ModelAttribute UpdateProfileImageRequest request) {
         return ResponseEntity.ok(
-                myPageService.updateUserProfileImage(userDetails.getStudentInfo(), isDefault, request));
+                studentService.updateUserProfileImage(userDetails.getStudentInfo(), isDefault, request));
     }
 
     @GetMapping("/myfeed")

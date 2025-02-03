@@ -28,8 +28,8 @@ public enum UserProfileDefaultImage {
 
     public static String getChatroomProfileImage(Student student) {
         if (isDefaultUserProfileImage(student)) {
-            return student.getProfileImage().getUrl();
+            return student.getCharacterProfileImage();
         }
-        return student.getCharacterProfileImage();
+        return student.getProfileImage().getUrl();
     }
 }
