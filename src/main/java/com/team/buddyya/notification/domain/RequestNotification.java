@@ -6,7 +6,7 @@ public class RequestNotification {
     private String to;
     private String title;
     private String body;
-    private Map<String, Object> data;  // data 추가
+    private Map<String, Object> data;
 
     public RequestNotification(String to, String title, String body, Map<String, Object> data) {
         this.to = to;

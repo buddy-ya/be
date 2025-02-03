@@ -11,12 +11,14 @@ import com.team.buddyya.notification.repository.ExpoTokenRepository;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.service.FindStudentService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
@@ -24,6 +26,7 @@ import java.util.Map;
 
 @Service
 @Transactional
+@Slf4j
 @RequiredArgsConstructor
 public class NotificationService {
 
@@ -75,59 +78,67 @@ public class NotificationService {
     }
 
     public void sendFeedNotification(Feed feed, String commentContent) {
-        Student recipient = feed.getStudent();
-        String token = getTokenByUserId(recipient.getId());
+        try {
+            Student recipient = feed.getStudent();
+            String token = getTokenByUserId(recipient.getId());
+            Map<String, Object> data = Map.of(
+                    "feedId", feed.getId(),
+                    "type", "FEED"
+            );
+            boolean isKorean = recipient.getIsKorean();
+            String title = getFeedNotificationTitle(isKorean);
+            RequestNotification notification = new RequestNotification(token, title, commentContent, data);
+            sendToExpo(notification);
+        } catch (NotificationException e) {
+            log.warn("피드 알림 전송 실패: {}", e.exceptionType().errorMessage());
+        }
+    }
 
-        Map<String, Object> data = new HashMap<>();
-        data.put("feedId", feed.getId());
-        data.put("type", "FEED");
-
-        String title = recipient.getIsKorean() ? FEED_TITLE_KR : FEED_TITLE_EN;
-
-        RequestNotification notification = new RequestNotification(
-                token,
-                title,
-                commentContent,
-                data
-        );
-
-        sendToExpo(notification);
+    private String getFeedNotificationTitle(boolean isKorean) {
+        return isKorean ? FEED_TITLE_KR : FEED_TITLE_EN;
     }
 
     public void sendAuthorizationNotification(Student student, boolean isSuccess) {
-        String token = getTokenByUserId(student.getId());
-
-        Map<String, Object> data = new HashMap<>();
-        data.put("type", "AUTHORIZATION");
-
-        RequestNotification notification;
-        if (isSuccess) {
-            String title = student.getIsKorean() ? AUTH_SUCCESS_TITLE_KR : AUTH_SUCCESS_TITLE_EN;
-            String body = student.getIsKorean() ? AUTH_SUCCESS_BODY_KR : AUTH_SUCCESS_BODY_EN;
-            notification = new RequestNotification(token, title, body, data);
-        } else {
-            String title = student.getIsKorean() ? AUTH_FAIL_TITLE_KR : AUTH_FAIL_TITLE_EN;
-            String body = student.getIsKorean() ? AUTH_FAIL_BODY_KR : AUTH_FAIL_BODY_EN;
-            notification = new RequestNotification(token, title, body, data);
+        try {
+            String token = getTokenByUserId(student.getId());
+            Map<String, Object> data = new HashMap<>();
+            data.put("type", "AUTHORIZATION");
+            boolean isKorean = student.getIsKorean();
+            RequestNotification notification = createAuthorizationNotification(isKorean, isSuccess, token, data);
+            sendToExpo(notification);
+        } catch (NotificationException e) {
+            log.warn("학생 인증 알림 전송 실패: {}", e.exceptionType().errorMessage());
         }
+    }
 
-        sendToExpo(notification);
+    private RequestNotification createAuthorizationNotification(boolean isKorean, boolean isSuccess, String token, Map<String, Object> data) {
+        String title = getTitle(isKorean, isSuccess);
+        String body = getBody(isKorean, isSuccess);
+        return new RequestNotification(token, title, body, data);
+    }
+
+    private String getTitle(boolean isKorean, boolean isSuccess) {
+        return isSuccess ? (isKorean ? AUTH_SUCCESS_TITLE_KR : AUTH_SUCCESS_TITLE_EN)
+                : (isKorean ? AUTH_FAIL_TITLE_KR : AUTH_FAIL_TITLE_EN);
+    }
+
+    private String getBody(boolean isKorean, boolean isSuccess) {
+        return isSuccess ? (isKorean ? AUTH_SUCCESS_BODY_KR : AUTH_SUCCESS_BODY_EN)
+                : (isKorean ? AUTH_FAIL_BODY_KR : AUTH_FAIL_BODY_EN);
     }
 
     private void sendToExpo(RequestNotification notification) {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(org.springframework.http.MediaType.APPLICATION_JSON);
-
             String payload = objectMapper.writeValueAsString(notification);
             HttpEntity<String> request = new HttpEntity<>(payload, headers);
-
-            ResponseEntity<String> response = restTemplate.postForEntity(expoApiUrl, request, String.class);
-
-            if (!response.getStatusCode().is2xxSuccessful()) {
-                throw new NotificationException(NotificationExceptionType.NOTIFICATION_SEND_FAILED);
-            }
+            restTemplate.postForEntity(expoApiUrl, request, String.class);
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
+            log.error("알림 전송 실패 (HTTP 에러): {}", e.getMessage());
+            throw new NotificationException(NotificationExceptionType.NOTIFICATION_SEND_FAILED);
         } catch (Exception e) {
+            log.error("알림 전송 실패 (알 수 없는 오류): {}", e.getMessage());
             throw new NotificationException(NotificationExceptionType.NOTIFICATION_SEND_FAILED);
         }
     }
