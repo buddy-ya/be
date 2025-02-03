@@ -3,6 +3,7 @@ package com.team.buddyya.notification.domain;
 import java.util.Map;
 
 public class RequestNotification {
+
     private String to;
     private String title;
     private String body;
