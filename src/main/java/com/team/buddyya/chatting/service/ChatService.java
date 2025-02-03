@@ -156,7 +156,7 @@ public class ChatService {
     }
 
     @Transactional(readOnly = true)
-    public List<ChatroomsResponse> getChatRooms(StudentInfo studentInfo) {
+    public List<ChatroomResponse> getChatRooms(StudentInfo studentInfo) {
         Student student = findStudentService.findByStudentId(studentInfo.id());
         return student.getChatroomStudents().stream()
                 .filter(chatroomStudent -> !chatroomStudent.getIsExited())
@@ -167,7 +167,7 @@ public class ChatService {
     }
 
     @Transactional(readOnly = true)
-    public ChatroomResponse getChatroom(StudentInfo studentInfo, Long roomId) {
+    public ChatroomDetailResponse getChatroom(StudentInfo studentInfo, Long roomId) {
         Student student = findStudentService.findByStudentId(studentInfo.id());
         Chatroom chatroom = chatRoomRepository.findById(roomId)
                 .orElseThrow(() -> new ChatException(ChatExceptionType.CHATROOM_NOT_FOUND));
@@ -175,26 +175,26 @@ public class ChatService {
                 .orElseThrow(() -> new ChatException(ChatExceptionType.USER_NOT_PART_OF_CHATROOM));
         Student buddy = getBuddyFromChatroom(student, chatroom);
         if (buddy == null) {
-            return ChatroomResponse.from(roomId, null, null, true);
+            return ChatroomDetailResponse.from(roomId, null, null, null, true);
         }
         boolean isBuddyExited = chatroom.getChatroomStudents().stream()
                 .filter(cs -> !cs.getStudent().getId().equals(student.getId()))
                 .anyMatch(ChatroomStudent::getIsExited);
         String buddyProfileImage = getChatroomProfileImage(buddy);
-        return ChatroomResponse.from(roomId, buddy.getName(), buddyProfileImage, isBuddyExited);
+        return ChatroomDetailResponse.from(roomId, buddy.getName(), buddyProfileImage, buddy.getIsKorean(), isBuddyExited);
     }
 
-    private ChatroomsResponse createChatroomResponse(ChatroomStudent chatroomStudent) {
+    private ChatroomResponse createChatroomResponse(ChatroomStudent chatroomStudent) {
         Chatroom chatroom = chatroomStudent.getChatroom();
         Student buddy = getBuddyFromChatroom(chatroomStudent.getStudent(), chatroom);
         if (buddy == null) {
-            return ChatroomsResponse.from(chatroom, null, chatroomStudent, null, true);
+            return ChatroomResponse.from(chatroom, null, chatroomStudent, null, true);
         }
         boolean isBuddyExited = chatroom.getChatroomStudents().stream()
                 .filter(cs -> !cs.getStudent().getId().equals(chatroomStudent.getStudent().getId()))
                 .anyMatch(ChatroomStudent::getIsExited);
         String buddyProfileImage = getChatroomProfileImage(buddy);
-        return ChatroomsResponse.from(chatroom, buddy.getName(), chatroomStudent, buddyProfileImage, isBuddyExited);
+        return ChatroomResponse.from(chatroom, buddy.getName(), chatroomStudent, buddyProfileImage, isBuddyExited);
     }
 
     private Student getBuddyFromChatroom(Student student, Chatroom chatroom) {

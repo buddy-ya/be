@@ -33,13 +33,13 @@ public class ChatController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ChatroomsResponse>> getChatRooms(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<List<ChatroomResponse>> getChatRooms(@AuthenticationPrincipal CustomUserDetails userDetails) {
         return ResponseEntity.ok(chatService.getChatRooms(userDetails.getStudentInfo()));
     }
 
     @GetMapping("/{roomId}")
-    public ResponseEntity<ChatroomResponse> getChatRoom(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                                        @PathVariable("roomId") Long roomId) {
+    public ResponseEntity<ChatroomDetailResponse> getChatRoom(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                              @PathVariable("roomId") Long roomId) {
         return ResponseEntity.ok(chatService.getChatroom(userDetails.getStudentInfo(), roomId));
     }
 
