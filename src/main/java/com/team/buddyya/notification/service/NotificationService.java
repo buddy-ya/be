@@ -119,35 +119,34 @@ public class NotificationService {
 
     private String getTitle(boolean isKorean, boolean isSuccess) {
         if (isSuccess) {
-            if (isKorean) {
-                return AUTH_SUCCESS_TITLE_KR;
-            } else {
-                return AUTH_SUCCESS_TITLE_EN;
-            }
-        } else {
-            if (isKorean) {
-                return AUTH_FAIL_TITLE_KR;
-            } else {
-                return AUTH_FAIL_TITLE_EN;
-            }
+            return getSuccessTitle(isKorean);
         }
+        return getFailTitle(isKorean);
     }
 
     private String getBody(boolean isKorean, boolean isSuccess) {
         if (isSuccess) {
-            if (isKorean) {
-                return AUTH_SUCCESS_BODY_KR;
-            } else {
-                return AUTH_SUCCESS_BODY_EN;
-            }
-        } else {
-            if (isKorean) {
-                return AUTH_FAIL_BODY_KR;
-            } else {
-                return AUTH_FAIL_BODY_EN;
-            }
+            return getSuccessBody(isKorean);
         }
+        return getFailBody(isKorean);
     }
+
+    private String getSuccessTitle(boolean isKorean) {
+        return isKorean ? AUTH_SUCCESS_TITLE_KR : AUTH_SUCCESS_TITLE_EN;
+    }
+
+    private String getFailTitle(boolean isKorean) {
+        return isKorean ? AUTH_FAIL_TITLE_KR : AUTH_FAIL_TITLE_EN;
+    }
+
+    private String getSuccessBody(boolean isKorean) {
+        return isKorean ? AUTH_SUCCESS_BODY_KR : AUTH_SUCCESS_BODY_EN;
+    }
+
+    private String getFailBody(boolean isKorean) {
+        return isKorean ? AUTH_FAIL_BODY_KR : AUTH_FAIL_BODY_EN;
+    }
+
 
     private void sendToExpo(RequestNotification notification) {
         try {
