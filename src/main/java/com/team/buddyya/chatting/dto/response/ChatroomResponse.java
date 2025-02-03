@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 public record ChatroomResponse(
         Long id,
         String name,
+        String country,
         int unreadCount,
         String profileImageUrl,
         String lastMessage,
@@ -15,7 +16,7 @@ public record ChatroomResponse(
         boolean isBuddyExited
 ) {
 
-    public static ChatroomResponse from(Chatroom chatroom, String name, ChatroomStudent chatroomStudent, String buddyProfileImage, boolean isBuddyLeave) {
-        return new ChatroomResponse(chatroom.getId(), name, chatroomStudent.getUnreadCount(), buddyProfileImage, chatroom.getLastMessage(), chatroom.getLastMessageTime(), isBuddyLeave);
+    public static ChatroomResponse from(Chatroom chatroom, String name, String country, ChatroomStudent chatroomStudent, String buddyProfileImage, boolean isBuddyLeave) {
+        return new ChatroomResponse(chatroom.getId(), name, country, chatroomStudent.getUnreadCount(), buddyProfileImage, chatroom.getLastMessage(), chatroom.getLastMessageTime(), isBuddyLeave);
     }
 }

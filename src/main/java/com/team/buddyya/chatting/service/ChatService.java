@@ -181,20 +181,20 @@ public class ChatService {
                 .filter(cs -> !cs.getStudent().getId().equals(student.getId()))
                 .anyMatch(ChatroomStudent::getIsExited);
         String buddyProfileImage = getChatroomProfileImage(buddy);
-        return ChatroomDetailResponse.from(roomId, buddy.getName(), buddyProfileImage, buddy.getIsKorean(), isBuddyExited);
+        return ChatroomDetailResponse.from(roomId, buddy.getName(), buddy.getCountry(), buddyProfileImage, isBuddyExited);
     }
 
     private ChatroomResponse createChatroomResponse(ChatroomStudent chatroomStudent) {
         Chatroom chatroom = chatroomStudent.getChatroom();
         Student buddy = getBuddyFromChatroom(chatroomStudent.getStudent(), chatroom);
         if (buddy == null) {
-            return ChatroomResponse.from(chatroom, null, chatroomStudent, null, true);
+            return ChatroomResponse.from(chatroom, null, null, chatroomStudent, null, true);
         }
         boolean isBuddyExited = chatroom.getChatroomStudents().stream()
                 .filter(cs -> !cs.getStudent().getId().equals(chatroomStudent.getStudent().getId()))
                 .anyMatch(ChatroomStudent::getIsExited);
         String buddyProfileImage = getChatroomProfileImage(buddy);
-        return ChatroomResponse.from(chatroom, buddy.getName(), chatroomStudent, buddyProfileImage, isBuddyExited);
+        return ChatroomResponse.from(chatroom, buddy.getName(), buddy.getCountry(), chatroomStudent, buddyProfileImage, isBuddyExited);
     }
 
     private Student getBuddyFromChatroom(Student student, Chatroom chatroom) {
