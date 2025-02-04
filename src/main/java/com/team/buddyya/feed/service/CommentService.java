@@ -8,8 +8,9 @@ import com.team.buddyya.feed.dto.request.comment.CommentUpdateRequest;
 import com.team.buddyya.feed.dto.response.comment.CommentResponse;
 import com.team.buddyya.feed.exception.FeedException;
 import com.team.buddyya.feed.exception.FeedExceptionType;
-import com.team.buddyya.feed.respository.CommentRepository;
-import com.team.buddyya.feed.respository.FeedRepository;
+import com.team.buddyya.feed.repository.CommentLikeRepository;
+import com.team.buddyya.feed.repository.CommentRepository;
+import com.team.buddyya.feed.repository.FeedRepository;
 import com.team.buddyya.notification.service.NotificationService;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.service.FindStudentService;
@@ -25,6 +26,7 @@ public class CommentService {
 
     private final FeedRepository feedRepository;
     private final CommentRepository commentRepository;
+    private final CommentLikeRepository commentLikeRepository;
     private final FindStudentService findStudentService;
     private final NotificationService notificationService;
 
@@ -46,7 +48,7 @@ public class CommentService {
                 .filter(comment -> comment.getParent() == null)
                 .toList();
         return comments.stream()
-                .map(comment -> CommentResponse.from(comment, feedId, studentInfo.id()))
+                .map(comment -> CommentResponse.from(comment, feedId, studentInfo.id(), commentLikeRepository))
                 .toList();
     }
 

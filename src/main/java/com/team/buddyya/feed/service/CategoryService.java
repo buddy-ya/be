@@ -3,7 +3,7 @@ package com.team.buddyya.feed.service;
 import com.team.buddyya.feed.domain.Category;
 import com.team.buddyya.feed.exception.FeedException;
 import com.team.buddyya.feed.exception.FeedExceptionType;
-import com.team.buddyya.feed.respository.CategoryRepository;
+import com.team.buddyya.feed.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
