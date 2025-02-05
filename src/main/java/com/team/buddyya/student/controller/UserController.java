@@ -3,8 +3,10 @@ package com.team.buddyya.student.controller;
 import com.team.buddyya.auth.domain.CustomUserDetails;
 import com.team.buddyya.feed.dto.response.feed.FeedListResponse;
 import com.team.buddyya.feed.service.FeedService;
+import com.team.buddyya.student.dto.request.BlockRequest;
 import com.team.buddyya.student.dto.request.MyPageUpdateRequest;
 import com.team.buddyya.student.dto.request.OnBoardingRequest;
+import com.team.buddyya.student.dto.response.BlockResponse;
 import com.team.buddyya.student.dto.response.UserResponse;
 import com.team.buddyya.student.dto.request.UpdateProfileImageRequest;
 import com.team.buddyya.student.service.OnBoardingService;
@@ -70,5 +72,12 @@ public class UserController {
     @DeleteMapping
     public void deleteStudent(@AuthenticationPrincipal CustomUserDetails userDetails) {
         studentService.deleteStudent(userDetails.getStudentInfo());
+    }
+
+    @PostMapping("/block")
+    public ResponseEntity<BlockResponse> blockStudent(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                      @RequestBody BlockRequest request) {
+        BlockResponse response = studentService.blockStudent(userDetails.getStudentInfo().id(), request.blockedStudentId());
+        return ResponseEntity.ok(response);
     }
 }
