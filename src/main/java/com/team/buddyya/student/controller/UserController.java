@@ -74,10 +74,10 @@ public class UserController {
         studentService.deleteStudent(userDetails.getStudentInfo());
     }
 
-    @PostMapping("/block")
+    @PostMapping("/block/{userId}")
     public ResponseEntity<BlockResponse> blockStudent(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                                      @RequestBody BlockRequest request) {
-        BlockResponse response = studentService.blockStudent(userDetails.getStudentInfo().id(), request.blockedStudentId());
+                                                      @PathVariable("userId") Long userId) {
+        BlockResponse response = studentService.blockStudent(userDetails.getStudentInfo().id(), userId);
         return ResponseEntity.ok(response);
     }
 }
