@@ -7,9 +7,11 @@ import com.team.buddyya.student.domain.*;
 import com.team.buddyya.student.dto.request.MyPageUpdateRequest;
 import com.team.buddyya.student.dto.request.OnBoardingRequest;
 import com.team.buddyya.student.dto.request.UpdateProfileImageRequest;
+import com.team.buddyya.student.dto.response.BlockResponse;
 import com.team.buddyya.student.dto.response.UserResponse;
 import com.team.buddyya.student.exception.StudentException;
 import com.team.buddyya.student.exception.StudentExceptionType;
+import com.team.buddyya.student.repository.BlockRepository;
 import com.team.buddyya.student.repository.StudentRepository;
 import com.team.buddyya.student.repository.UniversityRepository;
 import java.util.UUID;
@@ -33,6 +35,9 @@ public class StudentService {
     private final S3UploadService s3UploadService;
     private final UniversityRepository universityRepository;
     private final StudentIdCardRepository studentIdCardRepository;
+    private final BlockRepository blockRepository;
+
+    private static final String BLOCK_SUCCESS_MESSAGE= "차단이 성공적으로 완료되었습니다.";
 
     public Student createStudent(OnBoardingRequest request) {
         University university = universityRepository.findByUniversityName(request.university())
@@ -127,5 +132,19 @@ public class StudentService {
         student.updatePhoneNumber(randomPhoneNumber);
         student.updateEmail(randomEmail);
         student.updateIsCertificated(false);
+    }
+
+    public BlockResponse blockStudent(Long blockerId, Long blockedId) {
+        if (blockerId.equals(blockedId)) {
+            throw new StudentException(StudentExceptionType.CANNOT_BLOCK_SELF);
+        }
+        Student blocker = findStudentService.findByStudentId(blockedId);
+        Student blocked = findStudentService.findByStudentId(blockedId);
+        if (blockRepository.existsByStudentAndBlockedStudentId(blocker, blockedId)) {
+            throw new StudentException(StudentExceptionType.ALREADY_BLOCKED);
+        }
+        blockRepository.save(Block.builder().student(blocker).blockedStudentId(blockedId).build());
+        blockRepository.save(Block.builder().student(blocked).blockedStudentId(blockerId).build());
+        return BlockResponse.from(BLOCK_SUCCESS_MESSAGE);
     }
 }
