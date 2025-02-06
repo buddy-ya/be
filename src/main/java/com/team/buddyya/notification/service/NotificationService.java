@@ -87,8 +87,12 @@ public class NotificationService {
             );
             boolean isKorean = recipient.getIsKorean();
             String title = getFeedNotificationTitle(isKorean);
-            RequestNotification notification = new RequestNotification(token, title, commentContent, data);
-            sendToExpo(notification);
+            sendToExpo(RequestNotification.builder()
+                    .to(token)
+                    .title(title)
+                    .body(commentContent)
+                    .data(data).build()
+            );
         } catch (NotificationException e) {
             log.warn("피드 알림 전송 실패: {}", e.exceptionType().errorMessage());
         }
@@ -115,7 +119,12 @@ public class NotificationService {
     private RequestNotification createAuthorizationNotification(boolean isKorean, boolean isSuccess, String token, Map<String, Object> data) {
         String title = getTitle(isKorean, isSuccess);
         String body = getBody(isKorean, isSuccess);
-        return new RequestNotification(token, title, body, data);
+        return RequestNotification.builder()
+                .to(token)
+                .title(title)
+                .body(body)
+                .data(data)
+                .build();
     }
 
     private String getTitle(boolean isKorean, boolean isSuccess) {
