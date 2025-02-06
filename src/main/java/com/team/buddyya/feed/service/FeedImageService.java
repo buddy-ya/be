@@ -6,7 +6,7 @@ import com.team.buddyya.common.domain.S3DirectoryName;
 import com.team.buddyya.common.service.S3UploadService;
 import com.team.buddyya.feed.domain.Feed;
 import com.team.buddyya.feed.domain.FeedImage;
-import com.team.buddyya.feed.respository.FeedImageRepository;
+import com.team.buddyya.feed.repository.FeedImageRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

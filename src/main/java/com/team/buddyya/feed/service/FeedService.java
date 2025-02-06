@@ -13,9 +13,9 @@ import com.team.buddyya.feed.dto.response.feed.FeedListResponse;
 import com.team.buddyya.feed.dto.response.feed.FeedResponse;
 import com.team.buddyya.feed.exception.FeedException;
 import com.team.buddyya.feed.exception.FeedExceptionType;
-import com.team.buddyya.feed.respository.BookmarkRepository;
-import com.team.buddyya.feed.respository.FeedLikeRepository;
-import com.team.buddyya.feed.respository.FeedRepository;
+import com.team.buddyya.feed.repository.BookmarkRepository;
+import com.team.buddyya.feed.repository.FeedLikeRepository;
+import com.team.buddyya.feed.repository.FeedRepository;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.service.FindStudentService;
 import java.util.List;
@@ -68,13 +68,6 @@ public class FeedService {
                 .map(feed -> createFeedResponse(feed, studentInfo.id()))
                 .toList();
         return FeedListResponse.from(response, feeds);
-    }
-
-    @Transactional(readOnly = true)
-    public FeedResponse getFeed(StudentInfo studentInfo, Long feedId) {
-        Feed feed = findFeedByFeedId(feedId);
-        feed.increaseViewCount();
-        return createFeedResponse(feed, studentInfo.id());
     }
 
     @Transactional(readOnly = true)
@@ -133,6 +126,12 @@ public class FeedService {
         boolean isLiked = feedLikeRepository.existsByStudentAndFeed(student, feed);
         boolean isBookmarked = bookmarkRepository.existsByStudentAndFeed(student, feed);
         return FeedUserAction.from(isFeedOwner, isLiked, isBookmarked);
+    }
+
+    public FeedResponse getFeed(StudentInfo studentInfo, Long feedId) {
+        Feed feed = findFeedByFeedId(feedId);
+        feed.increaseViewCount();
+        return createFeedResponse(feed, studentInfo.id());
     }
 
     public void createFeed(StudentInfo studentInfo, FeedCreateRequest request) {

@@ -103,6 +103,7 @@ public class NotificationService {
             String token = getTokenByUserId(student.getId());
             Map<String, Object> data = new HashMap<>();
             data.put("type", "AUTHORIZATION");
+            data.put("isCertificated", isSuccess);
             boolean isKorean = student.getIsKorean();
             RequestNotification notification = createAuthorizationNotification(isKorean, isSuccess, token, data);
             sendToExpo(notification);

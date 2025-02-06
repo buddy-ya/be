@@ -1,4 +1,4 @@
-package com.team.buddyya.feed.respository;
+package com.team.buddyya.feed.repository;
 
 import com.team.buddyya.feed.domain.Bookmark;
 import com.team.buddyya.feed.domain.Feed;
