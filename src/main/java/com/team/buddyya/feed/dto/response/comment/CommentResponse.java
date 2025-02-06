@@ -1,6 +1,7 @@
 package com.team.buddyya.feed.dto.response.comment;
 
 import com.team.buddyya.feed.domain.Comment;
+import com.team.buddyya.feed.repository.CommentLikeRepository;
 import com.team.buddyya.student.domain.UserProfileDefaultImage;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,18 +17,21 @@ public record CommentResponse(
         int likeCount,
         LocalDateTime createdDate,
         boolean isDeleted,
+        boolean isLiked,
         boolean isFeedOwner,
         boolean isCommentOwner,
         boolean isProfileImageUpload,
         List<CommentResponse> replies
 ) {
 
-    public static CommentResponse from(Comment comment, Long feedOwnerId, Long currentUserId) {
+    public static CommentResponse from(Comment comment, Long feedOwnerId, Long currentUserId,
+                                       CommentLikeRepository commentLikeRepository) {
         boolean isFeedOwner = feedOwnerId.equals(comment.getStudent().getId());
         boolean isCommentOwner = currentUserId.equals(comment.getStudent().getId());
         boolean isProfileImageUpload = UserProfileDefaultImage.isProfileImageUpload(comment.getStudent());
+        boolean isLiked = commentLikeRepository.existsByCommentAndStudentId(comment, currentUserId);
         List<CommentResponse> replies = comment.getChildren().stream()
-                .map(reply -> CommentResponse.from(reply, feedOwnerId, currentUserId))
+                .map(reply -> CommentResponse.from(reply, feedOwnerId, currentUserId, commentLikeRepository))
                 .toList();
         return new CommentResponse(
                 comment.getId(),
@@ -40,6 +44,7 @@ public record CommentResponse(
                 comment.getLikeCount(),
                 comment.getCreatedDate(),
                 comment.isDeleted(),
+                isLiked,
                 isFeedOwner,
                 isCommentOwner,
                 isProfileImageUpload,

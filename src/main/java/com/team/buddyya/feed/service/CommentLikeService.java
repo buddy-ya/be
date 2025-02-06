@@ -6,8 +6,8 @@ import com.team.buddyya.feed.domain.CommentLike;
 import com.team.buddyya.feed.dto.response.LikeResponse;
 import com.team.buddyya.feed.exception.FeedException;
 import com.team.buddyya.feed.exception.FeedExceptionType;
-import com.team.buddyya.feed.respository.CommentLikeRepository;
-import com.team.buddyya.feed.respository.CommentRepository;
+import com.team.buddyya.feed.repository.CommentLikeRepository;
+import com.team.buddyya.feed.repository.CommentRepository;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.service.FindStudentService;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +24,8 @@ public class CommentLikeService {
     private final FindStudentService findStudentService;
 
     @Transactional(readOnly = true)
-    boolean existsByCommentAndStudent(Comment comment, Student student) {
-        return commentLikeRepository.existsByCommentAndStudent(comment, student);
+    boolean existsByCommentAndStudentId(Comment comment, Long studentId) {
+        return commentLikeRepository.existsByCommentAndStudentId(comment, studentId);
     }
 
     @Transactional(readOnly = true)
@@ -38,7 +38,7 @@ public class CommentLikeService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new FeedException(FeedExceptionType.COMMENT_NOT_FOUND));
         Student student = findStudentService.findByStudentId(studentInfo.id());
-        boolean isLiked = existsByCommentAndStudent(comment, student);
+        boolean isLiked = existsByCommentAndStudentId(comment, student.getId());
         if (isLiked) {
             CommentLike commentLike = findLikeByCommentAndStudent(comment, student);
             commentLikeRepository.delete(commentLike);

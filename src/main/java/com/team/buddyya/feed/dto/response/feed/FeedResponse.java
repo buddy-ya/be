@@ -24,13 +24,11 @@ public record FeedResponse(
         boolean isLiked,
         boolean isBookmarked,
         boolean isProfileImageUpload,
-        boolean isDefaultProfile,
         LocalDateTime createdDate
 ) {
 
     public static FeedResponse from(Feed feed, FeedUserAction userAction) {
         boolean isProfileImageUpload = UserProfileDefaultImage.isProfileImageUpload(feed.getStudent());
-        boolean isDefaultProfile = UserProfileDefaultImage.isDefaultUserProfileImage(feed.getStudent());
 
         return new FeedResponse(
                 feed.getId(),
@@ -51,7 +49,6 @@ public record FeedResponse(
                 userAction.isLiked(),
                 userAction.isBookmarked(),
                 isProfileImageUpload,
-                isDefaultProfile,
                 feed.getCreatedDate()
         );
     }
