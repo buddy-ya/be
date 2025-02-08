@@ -37,9 +37,6 @@ public class AuthService {
         if (!authToken.getRefreshToken().equals(request.refreshToken())) {
             throw new AuthException(AuthExceptionType.INVALID_REFRESH_TOKEN);
         }
-        if (isTokenExpiringWithinDays(claims)) {
-            return reissueAccessAndRefreshToken(studentId, authToken);
-        }
         return reissueAccessToken(studentId);
     }
 
