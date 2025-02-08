@@ -142,15 +142,15 @@ public class StudentService {
         }
         Student blocker = findStudentService.findByStudentId(blockerId);
         Student blocked = findStudentService.findByStudentId(blockedId);
-        if (blockRepository.existsByStudentAndBlockedStudentId(blocker, blockedId)) {
+        if (blockRepository.existsByBlockerAndBlockedStudentId(blocker, blockedId)) {
             throw new StudentException(StudentExceptionType.ALREADY_BLOCKED);
         }
         blockRepository.save(Block.builder()
-                .student(blocker)
+                .blocker(blocker)
                 .blockedStudentId(blockedId)
                 .build());
         blockRepository.save(Block.builder()
-                .student(blocked)
+                .blocker(blocked)
                 .blockedStudentId(blockerId)
                 .build());
         return BlockResponse.from(BLOCK_SUCCESS_MESSAGE);

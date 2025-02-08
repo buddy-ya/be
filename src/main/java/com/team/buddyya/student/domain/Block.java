@@ -20,14 +20,14 @@ public class Block {
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "student_id", nullable = false)
-    private Student student;
+    private Student blocker;
 
     @Column(name = "blocked_student_id", nullable = false)
     private Long blockedStudentId;
 
     @Builder
-    public Block(Student student, Long blockedStudentId) {
-        this.student = student;
+    public Block(Student blocker, Long blockedStudentId) {
+        this.blocker = blocker;
         this.blockedStudentId = blockedStudentId;
     }
 }
