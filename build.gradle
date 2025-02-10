@@ -32,8 +32,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
-	// 대학 메일 인증 smtp
-	implementation 'org.springframework.boot:spring-boot-starter-mail'
+    // 대학 메일 인증 smtp
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
     // 문자 인증 nurigo
     implementation 'net.nurigo:sdk:4.2.7'
     // 스웨거
@@ -55,4 +55,12 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+processResources.dependsOn('copySecret')
+
+tasks.register('copySecret', Copy) {
+    from './be-submodule' // 서브 모듈 디렉토리 경로
+    include "*.properties"  // 설정 파일 복사
+    into 'src/main/resources'  // 붙여넣을 위치
 }

@@ -1,0 +1,3 @@
+[submodule "be-submodule"]
+	path = be-submodule
+	url = https://github.com/buddy-ya/be-submodule.git
