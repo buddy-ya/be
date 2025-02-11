@@ -1,5 +1,6 @@
 package com.team.buddyya.chatting.domain;
 
+import com.team.buddyya.common.domain.CreatedTime;
 import com.team.buddyya.student.domain.Student;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -12,7 +13,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Table(name = "chatroom_student")
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-public class ChatroomStudent {
+public class ChatroomStudent extends CreatedTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

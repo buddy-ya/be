@@ -3,10 +3,10 @@ package com.team.buddyya.common.domain;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.PrePersist;
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.time.LocalDateTime;
 
 @Getter
@@ -15,6 +15,6 @@ import java.time.LocalDateTime;
 public class CreatedTime {
 
     @CreatedDate
-    @Column(name = "create_date", updatable = false)
+    @Column(name = "created_date", updatable = false)
     private LocalDateTime createdDate;
 }
