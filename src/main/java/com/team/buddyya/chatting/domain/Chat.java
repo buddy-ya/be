@@ -20,18 +20,20 @@ public class Chat extends CreatedTime {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "chatroom_id")
+    @JoinColumn(name = "chatroom_id", nullable = false)
     private Chatroom chatroom;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "student_id")
+    @JoinColumn(name = "student_id", nullable = false)
     private Student student;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "message", nullable = false, columnDefinition = "TEXT")
     private String message;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private MessageType type;
+
 
     @Builder
     public Chat(MessageType type, Chatroom chatroom, Student student, String message) {

@@ -20,17 +20,17 @@ public class ChatroomStudent extends CreatedTime {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "student_id")
+    @JoinColumn(name = "student_id", nullable = false)
     private Student student;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "chatroom_id")
+    @JoinColumn(name = "chatroom_id", nullable = false)
     private Chatroom chatroom;
 
-    @Column(name = "unread_count")
+    @Column(name = "unread_count", nullable = false)
     private int unreadCount;
 
-    @Column(name = "exited")
+    @Column(name = "exited", nullable = false)
     private Boolean isExited;
 
     @Builder

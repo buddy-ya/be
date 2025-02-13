@@ -19,19 +19,19 @@ public class Report {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "type", nullable = false)
     private ReportType type;
 
-    @Column(nullable = false)
+    @Column(name = "reported_id", nullable = false)
     private Long reportedId;
 
-    @Column(nullable = false)
+    @Column(name = "reporter_id", nullable = false)
     private Long reporterId;
 
-    @Column(nullable = false)
+    @Column(name = "reported_user_id", nullable = false)
     private Long reportedUserId;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String content;
 
     @Builder
