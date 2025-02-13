@@ -7,24 +7,17 @@ import com.team.buddyya.feed.repository.CategoryRepository;
 import com.team.buddyya.feed.repository.CommentRepository;
 import com.team.buddyya.feed.repository.FeedRepository;
 import com.team.buddyya.student.controller.UserController;
-import com.team.buddyya.student.domain.Interest;
-import com.team.buddyya.student.domain.Language;
-import com.team.buddyya.student.domain.Major;
-import com.team.buddyya.student.domain.Student;
-import com.team.buddyya.student.domain.University;
+import com.team.buddyya.student.domain.*;
 import com.team.buddyya.student.dto.request.OnBoardingRequest;
 import com.team.buddyya.student.dto.response.UserResponse;
-import com.team.buddyya.student.repository.InterestRepository;
-import com.team.buddyya.student.repository.LanguageRepository;
-import com.team.buddyya.student.repository.MajorRepository;
-import com.team.buddyya.student.repository.StudentRepository;
-import com.team.buddyya.student.repository.UniversityRepository;
-import java.util.List;
-import java.util.stream.IntStream;
+import com.team.buddyya.student.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.IntStream;
 
 @Component
 @RequiredArgsConstructor
@@ -100,7 +93,7 @@ public class DataLoader implements CommandLineRunner {
         List<String> universities = List.of("sju");
         universities.forEach(universityName -> {
             if (!universityRepository.findByUniversityName(universityName).isPresent()) {
-                universityRepository.save(new University(universityName, 0L));
+                universityRepository.save(new University(universityName));
             }
         });
     }

@@ -89,8 +89,6 @@ public class Student extends BaseTime {
     @OneToMany(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<ChatroomStudent> chatroomStudents;
 
-    private String test2;
-
     @Builder
     public Student(String name, String phoneNumber, String country, Boolean isKorean, Role role, University university,
                    Gender gender, String characterProfileImage) {
