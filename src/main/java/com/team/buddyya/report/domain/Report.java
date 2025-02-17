@@ -25,8 +25,8 @@ public class Report {
     @Column(name = "reported_id", nullable = false)
     private Long reportedId;
 
-    @Column(name = "reporter_id", nullable = false)
-    private Long reporterId;
+    @Column(name = "report_user_id", nullable = false)
+    private Long reportUserId;
 
     @Column(name = "reported_user_id", nullable = false)
     private Long reportedUserId;
@@ -35,10 +35,10 @@ public class Report {
     private String content;
 
     @Builder
-    public Report(ReportType type, Long reportedId, Long reporterId, Long reportedUserId, String content) {
+    public Report(ReportType type, Long reportedId, Long reportUserId, Long reportedUserId, String content) {
         this.type = type;
         this.reportedId = reportedId;
-        this.reporterId = reporterId;
+        this.reportUserId = reportUserId;
         this.reportedUserId = reportedUserId;
         this.content = content;
     }

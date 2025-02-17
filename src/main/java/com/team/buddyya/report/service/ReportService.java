@@ -19,7 +19,7 @@ public class ReportService {
         Report report = Report.builder()
                 .type(request.type())
                 .reportedId(request.reportedId())
-                .reporterId(studentInfo.id())
+                .reportUserId(studentInfo.id())
                 .reportedUserId(request.reportedUserId())
                 .content(request.content())
                 .build();
