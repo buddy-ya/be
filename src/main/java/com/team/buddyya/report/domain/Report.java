@@ -19,26 +19,26 @@ public class Report {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "type", nullable = false)
     private ReportType type;
 
-    @Column(nullable = false)
+    @Column(name = "reported_id", nullable = false)
     private Long reportedId;
 
-    @Column(nullable = false)
-    private Long reporterId;
+    @Column(name = "report_user_id", nullable = false)
+    private Long reportUserId;
 
-    @Column(nullable = false)
+    @Column(name = "reported_user_id", nullable = false)
     private Long reportedUserId;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String content;
 
     @Builder
-    public Report(ReportType type, Long reportedId, Long reporterId, Long reportedUserId, String content) {
+    public Report(ReportType type, Long reportedId, Long reportUserId, Long reportedUserId, String content) {
         this.type = type;
         this.reportedId = reportedId;
-        this.reporterId = reporterId;
+        this.reportUserId = reportUserId;
         this.reportedUserId = reportedUserId;
         this.content = content;
     }

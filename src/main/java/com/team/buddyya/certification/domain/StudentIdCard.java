@@ -24,7 +24,7 @@ public class StudentIdCard extends CreatedTime {
     private String imageUrl;
 
     @OneToOne
-    @JoinColumn(name = "student_id", nullable = false)
+    @JoinColumn(name = "student_id", nullable = false, unique = true)
     private Student student;
 
     @Builder

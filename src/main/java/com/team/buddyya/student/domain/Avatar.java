@@ -20,17 +20,17 @@ public class Avatar extends BaseTime {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @Column(name="notificationEnabled", nullable = false)
+    @Column(name = "notificationEnabled", nullable = false)
     private Boolean isNotificationEnabled;
 
-    @Column(name="active", nullable = false)
+    @Column(name = "active", nullable = false)
     private Boolean isActive;
 
-    @Column(name="loggedOut", nullable = false)
+    @Column(name = "loggedOut", nullable = false)
     private Boolean isLoggedOut;
 
     @OneToOne(fetch = LAZY)
-    @JoinColumn(name = "student_id", nullable = false)
+    @JoinColumn(name = "student_id", nullable = false, unique = true)
     private Student student;
 
     @Builder
