@@ -1,6 +1,7 @@
 package com.team.buddyya.notification.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.team.buddyya.feed.domain.Comment;
 import com.team.buddyya.feed.domain.Feed;
 import com.team.buddyya.notification.domain.ExpoToken;
 import com.team.buddyya.notification.domain.RequestNotification;
@@ -36,6 +37,9 @@ public class NotificationService {
     private final ObjectMapper objectMapper;
 
     private static final String TOKEN_SAVE_SUCCESS_MESSAGE = "토큰이 성공적으로 저장되었습니다.";
+
+    private static final String FEED_REPLY_TITLE_KR = "새로운 대댓글이 달렸어요!";
+    private static final String FEED_REPLY_TITLE_EN = "A new reply has been added!";
 
     private static final String FEED_TITLE_KR = "새로운 댓글이 달렸어요!";
     private static final String FEED_TITLE_EN = "You have a new comment!";
@@ -83,7 +87,33 @@ public class NotificationService {
         expoTokenRepository.save(Token);
     }
 
-    public void sendFeedNotification(Feed feed, String commentContent) {
+    public void sendCommentReplyNotification(Feed feed, Comment parent, String commentContent){
+        try{
+            Student recipient = parent.getStudent();
+            String token = recipient.getExpoToken().getToken();
+            Map<String, Object> data = Map.of(
+                    "feedId", feed.getId(),
+                    "type", "FEED"
+            );
+            boolean isKorean = recipient.getIsKorean();
+            String title = getCommentReplyNotificationTitle(isKorean);
+            sendToExpo(RequestNotification.builder()
+                    .to(token)
+                    .title(title)
+                    .body(commentContent)
+                    .data(data).build()
+            );
+        } catch (NotificationException e) {
+            log.warn("피드 대댓글 알림 전송 실패: {}", e.exceptionType().errorMessage());
+        }
+    }
+
+    private String getCommentReplyNotificationTitle(boolean isKorean) {
+        return isKorean ? FEED_REPLY_TITLE_KR: FEED_REPLY_TITLE_EN;
+    }
+
+
+    public void sendCommentNotification(Feed feed, String commentContent) {
         try {
             Student recipient = feed.getStudent();
             String token = getTokenByUserId(recipient.getId());
@@ -92,7 +122,7 @@ public class NotificationService {
                     "type", "FEED"
             );
             boolean isKorean = recipient.getIsKorean();
-            String title = getFeedNotificationTitle(isKorean);
+            String title = getCommentNotificationTitle(isKorean);
             sendToExpo(RequestNotification.builder()
                     .to(token)
                     .title(title)
@@ -104,7 +134,7 @@ public class NotificationService {
         }
     }
 
-    private String getFeedNotificationTitle(boolean isKorean) {
+    private String getCommentNotificationTitle(boolean isKorean) {
         return isKorean ? FEED_TITLE_KR : FEED_TITLE_EN;
     }
 

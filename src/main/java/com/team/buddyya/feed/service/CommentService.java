@@ -61,6 +61,7 @@ public class CommentService {
             if (parent.getParent() != null) {
                 throw new FeedException(FeedExceptionType.COMMENT_DEPTH_LIMIT);
             }
+            notificationService.sendCommentReplyNotification(feed,parent, request.content());
         }
         Comment comment = Comment.builder()
                 .student(student)
@@ -69,12 +70,11 @@ public class CommentService {
                 .parent(parent)
                 .build();
         commentRepository.save(comment);
-        notificationService.sendFeedNotification(feed, request.content());
+        notificationService.sendCommentNotification(feed, request.content());
     }
 
-    public void updateComment(StudentInfo studentInfo, Long feedId, Long commentId,
+    public void updateComment(StudentInfo studentInfo, Long commentId,
                               CommentUpdateRequest request) {
-        Feed feed = findFeedByFeedId(feedId);
         Comment comment = findCommentByCommentId(commentId);
         if (comment.isDeleted()) {
             throw new FeedException(FeedExceptionType.COMMENT_NOT_FOUND);
@@ -83,7 +83,7 @@ public class CommentService {
         comment.updateComment(request.content());
     }
 
-    public void deleteComment(StudentInfo studentInfo, Long feedId, Long commentId) {
+    public void deleteComment(StudentInfo studentInfo, Long commentId) {
         Comment comment = findCommentByCommentId(commentId);
         if (comment.isDeleted()) {
             throw new FeedException(FeedExceptionType.COMMENT_NOT_FOUND);
