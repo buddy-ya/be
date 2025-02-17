@@ -38,6 +38,9 @@ dependencies {
     implementation 'net.nurigo:sdk:4.2.7'
     // 스웨거
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
+    //Flyway
+    implementation 'org.flywaydb:flyway-core'
+    implementation 'org.flywaydb:flyway-mysql'
 
     implementation 'com.fasterxml.jackson.core:jackson-databind'
     compileOnly 'org.projectlombok:lombok'
