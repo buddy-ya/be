@@ -84,7 +84,6 @@ public class CommentService {
     }
 
     public void deleteComment(StudentInfo studentInfo, Long feedId, Long commentId) {
-        Feed feed = findFeedByFeedId(feedId);
         Comment comment = findCommentByCommentId(commentId);
         if (comment.isDeleted()) {
             throw new FeedException(FeedExceptionType.COMMENT_NOT_FOUND);
