@@ -52,6 +52,12 @@ public class NotificationService {
     private static final String AUTH_FAIL_BODY_KR = "제출된 학생증 정보를 다시 확인하고 재시도해 주세요.";
     private static final String AUTH_FAIL_BODY_EN = "Please check your student ID information and try again.";
 
+    private static final String CHAT_REQUEST_TITLE_KR = "채팅 요청이 도착했어요!";
+    private static final String CHAT_REQUEST_TITLE_EN = "You have a new chat request!";
+
+    private static final String CHAT_REQUEST_BODY_KR = "님이 채팅 요청을 보냈습니다. 확인하고 대화를 시작해 보세요!";
+    private static final String CHAT_REQUEST_BODY_EN = " has sent you a chat request. Check it out and start a conversation!";
+
     @Value("${EXPO.API.URL}")
     private String expoApiUrl;
 
@@ -157,6 +163,39 @@ public class NotificationService {
         return isKorean ? AUTH_FAIL_BODY_KR : AUTH_FAIL_BODY_EN;
     }
 
+    public void sendChatRequestNotification(Student sender, Student receiver) {
+        try {
+            String token = getTokenByUserId(receiver.getId());
+
+            boolean isKorean = receiver.getIsKorean();
+            String title = getChatRequestTitle(isKorean);
+            String body = getChatRequestBody(isKorean, sender.getName());
+
+            Map<String, Object> data = Map.of(
+                    "type", "CHAT_REQUEST"
+            );
+
+            sendToExpo(RequestNotification.builder()
+                    .to(token)
+                    .title(title)
+                    .body(body)
+                    .data(data)
+                    .build()
+            );
+        } catch (NotificationException e) {
+            log.warn("채팅 요청 알림 전송 실패: {}", e.exceptionType().errorMessage());
+        }
+    }
+
+    private String getChatRequestTitle(boolean isKorean) {
+        return isKorean ? CHAT_REQUEST_TITLE_KR : CHAT_REQUEST_TITLE_EN;
+    }
+
+    private String getChatRequestBody(boolean isKorean, String senderName) {
+        return isKorean
+                ? senderName + CHAT_REQUEST_BODY_KR
+                : senderName + CHAT_REQUEST_BODY_EN;
+    }
 
     private void sendToExpo(RequestNotification notification) {
         try {

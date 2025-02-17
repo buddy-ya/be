@@ -8,6 +8,7 @@ import com.team.buddyya.chatting.exception.ChatException;
 import com.team.buddyya.chatting.exception.ChatExceptionType;
 import com.team.buddyya.chatting.repository.ChatRequestRepository;
 import com.team.buddyya.chatting.repository.ChatroomRepository;
+import com.team.buddyya.notification.service.NotificationService;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.service.FindStudentService;
 import java.time.LocalDateTime;
@@ -27,6 +28,7 @@ public class ChatRequestService {
     private final ChatRequestRepository chatRequestRepository;
     private final ChatroomRepository chatroomRepository;
     private final FindStudentService findStudentService;
+    private final NotificationService notificationService;
 
     @Transactional(readOnly = true)
     public List<ChatRequestResponse> getChatRequests(CustomUserDetails userDetails) {
@@ -66,6 +68,7 @@ public class ChatRequestService {
                 .sender(sender)
                 .receiver(receiver)
                 .build();
+        notificationService.sendChatRequestNotification(sender,receiver);
         chatRequestRepository.save(chatRequest);
     }
 
