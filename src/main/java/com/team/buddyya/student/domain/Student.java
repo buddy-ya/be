@@ -148,4 +148,12 @@ public class Student extends BaseTime {
     public void setStudentIdCard(StudentIdCard studentIdCard) {
         this.studentIdCard = studentIdCard;
     }
+
+    public void markAsDeleted() {
+        this.isDeleted = true;
+        this.isCertificated = false;
+        this.phoneNumber = "deleted_" + UUID.randomUUID().toString().substring(0, 3);
+        this.email = "deleted_" + UUID.randomUUID().toString().substring(0, 4);
+        this.name = "UNKNOWN";
+    }
 }
