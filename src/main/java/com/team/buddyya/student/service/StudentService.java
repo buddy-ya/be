@@ -17,6 +17,9 @@ import com.team.buddyya.student.exception.StudentException;
 import com.team.buddyya.student.exception.StudentExceptionType;
 import com.team.buddyya.student.repository.*;
 
+import com.team.buddyya.student.repository.BlockRepository;
+import com.team.buddyya.student.repository.StudentRepository;
+import com.team.buddyya.student.repository.UniversityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -117,15 +120,8 @@ public class StudentService {
         return UserResponse.from(student, isStudentIdCardRequested);
     }
 
-    @Transactional(readOnly = true)
-    public boolean isDuplicateStudentNumber(String studentNumber, University university) {
-        return studentRepository.findByStudentNumberAndUniversity(studentNumber, university)
-                .isPresent();
-    }
-
-    public void updateStudentCertification(Student student, String studentNumber) {
+    public void updateStudentCertification(Student student) {
         student.updateIsCertificated(true);
-        student.updateStudentNumber(studentNumber);
     }
 
     @Transactional(readOnly = true)
@@ -151,7 +147,6 @@ public class StudentService {
         studentMajorRepository.deleteByStudent(student);
         studentLanguageRepository.deleteByStudent(student);
         studentInterestRepository.deleteByStudent(student);
-
         student.markAsDeleted();
     }
 

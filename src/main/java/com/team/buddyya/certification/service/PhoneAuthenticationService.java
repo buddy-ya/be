@@ -3,10 +3,10 @@ package com.team.buddyya.certification.service;
 import com.team.buddyya.auth.dto.request.TokenInfoRequest;
 import com.team.buddyya.auth.jwt.JwtUtils;
 import com.team.buddyya.certification.domain.RegisteredPhone;
-import com.team.buddyya.certification.exception.PhoneAuthenticationException;
-import com.team.buddyya.certification.repository.RegisteredPhoneRepository;
 import com.team.buddyya.certification.dto.response.SendCodeResponse;
+import com.team.buddyya.certification.exception.PhoneAuthenticationException;
 import com.team.buddyya.certification.exception.PhoneAuthenticationExceptionType;
+import com.team.buddyya.certification.repository.RegisteredPhoneRepository;
 import com.team.buddyya.certification.repository.StudentIdCardRepository;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.dto.response.UserResponse;
@@ -55,7 +55,7 @@ public class PhoneAuthenticationService {
         if (optionalStudent.isPresent()) {
             Student student = optionalStudent.get();
             String accessToken = jwtUtils.createAccessToken(new TokenInfoRequest(student.getId()));
-            String refreshToken = jwtUtils.createRefreshToken(new TokenInfoRequest(student.getId()));
+            String refreshToken = student.getAuthToken().getRefreshToken();
             boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student).isPresent();
             return UserResponse.from(student, isStudentIdCardRequested, "EXISTING_MEMBER", accessToken, refreshToken);
         }

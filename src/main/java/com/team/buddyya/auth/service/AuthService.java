@@ -10,6 +10,7 @@ import com.team.buddyya.auth.jwt.JwtUtils;
 import com.team.buddyya.auth.repository.AuthTokenRepository;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,7 @@ import java.time.temporal.ChronoUnit;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class AuthService {
 
     private static final int REFRESH_TOKEN_THRESHOLD_DAYS = 30;
@@ -29,14 +31,11 @@ public class AuthService {
     public TokenReissueResponse reissueToken(TokenReissueRequest request) {
         jwtUtils.validateToken(request.refreshToken());
         Claims claims = jwtUtils.parseClaims(request.refreshToken());
-        Long studentId = claims.get("id", Long.class);
+        Long studentId = claims.get("studentId", Long.class);
         AuthToken authToken = authTokenRepository.findByStudentId(studentId)
                 .orElseThrow(() -> new AuthException(AuthExceptionType.REFRESH_TOKEN_NOT_FOUND));
         if (!authToken.getRefreshToken().equals(request.refreshToken())) {
             throw new AuthException(AuthExceptionType.INVALID_REFRESH_TOKEN);
-        }
-        if (isTokenExpiringWithinDays(claims)) {
-            return reissueAccessAndRefreshToken(studentId, authToken);
         }
         return reissueAccessToken(studentId);
     }

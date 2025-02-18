@@ -34,4 +34,9 @@ public class AuthController {
         StudentInfo studentInfo = userDetails.getStudentInfo();
         return ResponseEntity.ok(studentInfo.toString());
     }
+
+    @GetMapping("/test")
+    public ResponseEntity<String> test() {
+        return ResponseEntity.ok("test success");
+    }
 }

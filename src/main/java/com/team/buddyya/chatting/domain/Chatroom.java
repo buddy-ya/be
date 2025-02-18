@@ -22,8 +22,10 @@ public class Chatroom extends CreatedTime {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "last_message")
     private String lastMessage;
 
+    @Column(name = "last_message_time", nullable = false)
     private LocalDateTime lastMessageTime;
 
     @OneToMany(mappedBy = "chatroom", cascade = CascadeType.ALL, orphanRemoval = true)
