@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
@@ -41,6 +42,9 @@ public class Student extends BaseTime {
 
     @Column(name = "korean", nullable = false)
     private Boolean isKorean;
+
+    @Column(name = "is_deleted", nullable = false)
+    private Boolean isDeleted;
 
     @OneToOne(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Avatar avatar;
@@ -106,6 +110,7 @@ public class Student extends BaseTime {
         this.isCertificated = false;
         this.studentNumber = null;
         this.characterProfileImage = characterProfileImage;
+        this.isDeleted=false;
     }
 
     public void updateIsCertificated(boolean isCertificated) {
