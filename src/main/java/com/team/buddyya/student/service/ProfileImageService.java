@@ -34,5 +34,9 @@ public class ProfileImageService {
         ProfileImage profileImage = student.getProfileImage();
         profileImage.updateUrl(imageUrl);
     }
+
+    public void setDefaultProfileImage(Student student){
+        student.getProfileImage().updateUrl(USER_PROFILE_DEFAULT_IMAGE.getUrl());
+    }
 }
 
