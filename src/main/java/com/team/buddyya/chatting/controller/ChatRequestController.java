@@ -51,6 +51,7 @@ public class ChatRequestController {
     public ResponseEntity<CreateChatroomResponse> createOrGetChatRoom(@RequestBody CreateChatroomRequest request,
                                                                       @AuthenticationPrincipal CustomUserDetails userDetails) {
         CreateChatroomResponse response = chatService.createOrGetChatRoom(request, userDetails.getStudentInfo());
+        chatRequestService.deleteChatRequest(userDetails, request.chatRequestId());
         return ResponseEntity.ok(response);
     }
 
