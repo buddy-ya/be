@@ -10,4 +10,6 @@ import java.util.Optional;
 public interface RegisteredPhoneRepository extends JpaRepository<RegisteredPhone, Long> {
 
     Optional<RegisteredPhone> findByPhoneNumber(String phoneNumber);
+
+    void deleteByPhoneNumber(String phoneNumber);
 }

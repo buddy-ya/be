@@ -10,4 +10,6 @@ import java.util.Optional;
 public interface StudentEmailRepository extends JpaRepository<StudentEmail, Long> {
 
     Optional<StudentEmail> findByEmail(String email);
+
+    void deleteByEmail(String email);
 }
