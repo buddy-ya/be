@@ -73,8 +73,9 @@ public class CommentService {
         notificationService.sendCommentNotification(feed, request.content());
     }
 
-    public void updateComment(StudentInfo studentInfo, Long commentId,
+    public void updateComment(StudentInfo studentInfo, Long feedId, Long commentId,
                               CommentUpdateRequest request) {
+        Feed feed = findFeedByFeedId(feedId);
         Comment comment = findCommentByCommentId(commentId);
         if (comment.isDeleted()) {
             throw new FeedException(FeedExceptionType.COMMENT_NOT_FOUND);
@@ -83,7 +84,8 @@ public class CommentService {
         comment.updateComment(request.content());
     }
 
-    public void deleteComment(StudentInfo studentInfo, Long commentId) {
+    public void deleteComment(StudentInfo studentInfo, Long feedId, Long commentId) {
+        Feed feed = findFeedByFeedId(feedId);
         Comment comment = findCommentByCommentId(commentId);
         if (comment.isDeleted()) {
             throw new FeedException(FeedExceptionType.COMMENT_NOT_FOUND);
