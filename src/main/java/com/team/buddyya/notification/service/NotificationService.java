@@ -196,15 +196,12 @@ public class NotificationService {
     public void sendChatRequestNotification(Student sender, Student receiver) {
         try {
             String token = getTokenByUserId(receiver.getId());
-
             boolean isKorean = receiver.getIsKorean();
             String title = getChatRequestTitle(isKorean);
             String body = getChatRequestBody(isKorean, sender.getName());
-
             Map<String, Object> data = Map.of(
                     "type", "CHAT_REQUEST"
             );
-
             sendToExpo(RequestNotification.builder()
                     .to(token)
                     .title(title)
