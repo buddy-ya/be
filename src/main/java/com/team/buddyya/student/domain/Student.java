@@ -13,6 +13,7 @@ import org.hibernate.annotations.ColumnDefault;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
@@ -43,6 +44,9 @@ public class Student extends BaseTime {
 
     @Column(name = "korean", nullable = false)
     private Boolean isKorean;
+
+    @Column(name = "is_deleted", nullable = false)
+    private Boolean isDeleted;
 
     @OneToOne(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Avatar avatar;
@@ -104,6 +108,7 @@ public class Student extends BaseTime {
         this.interests = new ArrayList<>();
         this.isCertificated = false;
         this.characterProfileImage = characterProfileImage;
+        this.isDeleted=false;
     }
 
     public void updateIsCertificated(boolean isCertificated) {
@@ -136,5 +141,13 @@ public class Student extends BaseTime {
 
     public void setStudentIdCard(StudentIdCard studentIdCard) {
         this.studentIdCard = studentIdCard;
+    }
+
+    public void markAsDeleted() {
+        this.isDeleted = true;
+        this.isCertificated = false;
+        this.phoneNumber = "deleted_" + UUID.randomUUID().toString().substring(0, 3);
+        this.email = "deleted_" + UUID.randomUUID().toString().substring(0, 4);
+        this.name = "UNKNOWN";
     }
 }

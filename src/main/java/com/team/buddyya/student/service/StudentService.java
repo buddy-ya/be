@@ -1,8 +1,12 @@
 package com.team.buddyya.student.service;
 
 import com.team.buddyya.auth.domain.StudentInfo;
+import com.team.buddyya.auth.repository.AuthTokenRepository;
+import com.team.buddyya.certification.repository.RegisteredPhoneRepository;
+import com.team.buddyya.certification.repository.StudentEmailRepository;
 import com.team.buddyya.certification.repository.StudentIdCardRepository;
 import com.team.buddyya.common.service.S3UploadService;
+import com.team.buddyya.notification.repository.ExpoTokenRepository;
 import com.team.buddyya.student.domain.*;
 import com.team.buddyya.student.dto.request.MyPageUpdateRequest;
 import com.team.buddyya.student.dto.request.OnBoardingRequest;
@@ -11,14 +15,14 @@ import com.team.buddyya.student.dto.response.BlockResponse;
 import com.team.buddyya.student.dto.response.UserResponse;
 import com.team.buddyya.student.exception.StudentException;
 import com.team.buddyya.student.exception.StudentExceptionType;
+import com.team.buddyya.student.repository.*;
+
 import com.team.buddyya.student.repository.BlockRepository;
 import com.team.buddyya.student.repository.StudentRepository;
 import com.team.buddyya.student.repository.UniversityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
 
 import static com.team.buddyya.common.domain.S3DirectoryName.PROFILE_IMAGE;
 import static com.team.buddyya.student.domain.UserProfileDefaultImage.USER_PROFILE_DEFAULT_IMAGE;
@@ -37,6 +41,13 @@ public class StudentService {
     private final UniversityRepository universityRepository;
     private final StudentIdCardRepository studentIdCardRepository;
     private final BlockRepository blockRepository;
+    private final AuthTokenRepository authTokenRepository;
+    private final ExpoTokenRepository expoTokenRepository;
+    private final RegisteredPhoneRepository registeredPhoneRepository;
+    private final StudentEmailRepository studentEmailRepository;
+    private final StudentMajorRepository studentMajorRepository;
+    private final StudentLanguageRepository studentLanguageRepository;
+    private final StudentInterestRepository studentInterestRepository;
 
     private static final String BLOCK_SUCCESS_MESSAGE = "차단이 성공적으로 완료되었습니다.";
 
@@ -121,11 +132,19 @@ public class StudentService {
 
     public void deleteStudent(StudentInfo studentInfo) {
         Student student = findStudentService.findByStudentId(studentInfo.id());
-        String randomPhoneNumber = "deleted_" + UUID.randomUUID().toString().substring(0, 3);
-        String randomEmail = "deleted_" + UUID.randomUUID().toString().substring(0, 4);
-        student.updatePhoneNumber(randomPhoneNumber);
-        student.updateEmail(randomEmail);
-        student.updateIsCertificated(false);
+        if (student.getAuthToken() != null) {
+            authTokenRepository.delete(student.getAuthToken());
+        }
+        if (student.getExpoToken() != null) {
+            expoTokenRepository.delete(student.getExpoToken());
+        }
+        if (student.getStudentIdCard() != null) {
+            studentIdCardRepository.delete(student.getStudentIdCard());
+        }
+        profileImageService.setDefaultProfileImage(student);
+        registeredPhoneRepository.deleteByPhoneNumber(student.getPhoneNumber());
+        studentEmailRepository.deleteByEmail(student.getEmail());
+        student.markAsDeleted();
     }
 
     public BlockResponse blockStudent(Long blockerId, Long blockedId) {

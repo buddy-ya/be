@@ -5,5 +5,6 @@ import com.team.buddyya.student.domain.StudentLanguage;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface StudentLanguageRepository extends JpaRepository<StudentLanguage, Long> {
+
     void deleteByStudent(Student student);
 }
