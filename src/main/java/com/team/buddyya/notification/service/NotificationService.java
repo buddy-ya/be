@@ -112,7 +112,6 @@ public class NotificationService {
         return isKorean ? FEED_REPLY_TITLE_KR: FEED_REPLY_TITLE_EN;
     }
 
-
     public void sendCommentNotification(Feed feed, String commentContent) {
         try {
             Student recipient = feed.getStudent();

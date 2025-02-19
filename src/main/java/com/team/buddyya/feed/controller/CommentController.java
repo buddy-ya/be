@@ -47,21 +47,24 @@ public class CommentController {
 
     @PatchMapping("/{commentId}")
     public ResponseEntity<Void> updateComment(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                              @PathVariable Long feedId,
                                               @PathVariable Long commentId,
                                               @RequestBody CommentUpdateRequest request) {
-        commentService.updateComment(userDetails.getStudentInfo(), commentId, request);
+        commentService.updateComment(userDetails.getStudentInfo(), feedId, commentId, request);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{commentId}")
     public ResponseEntity<Void> deleteComment(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                              @PathVariable Long feedId,
                                               @PathVariable Long commentId) {
-        commentService.deleteComment(userDetails.getStudentInfo(), commentId);
+        commentService.deleteComment(userDetails.getStudentInfo(), feedId, commentId);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{commentId}/like")
     public ResponseEntity<LikeResponse> toggleCommentLike(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                          @PathVariable Long feedId,
                                                           @PathVariable Long commentId) {
         LikeResponse response = commentLikeService.toggleLike(userDetails.getStudentInfo(), commentId);
         return ResponseEntity.ok(response);
