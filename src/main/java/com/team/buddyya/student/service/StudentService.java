@@ -144,9 +144,6 @@ public class StudentService {
         profileImageService.setDefaultProfileImage(student);
         registeredPhoneRepository.deleteByPhoneNumber(student.getPhoneNumber());
         studentEmailRepository.deleteByEmail(student.getEmail());
-        studentMajorRepository.deleteByStudent(student);
-        studentLanguageRepository.deleteByStudent(student);
-        studentInterestRepository.deleteByStudent(student);
         student.markAsDeleted();
     }
 
