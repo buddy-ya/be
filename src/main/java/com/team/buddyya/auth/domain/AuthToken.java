@@ -19,11 +19,11 @@ public class AuthToken extends CreatedTime {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String refreshToken;
 
     @OneToOne
-    @JoinColumn(name = "student_id", nullable = false)
+    @JoinColumn(name = "student_id", nullable = false, unique = true)
     private Student student;
 
     @Builder

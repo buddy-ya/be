@@ -46,15 +46,7 @@ public class AdminService {
         Student student = findStudentService.findByStudentId(request.id());
         studentIdCardRepository.deleteByStudent(student);
         s3UploadService.deleteFile(STUDENT_ID_CARD.getDirectoryName(), request.imageUrl());
-        if (request.studentNumber() == null) {
-            notificationService.sendAuthorizationNotification(student, false);
-            return new StudentVerificationResponse(REQUEST_REJECTED_MESSAGE);
-        }
-        if (studentService.isDuplicateStudentNumber(request.studentNumber(), student.getUniversity())) {
-            notificationService.sendAuthorizationNotification(student, false);
-            return new StudentVerificationResponse(ALREADY_REGISTERED_MESSAGE);
-        }
-        studentService.updateStudentCertification(student, request.studentNumber());
+        studentService.updateStudentCertification(student);
         notificationService.sendAuthorizationNotification(student, true);
         return new StudentVerificationResponse(VERIFICATION_COMPLETED_MESSAGE);
     }

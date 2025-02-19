@@ -9,6 +9,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +28,7 @@ public class Student extends BaseTime {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @Column(length = 11, nullable = false)
+    @Column(length = 11, nullable = false, unique = true)
     private String phoneNumber;
 
     @Column(length = 64, nullable = false)
@@ -37,6 +38,7 @@ public class Student extends BaseTime {
     private String country;
 
     @Column(name = "certificated", nullable = false)
+    @ColumnDefault("false")
     private Boolean isCertificated;
 
     @Column(name = "korean", nullable = false)
@@ -57,10 +59,7 @@ public class Student extends BaseTime {
     @Column(nullable = false)
     private Gender gender;
 
-    @Column(name = "student_number")
-    private String studentNumber;
-
-    @Column(name = "email")
+    @Column(name = "email", unique = true)
     private String email;
 
     @OneToMany(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
@@ -75,7 +74,7 @@ public class Student extends BaseTime {
     @OneToOne(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private ProfileImage profileImage;
 
-    @Column(name = "character_profile_image")
+    @Column(name = "character_profile_image", nullable = false)
     private String characterProfileImage;
 
     @OneToOne(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
@@ -92,7 +91,7 @@ public class Student extends BaseTime {
 
     @Builder
     public Student(String name, String phoneNumber, String country, Boolean isKorean, Role role, University university,
-                   Gender gender,String characterProfileImage) {
+                   Gender gender, String characterProfileImage) {
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.country = country;
@@ -100,20 +99,15 @@ public class Student extends BaseTime {
         this.role = role;
         this.university = university;
         this.gender = gender;
-        this.majors =  new ArrayList<>();
+        this.majors = new ArrayList<>();
         this.languages = new ArrayList<>();
         this.interests = new ArrayList<>();
         this.isCertificated = false;
-        this.studentNumber = null;
         this.characterProfileImage = characterProfileImage;
     }
 
     public void updateIsCertificated(boolean isCertificated) {
         this.isCertificated = isCertificated;
-    }
-
-    public void updateStudentNumber(String studentNumber) {
-        this.studentNumber = studentNumber;
     }
 
     public void updateEmail(String email) {

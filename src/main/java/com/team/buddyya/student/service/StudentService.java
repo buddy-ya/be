@@ -14,12 +14,11 @@ import com.team.buddyya.student.exception.StudentExceptionType;
 import com.team.buddyya.student.repository.BlockRepository;
 import com.team.buddyya.student.repository.StudentRepository;
 import com.team.buddyya.student.repository.UniversityRepository;
-
-import java.util.UUID;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 import static com.team.buddyya.common.domain.S3DirectoryName.PROFILE_IMAGE;
 import static com.team.buddyya.student.domain.UserProfileDefaultImage.USER_PROFILE_DEFAULT_IMAGE;
@@ -110,15 +109,8 @@ public class StudentService {
         return UserResponse.from(student, isStudentIdCardRequested);
     }
 
-    @Transactional(readOnly = true)
-    public boolean isDuplicateStudentNumber(String studentNumber, University university) {
-        return studentRepository.findByStudentNumberAndUniversity(studentNumber, university)
-                .isPresent();
-    }
-
-    public void updateStudentCertification(Student student, String studentNumber) {
+    public void updateStudentCertification(Student student) {
         student.updateIsCertificated(true);
-        student.updateStudentNumber(studentNumber);
     }
 
     @Transactional(readOnly = true)
