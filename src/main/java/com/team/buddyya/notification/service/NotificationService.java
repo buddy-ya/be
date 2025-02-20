@@ -1,6 +1,7 @@
 package com.team.buddyya.notification.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.team.buddyya.feed.domain.Comment;
 import com.team.buddyya.feed.domain.Feed;
 import com.team.buddyya.notification.domain.ExpoToken;
 import com.team.buddyya.notification.domain.RequestNotification;
@@ -37,6 +38,9 @@ public class NotificationService {
 
     private static final String TOKEN_SAVE_SUCCESS_MESSAGE = "토큰이 성공적으로 저장되었습니다.";
 
+    private static final String FEED_REPLY_TITLE_KR = "새로운 대댓글이 달렸어요!";
+    private static final String FEED_REPLY_TITLE_EN = "A new reply has been added!";
+
     private static final String FEED_TITLE_KR = "새로운 댓글이 달렸어요!";
     private static final String FEED_TITLE_EN = "You have a new comment!";
 
@@ -51,6 +55,12 @@ public class NotificationService {
 
     private static final String AUTH_FAIL_BODY_KR = "제출된 학생증 정보를 다시 확인하고 재시도해 주세요.";
     private static final String AUTH_FAIL_BODY_EN = "Please check your student ID information and try again.";
+
+    private static final String CHAT_REQUEST_TITLE_KR = "채팅 요청이 도착했어요!";
+    private static final String CHAT_REQUEST_TITLE_EN = "You have a new chat request!";
+
+    private static final String CHAT_REQUEST_BODY_KR = "님이 채팅 요청을 보냈습니다. 확인하고 대화를 시작해 보세요!";
+    private static final String CHAT_REQUEST_BODY_EN = " has sent you a chat request. Check it out and start a conversation!";
 
     @Value("${EXPO.API.URL}")
     private String expoApiUrl;
@@ -77,7 +87,32 @@ public class NotificationService {
         expoTokenRepository.save(Token);
     }
 
-    public void sendFeedNotification(Feed feed, String commentContent) {
+    public void sendCommentReplyNotification(Feed feed, Comment parent, String commentContent){
+        try{
+            Student recipient = parent.getStudent();
+            String token = recipient.getExpoToken().getToken();
+            Map<String, Object> data = Map.of(
+                    "feedId", feed.getId(),
+                    "type", "FEED"
+            );
+            boolean isKorean = recipient.getIsKorean();
+            String title = getCommentReplyNotificationTitle(isKorean);
+            sendToExpo(RequestNotification.builder()
+                    .to(token)
+                    .title(title)
+                    .body(commentContent)
+                    .data(data).build()
+            );
+        } catch (NotificationException e) {
+            log.warn("피드 대댓글 알림 전송 실패: {}", e.exceptionType().errorMessage());
+        }
+    }
+
+    private String getCommentReplyNotificationTitle(boolean isKorean) {
+        return isKorean ? FEED_REPLY_TITLE_KR: FEED_REPLY_TITLE_EN;
+    }
+
+    public void sendCommentNotification(Feed feed, String commentContent) {
         try {
             Student recipient = feed.getStudent();
             String token = getTokenByUserId(recipient.getId());
@@ -86,7 +121,7 @@ public class NotificationService {
                     "type", "FEED"
             );
             boolean isKorean = recipient.getIsKorean();
-            String title = getFeedNotificationTitle(isKorean);
+            String title = getCommentNotificationTitle(isKorean);
             sendToExpo(RequestNotification.builder()
                     .to(token)
                     .title(title)
@@ -98,7 +133,7 @@ public class NotificationService {
         }
     }
 
-    private String getFeedNotificationTitle(boolean isKorean) {
+    private String getCommentNotificationTitle(boolean isKorean) {
         return isKorean ? FEED_TITLE_KR : FEED_TITLE_EN;
     }
 
@@ -157,6 +192,36 @@ public class NotificationService {
         return isKorean ? AUTH_FAIL_BODY_KR : AUTH_FAIL_BODY_EN;
     }
 
+    public void sendChatRequestNotification(Student sender, Student receiver) {
+        try {
+            String token = getTokenByUserId(receiver.getId());
+            boolean isKorean = receiver.getIsKorean();
+            String title = getChatRequestTitle(isKorean);
+            String body = getChatRequestBody(isKorean, sender.getName());
+            Map<String, Object> data = Map.of(
+                    "type", "CHAT_REQUEST"
+            );
+            sendToExpo(RequestNotification.builder()
+                    .to(token)
+                    .title(title)
+                    .body(body)
+                    .data(data)
+                    .build()
+            );
+        } catch (NotificationException e) {
+            log.warn("채팅 요청 알림 전송 실패: {}", e.exceptionType().errorMessage());
+        }
+    }
+
+    private String getChatRequestTitle(boolean isKorean) {
+        return isKorean ? CHAT_REQUEST_TITLE_KR : CHAT_REQUEST_TITLE_EN;
+    }
+
+    private String getChatRequestBody(boolean isKorean, String senderName) {
+        return isKorean
+                ? senderName + CHAT_REQUEST_BODY_KR
+                : senderName + CHAT_REQUEST_BODY_EN;
+    }
 
     private void sendToExpo(RequestNotification notification) {
         try {

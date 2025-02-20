@@ -61,6 +61,7 @@ public class CommentService {
             if (parent.getParent() != null) {
                 throw new FeedException(FeedExceptionType.COMMENT_DEPTH_LIMIT);
             }
+            notificationService.sendCommentReplyNotification(feed,parent, request.content());
         }
         Comment comment = Comment.builder()
                 .student(student)
@@ -69,7 +70,7 @@ public class CommentService {
                 .parent(parent)
                 .build();
         commentRepository.save(comment);
-        notificationService.sendFeedNotification(feed, request.content());
+        notificationService.sendCommentNotification(feed, request.content());
     }
 
     public void updateComment(StudentInfo studentInfo, Long feedId, Long commentId,
