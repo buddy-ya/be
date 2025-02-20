@@ -13,8 +13,10 @@ import com.team.buddyya.feed.repository.CommentRepository;
 import com.team.buddyya.feed.repository.FeedRepository;
 import com.team.buddyya.notification.service.NotificationService;
 import com.team.buddyya.student.domain.Student;
+import com.team.buddyya.student.repository.BlockRepository;
 import com.team.buddyya.student.service.FindStudentService;
 import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +31,7 @@ public class CommentService {
     private final CommentLikeRepository commentLikeRepository;
     private final FindStudentService findStudentService;
     private final NotificationService notificationService;
+    private final BlockRepository blockRepository;
 
     @Transactional(readOnly = true)
     Feed findFeedByFeedId(Long feedId) {
@@ -44,11 +47,13 @@ public class CommentService {
     @Transactional(readOnly = true)
     public List<CommentResponse> getComments(StudentInfo studentInfo, Long feedId) {
         Feed feed = findFeedByFeedId(feedId);
+        Set<Long> blockedStudentIds = blockRepository.findBlockedStudentIdByBlockerId(studentInfo.id());
         List<Comment> comments = feed.getComments().stream()
                 .filter(comment -> comment.getParent() == null)
+                .filter(comment -> !blockedStudentIds.contains(comment.getStudent().getId()))
                 .toList();
         return comments.stream()
-                .map(comment -> CommentResponse.from(comment, feedId, studentInfo.id(), commentLikeRepository))
+                .map(comment -> CommentResponse.from(comment, feedId, studentInfo.id(), commentLikeRepository, blockedStudentIds))
                 .toList();
     }
 
