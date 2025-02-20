@@ -2,7 +2,6 @@ package com.team.buddyya.student.repository;
 
 import com.team.buddyya.student.domain.Block;
 import com.team.buddyya.student.domain.Student;
-import java.util.List;
 import java.util.Set;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
