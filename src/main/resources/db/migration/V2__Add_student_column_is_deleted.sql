@@ -1,0 +1,2 @@
+ALTER TABLE student
+    ADD COLUMN is_deleted BOOLEAN DEFAULT FALSE;
