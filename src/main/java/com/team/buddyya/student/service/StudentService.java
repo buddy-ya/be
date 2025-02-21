@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static com.team.buddyya.common.domain.S3DirectoryName.PROFILE_IMAGE;
 import static com.team.buddyya.student.domain.UserProfileDefaultImage.USER_PROFILE_DEFAULT_IMAGE;
+import static com.team.buddyya.student.domain.UserProfileDefaultImage.isDefaultUserProfileImage;
 
 @Service
 @RequiredArgsConstructor
@@ -70,7 +71,6 @@ public class StudentService {
 
     public UserResponse updateUser(StudentInfo studentInfo, MyPageUpdateRequest request) {
         Student student = findStudentService.findByStudentId(studentInfo.id());
-
         switch (request.key()) {
             case "interests":
                 studentInterestService.updateStudentInterests(request.values(), student);
@@ -90,10 +90,10 @@ public class StudentService {
             default:
                 throw new StudentException(StudentExceptionType.UNSUPPORTED_UPDATE_KEY);
         }
-
+        boolean isDefaultProfileImage = isDefaultUserProfileImage(student);
         boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
                 .isPresent();
-        return UserResponse.from(student, isStudentIdCardRequested);
+        return UserResponse.from(student, isStudentIdCardRequested, isDefaultProfileImage);
     }
 
     public UserResponse updateUserProfileImage(StudentInfo studentInfo, boolean isDefault, UpdateProfileImageRequest request) {
@@ -102,22 +102,23 @@ public class StudentService {
                 .isPresent();
         if (isDefault) {
             profileImageService.updateUserProfileImage(student, USER_PROFILE_DEFAULT_IMAGE.getUrl());
-            return UserResponse.from(student, isStudentIdCardRequested);
+            return UserResponse.from(student, isStudentIdCardRequested,true);
         }
         String imageUrl = s3UploadService.uploadFile(PROFILE_IMAGE.getDirectoryName(), request.profileImage());
         profileImageService.updateUserProfileImage(student, imageUrl);
-        return UserResponse.from(student, isStudentIdCardRequested);
+        return UserResponse.from(student, isStudentIdCardRequested, false);
     }
 
     @Transactional(readOnly = true)
     public UserResponse getUserInfo(StudentInfo studentInfo, Long userId) {
         Student student = findStudentService.findByStudentId(userId);
+        boolean isDefaultProfileImage = isDefaultUserProfileImage(student);
         if (studentInfo.id() != userId) {
-            return UserResponse.from(student);
+            return UserResponse.from(student, isDefaultProfileImage);
         }
         boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
                 .isPresent();
-        return UserResponse.from(student, isStudentIdCardRequested);
+        return UserResponse.from(student, isStudentIdCardRequested, isDefaultProfileImage);
     }
 
     public void updateStudentCertification(Student student) {

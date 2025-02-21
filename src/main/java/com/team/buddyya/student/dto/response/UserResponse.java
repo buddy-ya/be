@@ -15,6 +15,7 @@ public record UserResponse(
         Boolean isCertificated,
         Boolean isStudentIdCardRequested,
         Boolean isKorean,
+        Boolean isDefaultProfileImage,
         List<String> majors,
         List<String> languages,
         List<String> interests,
@@ -23,7 +24,7 @@ public record UserResponse(
         String refreshToken
 ) {
 
-    public static UserResponse from(Student student, boolean isStudentIdCardRequested) {
+    public static UserResponse from(Student student, boolean isStudentIdCardRequested, Boolean isDefaultProfileImage) {
         return new UserResponse(
                 student.getId(),
                 student.getName(),
@@ -34,6 +35,7 @@ public record UserResponse(
                 student.getIsCertificated(),
                 isStudentIdCardRequested,
                 student.getIsKorean(),
+                isDefaultProfileImage,
                 convertToStringList(student.getMajors()),
                 convertToStringList(student.getLanguages()),
                 convertToStringList(student.getInterests()),
@@ -43,7 +45,7 @@ public record UserResponse(
         );
     }
 
-    public static UserResponse from(Student student) {
+    public static UserResponse from(Student student, Boolean isDefaultProfileImage) {
         return new UserResponse(
                 student.getId(),
                 student.getName(),
@@ -54,6 +56,7 @@ public record UserResponse(
                 null,
                 null,
                 null,
+                isDefaultProfileImage,
                 convertToStringList(student.getMajors()),
                 convertToStringList(student.getLanguages()),
                 convertToStringList(student.getInterests()),
@@ -63,7 +66,7 @@ public record UserResponse(
         );
     }
 
-    public static UserResponse from(Student student, Boolean isStudentIdCardRequested, String accessToken, String refreshToken) {
+    public static UserResponse from(Student student, Boolean isStudentIdCardRequested, String accessToken, String refreshToken, Boolean isDefaultProfileImage) {
         return new UserResponse(
                 student.getId(),
                 student.getName(),
@@ -74,6 +77,7 @@ public record UserResponse(
                 student.getIsCertificated(),
                 isStudentIdCardRequested,
                 student.getIsKorean(),
+                isDefaultProfileImage,
                 convertToStringList(student.getMajors()),
                 convertToStringList(student.getLanguages()),
                 convertToStringList(student.getInterests()),
@@ -83,7 +87,7 @@ public record UserResponse(
         );
     }
 
-    public static UserResponse from(Student student, Boolean isStudentIdCardRequested, String status, String accessToken, String refreshToken) {
+    public static UserResponse from(Student student, Boolean isStudentIdCardRequested, String status, String accessToken, String refreshToken, Boolean isDefaultProfileImage) {
         return new UserResponse(
                 student.getId(),
                 student.getName(),
@@ -94,6 +98,7 @@ public record UserResponse(
                 student.getIsCertificated(),
                 isStudentIdCardRequested,
                 student.getIsKorean(),
+                isDefaultProfileImage,
                 convertToStringList(student.getMajors()),
                 convertToStringList(student.getLanguages()),
                 convertToStringList(student.getInterests()),
@@ -114,6 +119,7 @@ public record UserResponse(
                 false,
                 false,
                 null,
+                true,
                 null,
                 null,
                 null,

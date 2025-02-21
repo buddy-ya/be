@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.team.buddyya.student.domain.UserProfileDefaultImage.isDefaultUserProfileImage;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -34,7 +36,8 @@ public class OnBoardingService {
         studentMajorService.createStudentMajors(request.majors(), student);
         studentInterestService.createStudentInterests(request.interests(), student);
         studentLanguageService.createStudentLanguages(request.languages(), student);
-        return UserResponse.from(student,false,accessToken, refreshToken);
+        boolean isDefaultProfileImage = isDefaultUserProfileImage(student);
+        return UserResponse.from(student,false,accessToken, refreshToken, isDefaultProfileImage);
     }
 
     private String createAndSaveToken(Student student) {
