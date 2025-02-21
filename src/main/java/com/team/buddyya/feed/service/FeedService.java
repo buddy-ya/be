@@ -17,8 +17,11 @@ import com.team.buddyya.feed.repository.BookmarkRepository;
 import com.team.buddyya.feed.repository.FeedLikeRepository;
 import com.team.buddyya.feed.repository.FeedRepository;
 import com.team.buddyya.student.domain.Student;
+import com.team.buddyya.student.repository.BlockRepository;
 import com.team.buddyya.student.service.FindStudentService;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -41,6 +44,7 @@ public class FeedService {
     private final FeedLikeRepository feedLikeRepository;
     private final BookmarkRepository bookmarkRepository;
     private final FeedImageService feedImageService;
+    private final BlockRepository blockRepository;
 
     @Transactional(readOnly = true)
     Feed findFeedByFeedId(Long feedId) {
@@ -56,17 +60,11 @@ public class FeedService {
     @Transactional(readOnly = true)
     public FeedListResponse getFeeds(StudentInfo studentInfo, Pageable pageable, FeedListRequest request) {
         String keyword = request.keyword();
-        if (keyword == null || keyword.isBlank()) {
-            Page<Feed> feeds = getFeedsByCategory(request, pageable);
-            List<FeedResponse> response = feeds.getContent().stream()
-                    .map(feed -> createFeedResponse(feed, studentInfo.id()))
-                    .toList();
-            return FeedListResponse.from(response, feeds);
-        }
-        Page<Feed> feeds = getFeedsByKeyword(keyword, pageable);
-        List<FeedResponse> response = feeds.getContent().stream()
-                .map(feed -> createFeedResponse(feed, studentInfo.id()))
-                .toList();
+        Page<Feed> feeds = (keyword == null || keyword.isBlank())
+                ? getFeedsByCategory(request, pageable)
+                : getFeedsByKeyword(keyword, pageable);
+        Set<Long> blockedStudentIds = blockRepository.findBlockedStudentIdByBlockerId(studentInfo.id());
+        List<FeedResponse> response = filterBlockedFeeds(feeds.getContent(), blockedStudentIds, studentInfo.id());
         return FeedListResponse.from(response, feeds);
     }
 
@@ -109,9 +107,8 @@ public class FeedService {
         Student student = findStudentByStudentId(studentInfo.id());
         Page<Bookmark> bookmarks = bookmarkRepository.findAllByStudent(student, pageable);
         Page<Feed> feeds = bookmarks.map(Bookmark::getFeed);
-        List<FeedResponse> response = bookmarks.getContent().stream()
-                .map(bookmark -> createFeedResponse(bookmark.getFeed(), studentInfo.id()))
-                .toList();
+        Set<Long> blockedStudentIds = blockRepository.findBlockedStudentIdByBlockerId(studentInfo.id());
+        List<FeedResponse> response = filterBlockedFeeds(feeds.getContent(), blockedStudentIds, studentInfo.id());
         return FeedListResponse.from(response, feeds);
     }
 
@@ -161,6 +158,13 @@ public class FeedService {
         validateFeedOwner(studentInfo.id(), feed);
         feedImageService.deleteS3FeedImages(feed);
         feedRepository.delete(feed);
+    }
+
+    private List<FeedResponse> filterBlockedFeeds(List<Feed> feeds, Set<Long> blockedStudentIds, Long currentStudentId) {
+        return feeds.stream()
+                .filter(feed -> !blockedStudentIds.contains(feed.getStudent().getId()))
+                .map(feed -> createFeedResponse(feed, currentStudentId))
+                .toList();
     }
 
     private void validateFeedOwner(Long studentId, Feed feed) {

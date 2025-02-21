@@ -1,5 +1,7 @@
 package com.team.buddyya.chatting.dto.response;
 
+import static com.team.buddyya.student.domain.UserProfileDefaultImage.getChatroomProfileImage;
+
 import com.team.buddyya.chatting.domain.ChatRequest;
 import java.time.LocalDateTime;
 
@@ -20,7 +22,7 @@ public record ChatRequestResponse(
                 chatRequest.getSender().getUniversity().getUniversityName(),
                 chatRequest.getSender().getName(),
                 chatRequest.getSender().getCountry(),
-                chatRequest.getSender().getProfileImage().getUrl(),
+                getChatroomProfileImage(chatRequest.getSender()),
                 chatRequest.getCreatedDate()
         );
     }

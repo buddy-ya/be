@@ -1,9 +1,12 @@
 package com.team.buddyya.chatting.controller;
 
 import com.team.buddyya.auth.domain.CustomUserDetails;
+import com.team.buddyya.chatting.dto.request.CreateChatroomRequest;
 import com.team.buddyya.chatting.dto.response.ChatRequestInfoResponse;
 import com.team.buddyya.chatting.dto.response.ChatRequestResponse;
+import com.team.buddyya.chatting.dto.response.CreateChatroomResponse;
 import com.team.buddyya.chatting.service.ChatRequestService;
+import com.team.buddyya.chatting.service.ChatService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +15,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ChatRequestController {
 
     private final ChatRequestService chatRequestService;
+    private final ChatService chatService;
 
     @GetMapping("/{receiverId}")
     public ResponseEntity<ChatRequestInfoResponse> getChatRequestInfo(
@@ -40,6 +45,14 @@ public class ChatRequestController {
             , @PathVariable("receiverId") Long receiverId) {
         chatRequestService.createChatRequest(userDetails, receiverId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping
+    public ResponseEntity<CreateChatroomResponse> createOrGetChatRoom(@RequestBody CreateChatroomRequest request,
+                                                                      @AuthenticationPrincipal CustomUserDetails userDetails) {
+        CreateChatroomResponse response = chatService.createOrGetChatRoom(request, userDetails.getStudentInfo());
+        chatRequestService.deleteChatRequest(userDetails, request.chatRequestId());
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{chatRequestId}")
