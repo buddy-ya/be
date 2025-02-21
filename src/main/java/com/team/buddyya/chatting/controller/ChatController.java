@@ -12,8 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 import static org.springframework.data.domain.Sort.Direction;
 
 @RestController
@@ -33,7 +31,7 @@ public class ChatController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ChatroomResponse>> getChatRooms(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<ChatroomListResponse> getChatRooms(@AuthenticationPrincipal CustomUserDetails userDetails) {
         return ResponseEntity.ok(chatService.getChatRooms(userDetails.getStudentInfo()));
     }
 
