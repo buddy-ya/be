@@ -51,15 +51,13 @@ public class PhoneAuthenticationService {
 
     public UserResponse checkMembership(String phoneNumber) {
         Optional<Student> optionalStudent = studentRepository.findByPhoneNumber(phoneNumber);
-
         if (optionalStudent.isPresent()) {
             Student student = optionalStudent.get();
             String accessToken = jwtUtils.createAccessToken(new TokenInfoRequest(student.getId()));
             String refreshToken = student.getAuthToken().getRefreshToken();
             boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student).isPresent();
-            return UserResponse.from(student, isStudentIdCardRequested, "EXISTING_MEMBER", accessToken, refreshToken);
+            return UserResponse.from(student, isStudentIdCardRequested, EXISTING_MEMBER, accessToken, refreshToken);
         }
-
-        return UserResponse.from("NEW_MEMBER");
+        return UserResponse.from(NEW_MEMBER);
     }
 }

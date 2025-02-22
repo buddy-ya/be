@@ -70,7 +70,6 @@ public class StudentService {
 
     public UserResponse updateUser(StudentInfo studentInfo, MyPageUpdateRequest request) {
         Student student = findStudentService.findByStudentId(studentInfo.id());
-
         switch (request.key()) {
             case "interests":
                 studentInterestService.updateStudentInterests(request.values(), student);
@@ -90,7 +89,6 @@ public class StudentService {
             default:
                 throw new StudentException(StudentExceptionType.UNSUPPORTED_UPDATE_KEY);
         }
-
         boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
                 .isPresent();
         return UserResponse.from(student, isStudentIdCardRequested);
