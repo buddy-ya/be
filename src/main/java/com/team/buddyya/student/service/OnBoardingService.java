@@ -36,8 +36,7 @@ public class OnBoardingService {
         studentMajorService.createStudentMajors(request.majors(), student);
         studentInterestService.createStudentInterests(request.interests(), student);
         studentLanguageService.createStudentLanguages(request.languages(), student);
-        boolean isDefaultProfileImage = isDefaultUserProfileImage(student);
-        return UserResponse.from(student, false, accessToken, refreshToken, isDefaultProfileImage);
+        return UserResponse.from(student, false, accessToken, refreshToken);
     }
 
     private String createAndSaveToken(Student student) {

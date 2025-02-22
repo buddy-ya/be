@@ -90,10 +90,9 @@ public class StudentService {
             default:
                 throw new StudentException(StudentExceptionType.UNSUPPORTED_UPDATE_KEY);
         }
-        boolean isDefaultProfileImage = isDefaultUserProfileImage(student);
         boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
                 .isPresent();
-        return UserResponse.from(student, isStudentIdCardRequested, isDefaultProfileImage);
+        return UserResponse.from(student, isStudentIdCardRequested);
     }
 
     public UserResponse updateUserProfileImage(StudentInfo studentInfo, boolean isDefault, UpdateProfileImageRequest request) {
@@ -102,23 +101,22 @@ public class StudentService {
                 .isPresent();
         if (isDefault) {
             profileImageService.updateUserProfileImage(student, USER_PROFILE_DEFAULT_IMAGE.getUrl());
-            return UserResponse.from(student, isStudentIdCardRequested,true);
+            return UserResponse.from(student, isStudentIdCardRequested);
         }
         String imageUrl = s3UploadService.uploadFile(PROFILE_IMAGE.getDirectoryName(), request.profileImage());
         profileImageService.updateUserProfileImage(student, imageUrl);
-        return UserResponse.from(student, isStudentIdCardRequested, false);
+        return UserResponse.from(student, isStudentIdCardRequested);
     }
 
     @Transactional(readOnly = true)
     public UserResponse getUserInfo(StudentInfo studentInfo, Long userId) {
         Student student = findStudentService.findByStudentId(userId);
-        boolean isDefaultProfileImage = isDefaultUserProfileImage(student);
         if (studentInfo.id() != userId) {
-            return UserResponse.from(student, isDefaultProfileImage);
+            return UserResponse.from(student);
         }
         boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
                 .isPresent();
-        return UserResponse.from(student, isStudentIdCardRequested, isDefaultProfileImage);
+        return UserResponse.from(student, isStudentIdCardRequested);
     }
 
     public void updateStudentCertification(Student student) {

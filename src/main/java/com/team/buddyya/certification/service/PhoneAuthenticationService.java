@@ -17,8 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static com.team.buddyya.student.domain.UserProfileDefaultImage.isDefaultUserProfileImage;
-
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -58,9 +56,8 @@ public class PhoneAuthenticationService {
             String accessToken = jwtUtils.createAccessToken(new TokenInfoRequest(student.getId()));
             String refreshToken = student.getAuthToken().getRefreshToken();
             boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student).isPresent();
-            boolean isDefaultProfileImage = isDefaultUserProfileImage(student);
-            return UserResponse.from(student, isStudentIdCardRequested, "EXISTING_MEMBER", accessToken, refreshToken, isDefaultProfileImage);
+            return UserResponse.from(student, isStudentIdCardRequested, EXISTING_MEMBER, accessToken, refreshToken);
         }
-        return UserResponse.from("NEW_MEMBER");
+        return UserResponse.from(NEW_MEMBER);
     }
 }
