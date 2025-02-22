@@ -26,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static com.team.buddyya.common.domain.S3DirectoryName.PROFILE_IMAGE;
 import static com.team.buddyya.student.domain.UserProfileDefaultImage.USER_PROFILE_DEFAULT_IMAGE;
-import static com.team.buddyya.student.domain.UserProfileDefaultImage.isDefaultUserProfileImage;
 
 @Service
 @RequiredArgsConstructor

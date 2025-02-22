@@ -11,8 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.team.buddyya.student.domain.UserProfileDefaultImage.isDefaultUserProfileImage;
-
 @Service
 @RequiredArgsConstructor
 @Transactional
