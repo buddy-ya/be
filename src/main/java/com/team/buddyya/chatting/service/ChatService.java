@@ -156,14 +156,18 @@ public class ChatService {
     }
 
     @Transactional(readOnly = true)
-    public List<ChatroomResponse> getChatRooms(StudentInfo studentInfo) {
+    public ChatroomListResponse getChatRooms(StudentInfo studentInfo) {
         Student student = findStudentService.findByStudentId(studentInfo.id());
-        return student.getChatroomStudents().stream()
+        List<ChatroomResponse> chatroomResponses = student.getChatroomStudents().stream()
                 .filter(chatroomStudent -> !chatroomStudent.getIsExited())
                 .map(chatroomStudent -> createChatroomResponse(chatroomStudent))
                 .filter(Objects::nonNull)
                 .sorted((a, b) -> b.lastMessageDate().compareTo(a.lastMessageDate()))
                 .collect(Collectors.toList());
+        int totalUnreadCount = chatroomResponses.stream()
+                .mapToInt(ChatroomResponse::unreadCount)
+                .sum();
+        return ChatroomListResponse.from(chatroomResponses, totalUnreadCount);
     }
 
     @Transactional(readOnly = true)
