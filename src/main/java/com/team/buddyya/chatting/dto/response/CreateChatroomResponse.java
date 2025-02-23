@@ -24,4 +24,15 @@ public record CreateChatroomResponse(
                 isNew
         );
     }
+
+    public static CreateChatroomResponse from(){
+        return new CreateChatroomResponse(
+                null,
+                null,
+                null,
+                null,
+                null,
+                false
+        );
+    }
 }
