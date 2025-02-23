@@ -29,6 +29,7 @@ public class MatchService {
     private final FindStudentService findStudentService;
     private final ChatRequestService chatRequestService;
     private final ChatService chatService;
+    private final NotificationService notificationService;
 
     private final String SAME_UNIVERSITY_TYPE = "SAME_UNIVERSITY";
     private final String DIFFERENT_UNIVERSITY_TYPE = "DIFFERENT_UNIVERSITY";
@@ -63,6 +64,8 @@ public class MatchService {
             buddyRepository.save(MatchedBuddy);
             matchRepository.delete(optionalMatchRequest.get());
             Chatroom chatroom = chatService.createChatroom(student, matchedStudent);
+            notificationService.sendMatchSuccessNotification(student,chatroom.getId());
+            notificationService.sendMatchSuccessNotification(matchedStudent,chatroom.getId());
             return CreateChatroomResponse.from(chatroom, matchedStudent, true);
         }
         MatchRequest matchRequest = MatchRequest.builder()
