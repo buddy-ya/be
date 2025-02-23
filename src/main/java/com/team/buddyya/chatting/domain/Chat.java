@@ -34,7 +34,6 @@ public class Chat extends CreatedTime {
     @Column(nullable = false)
     private MessageType type;
 
-
     @Builder
     public Chat(MessageType type, Chatroom chatroom, Student student, String message) {
         this.type = type;
