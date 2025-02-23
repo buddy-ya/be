@@ -68,7 +68,7 @@ public class ChatService {
         return CreateChatroomResponse.from(newChatroom, buddy, true);
     }
 
-    private Chatroom createChatroom(Student user, Student buddy) {
+    public Chatroom createChatroom(Student user, Student buddy) {
         Chatroom newChatroom = Chatroom
                 .builder()
                 .createdTime(LocalDateTime.now())
