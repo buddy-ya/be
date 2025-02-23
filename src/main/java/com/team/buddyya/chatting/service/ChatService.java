@@ -87,6 +87,12 @@ public class ChatService {
         return newChatroom;
     }
 
+    @Transactional(readOnly = true)
+    public Chatroom findByChatroomByChatroomId(Long chatroomId) {
+        return chatRoomRepository.findById(chatroomId)
+                .orElseThrow(() -> new ChatException(ChatExceptionType.CHATROOM_NOT_FOUND));
+    }
+
     public void handleAction(ChatMessage chatMessage) throws IllegalArgumentException {
         Chatroom chatRoom = chatRoomRepository.findById(chatMessage.getRoomId())
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_CHATROOM_NOT_FOUND));

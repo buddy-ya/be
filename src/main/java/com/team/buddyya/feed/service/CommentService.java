@@ -15,11 +15,12 @@ import com.team.buddyya.notification.service.NotificationService;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.repository.BlockRepository;
 import com.team.buddyya.student.service.FindStudentService;
-import java.util.List;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -34,12 +35,12 @@ public class CommentService {
     private final BlockRepository blockRepository;
 
     @Transactional(readOnly = true)
-    Feed findFeedByFeedId(Long feedId) {
+    public Feed findFeedByFeedId(Long feedId) {
         return feedRepository.findById(feedId).orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND));
     }
 
     @Transactional(readOnly = true)
-    Comment findCommentByCommentId(Long commentId) {
+    public Comment findCommentByCommentId(Long commentId) {
         return commentRepository.findById(commentId)
                 .orElseThrow(() -> new FeedException(FeedExceptionType.COMMENT_NOT_FOUND));
     }
@@ -66,7 +67,7 @@ public class CommentService {
             if (parent.getParent() != null) {
                 throw new FeedException(FeedExceptionType.COMMENT_DEPTH_LIMIT);
             }
-            notificationService.sendCommentReplyNotification(feed,parent, request.content());
+            notificationService.sendCommentReplyNotification(feed, parent, request.content());
         }
         Comment comment = Comment.builder()
                 .student(student)
