@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface MatchRepository extends JpaRepository<MatchRequest, Long> {
+public interface MatchRequestRepository extends JpaRepository<MatchRequest, Long> {
 
     @Query("""
                 SELECT m FROM MatchRequest m 

@@ -8,7 +8,7 @@ import com.team.buddyya.match.domain.Buddy;
 import com.team.buddyya.match.domain.MatchRequest;
 import com.team.buddyya.match.dto.request.MatchCreateRequest;
 import com.team.buddyya.match.repositorry.BuddyRepository;
-import com.team.buddyya.match.repositorry.MatchRepository;
+import com.team.buddyya.match.repositorry.MatchRequestRepository;
 import com.team.buddyya.notification.service.NotificationService;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.service.FindStudentService;
@@ -24,7 +24,7 @@ import java.util.Set;
 @Transactional
 public class MatchService {
 
-    private final MatchRepository matchRepository;
+    private final MatchRequestRepository matchRequestRepository;
     private final BuddyRepository buddyRepository;
     private final FindStudentService findStudentService;
     private final ChatRequestService chatRequestService;
@@ -62,7 +62,7 @@ public class MatchService {
                     .build();
             buddyRepository.save(requestedBuddy);
             buddyRepository.save(MatchedBuddy);
-            matchRepository.delete(optionalMatchRequest.get());
+            matchRequestRepository.delete(optionalMatchRequest.get());
             Chatroom chatroom = chatService.createChatroom(student, matchedStudent);
             notificationService.sendMatchSuccessNotification(student,chatroom.getId());
             notificationService.sendMatchSuccessNotification(matchedStudent,chatroom.getId());
@@ -72,14 +72,14 @@ public class MatchService {
                 .student(student)
                 .isKorean(isKorean)
                 .build();
-        matchRepository.save(matchRequest);
+        matchRequestRepository.save(matchRequest);
         return CreateChatroomResponse.from();
     }
 
     private Optional<MatchRequest> findValidMatchRequest(
             Student student, boolean isKorean, String universityType, String genderType,
             Long universityId, String studentGender, Set<Long> existingBuddies) {
-        return matchRepository.findAllMatches(isKorean).stream()
+        return matchRequestRepository.findAllMatches(isKorean).stream()
                 .filter(matchedRequest -> {
                     Student matchedStudent = matchedRequest.getStudent();
                     Long matchedUniversityId = matchedStudent.getUniversity().getId();
