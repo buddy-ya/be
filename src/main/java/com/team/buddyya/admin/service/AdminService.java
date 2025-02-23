@@ -1,12 +1,14 @@
 package com.team.buddyya.admin.service;
 
 import com.team.buddyya.admin.dto.request.StudentVerificationRequest;
+import com.team.buddyya.admin.dto.response.AdminReportsResponse;
 import com.team.buddyya.admin.dto.response.StudentIdCardListResponse;
 import com.team.buddyya.admin.dto.response.StudentIdCardResponse;
 import com.team.buddyya.admin.dto.response.StudentVerificationResponse;
 import com.team.buddyya.certification.repository.StudentIdCardRepository;
 import com.team.buddyya.common.service.S3UploadService;
 import com.team.buddyya.notification.service.NotificationService;
+import com.team.buddyya.report.repository.ReportRepository;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.service.FindStudentService;
 import com.team.buddyya.student.service.StudentService;
@@ -30,9 +32,10 @@ public class AdminService {
 
     private final StudentService studentService;
     private final FindStudentService findStudentService;
-    private final StudentIdCardRepository studentIdCardRepository;
     private final S3UploadService s3UploadService;
     private final NotificationService notificationService;
+    private final StudentIdCardRepository studentIdCardRepository;
+    private final ReportRepository reportRepository;
 
     @Transactional(readOnly = true)
     public StudentIdCardListResponse getStudentIdCards() {
@@ -49,5 +52,11 @@ public class AdminService {
         studentService.updateStudentCertification(student);
         notificationService.sendAuthorizationNotification(student, true);
         return new StudentVerificationResponse(VERIFICATION_COMPLETED_MESSAGE);
+    }
+
+    public List<AdminReportsResponse> getAllReports() {
+        return reportRepository.findAll().stream()
+                .map(AdminReportsResponse::from)
+                .collect(Collectors.toList());
     }
 }

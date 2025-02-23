@@ -1,12 +1,15 @@
 package com.team.buddyya.admin.controller;
 
 import com.team.buddyya.admin.dto.request.StudentVerificationRequest;
+import com.team.buddyya.admin.dto.response.AdminReportsResponse;
 import com.team.buddyya.admin.dto.response.StudentIdCardListResponse;
 import com.team.buddyya.admin.dto.response.StudentVerificationResponse;
 import com.team.buddyya.admin.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,5 +26,10 @@ public class AdminController {
     @PostMapping("/student-id-cards/verify")
     public ResponseEntity<StudentVerificationResponse> verifyStudentIdCard(@RequestBody StudentVerificationRequest request) {
         return ResponseEntity.ok(adminService.verifyStudentIdCard(request));
+    }
+
+    @GetMapping("/reports")
+    public ResponseEntity<List<AdminReportsResponse>> getReports() {
+        return ResponseEntity.ok(adminService.getAllReports());
     }
 }
