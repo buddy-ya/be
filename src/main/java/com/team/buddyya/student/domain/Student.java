@@ -116,6 +116,7 @@ public class Student extends BaseTime {
         this.isCertificated = false;
         this.characterProfileImage = characterProfileImage;
         this.isDeleted = false;
+        this.isBanned = false;
     }
 
     public void updateIsCertificated(boolean isCertificated) {
