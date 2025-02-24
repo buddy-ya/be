@@ -45,9 +45,6 @@ public class StudentService {
     private final ExpoTokenRepository expoTokenRepository;
     private final RegisteredPhoneRepository registeredPhoneRepository;
     private final StudentEmailRepository studentEmailRepository;
-    private final StudentMajorRepository studentMajorRepository;
-    private final StudentLanguageRepository studentLanguageRepository;
-    private final StudentInterestRepository studentInterestRepository;
 
     private static final String BLOCK_SUCCESS_MESSAGE = "차단이 성공적으로 완료되었습니다.";
 
