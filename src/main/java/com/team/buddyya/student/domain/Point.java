@@ -19,6 +19,7 @@ public class Point extends BaseTime {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
+    private static final int MIN_POINT = 0;
     private static final int MAX_POINT = 100_000;
 
     @OneToOne(fetch = LAZY)
@@ -41,7 +42,7 @@ public class Point extends BaseTime {
     }
 
     private void validatePoint(int point) {
-        if (point < 0) {
+        if (point < MIN_POINT) {
             throw new StudentException(StudentExceptionType.NEGATIVE_POINT);
         }
         if (point > MAX_POINT) {
