@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -93,6 +94,12 @@ public class Student extends BaseTime {
     @OneToMany(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<ChatroomStudent> chatroomStudents;
 
+    @Column(name = "is_banned", nullable = false)
+    private Boolean isBanned = false;
+
+    @Column(name = "ban_end_time")
+    private LocalDateTime banEndTime;
+
     @Builder
     public Student(String name, String phoneNumber, String country, Boolean isKorean, Role role, University university,
                    Gender gender, String characterProfileImage) {
@@ -108,7 +115,7 @@ public class Student extends BaseTime {
         this.interests = new ArrayList<>();
         this.isCertificated = false;
         this.characterProfileImage = characterProfileImage;
-        this.isDeleted=false;
+        this.isDeleted = false;
     }
 
     public void updateIsCertificated(boolean isCertificated) {
@@ -149,5 +156,25 @@ public class Student extends BaseTime {
         this.phoneNumber = "deleted_" + UUID.randomUUID().toString().substring(0, 3);
         this.email = "deleted_" + UUID.randomUUID().toString().substring(0, 4);
         this.name = "UNKNOWN";
+    }
+
+    public boolean checkAndUpdateBanStatus() {
+        if (this.isBanned && this.banEndTime != null) {
+            if (LocalDateTime.now().isAfter(this.banEndTime)) {
+                unban();
+                return false;
+            }
+        }
+        return this.isBanned;
+    }
+
+    public void ban(int days) {
+        this.isBanned = true;
+        this.banEndTime = LocalDateTime.now().plusDays(days);
+    }
+
+    public void unban() {
+        this.isBanned = false;
+        this.banEndTime = null;
     }
 }
