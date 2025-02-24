@@ -59,4 +59,14 @@ public class AdminService {
                 .map(AdminReportsResponse::from)
                 .collect(Collectors.toList());
     }
+
+    public void banStudent(Long studentId, int days) {
+        Student student = findStudentService.findByStudentId(studentId);
+        student.ban(days);
+    }
+
+    public void unbanStudent(Long studentId) {
+        Student student = findStudentService.findByStudentId(studentId);
+        student.unban();
+    }
 }

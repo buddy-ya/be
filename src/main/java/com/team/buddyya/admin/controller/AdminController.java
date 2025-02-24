@@ -1,5 +1,6 @@
 package com.team.buddyya.admin.controller;
 
+import com.team.buddyya.admin.dto.request.BanRequest;
 import com.team.buddyya.admin.dto.request.StudentVerificationRequest;
 import com.team.buddyya.admin.dto.response.AdminReportsResponse;
 import com.team.buddyya.admin.dto.response.StudentIdCardListResponse;
@@ -31,5 +32,19 @@ public class AdminController {
     @GetMapping("/reports")
     public ResponseEntity<List<AdminReportsResponse>> getReports() {
         return ResponseEntity.ok(adminService.getAllReports());
+    }
+
+    @PostMapping("/ban/{studentId}")
+    public ResponseEntity<Void> banStudent(
+            @PathVariable("studentId") Long studentId,
+            @RequestBody BanRequest request) {
+        adminService.banStudent(studentId, request.days());
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/unban/{studentId}")
+    public ResponseEntity<Void> unbanStudent(@PathVariable("studentId") Long studentId) {
+        adminService.unbanStudent(studentId);
+        return ResponseEntity.ok().build();
     }
 }
