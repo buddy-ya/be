@@ -12,14 +12,11 @@ import com.team.buddyya.student.dto.request.MyPageUpdateRequest;
 import com.team.buddyya.student.dto.request.OnBoardingRequest;
 import com.team.buddyya.student.dto.request.UpdateProfileImageRequest;
 import com.team.buddyya.student.dto.response.BlockResponse;
+import com.team.buddyya.student.dto.response.UserBanStatusResponse;
 import com.team.buddyya.student.dto.response.UserResponse;
 import com.team.buddyya.student.exception.StudentException;
 import com.team.buddyya.student.exception.StudentExceptionType;
 import com.team.buddyya.student.repository.*;
-
-import com.team.buddyya.student.repository.BlockRepository;
-import com.team.buddyya.student.repository.StudentRepository;
-import com.team.buddyya.student.repository.UniversityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -163,5 +160,14 @@ public class StudentService {
                 .blockedStudentId(blockerId)
                 .build());
         return BlockResponse.from(BLOCK_SUCCESS_MESSAGE);
+    }
+
+    public UserBanStatusResponse checkBanEndTimeOrUpdate(StudentInfo studentId) {
+        Student student = findStudentService.findByStudentId(studentId.id());
+        boolean isBanned = student.checkAndUpdateBanStatus();
+        if (!isBanned) {
+            studentRepository.save(student);
+        }
+        return new UserBanStatusResponse(isBanned, student.getBanEndTime());
     }
 }
