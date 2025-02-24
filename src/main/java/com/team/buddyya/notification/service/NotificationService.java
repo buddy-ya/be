@@ -62,7 +62,7 @@ public class NotificationService {
     private static final String CHAT_REQUEST_BODY_KR = "님이 채팅 요청을 보냈습니다. 확인하고 대화를 시작해 보세요!";
     private static final String CHAT_REQUEST_BODY_EN = " has sent you a chat request. Check it out and start a conversation!";
 
-    private static final String CHAT_ACCEPT_TITLE_KR = "이 채팅 요청을 승낙했습니다.";
+    private static final String CHAT_ACCEPT_TITLE_KR = "이 채팅 요청을 수락했습니다.";
     private static final String CHAT_ACCEPT_TITLE_EN = "have accepted this chat request.";
 
     private static final String CHAT_ACCEPT_BODY_KR = "대화를 시작해보세요!";
