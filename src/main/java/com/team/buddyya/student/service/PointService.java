@@ -40,4 +40,23 @@ public class PointService {
         pointStatusRepository.save(signUpPointStatus);
         return point;
     }
+
+    public void updatePoint(Student student, String pointTypeValue){
+        Point point = getPoint(student);
+        PointType pointType = PointType.fromValue(pointTypeValue);
+        int pointChange = pointType.getPointChange();
+        point.updatePoint(pointChange);
+        pointRepository.save(point);
+        PointStatus pointStatus = PointStatus.builder()
+                .point(point)
+                .pointType(pointType)
+                .changedPoint(pointChange)
+                .build();
+        pointStatusRepository.save(pointStatus);
+    }
+
+    public Point getPoint(Student student){
+        return pointRepository.findByStudent(student)
+                .orElseGet(() -> Point.builder().student(student).currentPoint(0).build());
+    }
 }
