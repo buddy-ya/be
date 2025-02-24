@@ -229,7 +229,7 @@ public class NotificationService {
                 : senderName + CHAT_REQUEST_BODY_EN;
     }
 
-    public void sendChatAcceptNotification(Student student, Long roomId){
+    public void sendChatAcceptNotification(Student student, String senderName, Long roomId){
         try{
             String token = getTokenByUserId(student.getId());
             Map<String, Object> data = Map.of(
@@ -238,7 +238,7 @@ public class NotificationService {
             );
             boolean isKorean = student.getIsKorean();
             String title = getChatAcceptTitle(isKorean);
-            String body = getChatAcceptBody(isKorean, student.getName());
+            String body = getChatAcceptBody(isKorean, senderName);
             sendToExpo(RequestNotification.builder()
                     .to(token)
                     .title(title)

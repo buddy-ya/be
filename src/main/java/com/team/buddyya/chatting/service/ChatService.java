@@ -67,8 +67,7 @@ public class ChatService {
             return CreateChatroomResponse.from(room, buddy, false);
         }
         Chatroom newChatroom = createChatroom(user, buddy);
-        notificationService.sendChatAcceptNotification(user, newChatroom.getId());
-        notificationService.sendChatAcceptNotification(buddy, newChatroom.getId());
+        notificationService.sendChatAcceptNotification(buddy, user.getName(), newChatroom.getId());
         return CreateChatroomResponse.from(newChatroom, buddy, true);
     }
 
