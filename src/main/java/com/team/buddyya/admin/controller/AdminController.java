@@ -34,7 +34,7 @@ public class AdminController {
         return ResponseEntity.ok(adminService.getAllReports());
     }
 
-    @PostMapping("/ban/{studentId}")
+    @PatchMapping("/ban/{studentId}")
     public ResponseEntity<Void> banStudent(
             @PathVariable("studentId") Long studentId,
             @RequestBody BanRequest request) {
@@ -42,7 +42,7 @@ public class AdminController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/unban/{studentId}")
+    @PatchMapping("/unban/{studentId}")
     public ResponseEntity<Void> unbanStudent(@PathVariable("studentId") Long studentId) {
         adminService.unbanStudent(studentId);
         return ResponseEntity.ok().build();
