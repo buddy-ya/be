@@ -16,6 +16,7 @@ import com.team.buddyya.chatting.repository.ChatRepository;
 import com.team.buddyya.chatting.repository.ChatroomRepository;
 import com.team.buddyya.chatting.repository.ChatroomStudentRepository;
 import com.team.buddyya.common.service.S3UploadService;
+import com.team.buddyya.notification.service.NotificationService;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.service.FindStudentService;
 import lombok.RequiredArgsConstructor;
@@ -55,6 +56,7 @@ public class ChatService {
     private final ChatroomStudentRepository chatroomStudentRepository;
     private final Map<Long, Set<WebSocketSession>> sessionsPerRoom = new ConcurrentHashMap<>();
     private final Map<WebSocketSession, Long> lastPongTimestamps = new ConcurrentHashMap<>();
+    private final NotificationService notificationService;
 
     public CreateChatroomResponse createOrGetChatRoom(CreateChatroomRequest request, StudentInfo studentInfo) {
         Student user = findStudentService.findByStudentId(studentInfo.id());
@@ -65,6 +67,7 @@ public class ChatService {
             return CreateChatroomResponse.from(room, buddy, false);
         }
         Chatroom newChatroom = createChatroom(user, buddy);
+        notificationService.sendChatAcceptNotification(buddy, user.getName(), newChatroom.getId());
         return CreateChatroomResponse.from(newChatroom, buddy, true);
     }
 
