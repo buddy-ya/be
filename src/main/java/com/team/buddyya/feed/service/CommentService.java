@@ -22,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Set;
 
+import static com.team.buddyya.student.domain.Role.ADMIN;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -86,7 +88,7 @@ public class CommentService {
         if (comment.isDeleted()) {
             throw new FeedException(FeedExceptionType.COMMENT_NOT_FOUND);
         }
-        validateCommentOwner(studentInfo.id(), comment);
+        validateCommentOwner(studentInfo, comment);
         comment.updateComment(request.content());
     }
 
@@ -96,7 +98,7 @@ public class CommentService {
         if (comment.isDeleted()) {
             throw new FeedException(FeedExceptionType.COMMENT_NOT_FOUND);
         }
-        validateCommentOwner(studentInfo.id(), comment);
+        validateCommentOwner(studentInfo, comment);
         boolean hasChild = !comment.getChildren().isEmpty();
         if (hasChild) {
             comment.updateIsDeleted(true);
@@ -106,8 +108,8 @@ public class CommentService {
         commentRepository.delete(comment);
     }
 
-    private void validateCommentOwner(Long studentId, Comment comment) {
-        if (!studentId.equals(comment.getStudent().getId())) {
+    private void validateCommentOwner(StudentInfo studentInfo, Comment comment) {
+        if (!studentInfo.id().equals(comment.getStudent().getId()) && !studentInfo.role().equals(ADMIN)) {
             throw new FeedException(FeedExceptionType.NOT_COMMENT_OWNER);
         }
     }
