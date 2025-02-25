@@ -1,7 +1,6 @@
 package com.team.buddyya.match.controller;
 
 import com.team.buddyya.auth.domain.CustomUserDetails;
-import com.team.buddyya.chatting.dto.response.CreateChatroomResponse;
 import com.team.buddyya.match.dto.request.MatchCreateRequest;
 import com.team.buddyya.match.dto.response.MatchCreateResponse;
 import com.team.buddyya.match.service.MatchService;
