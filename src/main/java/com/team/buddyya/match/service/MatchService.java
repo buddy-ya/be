@@ -51,29 +51,9 @@ public class MatchService {
                 existingBuddies
         );
         if (optionalMatchRequest.isPresent()) {
-            Student matchedStudent = optionalMatchRequest.get().getStudent();
-            Buddy requestedBuddy = Buddy.builder()
-                    .student(student)
-                    .buddyId(matchedStudent.getId())
-                    .build();
-            Buddy MatchedBuddy = Buddy.builder()
-                    .student(matchedStudent)
-                    .buddyId(studentId)
-                    .build();
-            buddyRepository.save(requestedBuddy);
-            buddyRepository.save(MatchedBuddy);
-            matchRequestRepository.delete(optionalMatchRequest.get());
-            Chatroom chatroom = chatService.createChatroom(student, matchedStudent);
-            notificationService.sendMatchSuccessNotification(student,chatroom.getId());
-            notificationService.sendMatchSuccessNotification(matchedStudent,chatroom.getId());
-            return CreateChatroomResponse.from(chatroom, matchedStudent, true);
+            return processMatchSuccess(student, optionalMatchRequest.get());
         }
-        MatchRequest matchRequest = MatchRequest.builder()
-                .student(student)
-                .isKorean(isKorean)
-                .build();
-        matchRequestRepository.save(matchRequest);
-        return CreateChatroomResponse.from();
+        return createMatchRequest(student, isKorean);
     }
 
     private Optional<MatchRequest> findValidMatchRequest(
@@ -102,5 +82,33 @@ public class MatchService {
                     return true;
                 })
                 .findFirst();
+    }
+
+    private CreateChatroomResponse processMatchSuccess(Student student, MatchRequest matchRequest) {
+        Student matchedStudent = matchRequest.getStudent();
+        Buddy requestedBuddy = Buddy.builder()
+                .student(student)
+                .buddyId(matchedStudent.getId())
+                .build();
+        Buddy matchedBuddy = Buddy.builder()
+                .student(matchedStudent)
+                .buddyId(student.getId())
+                .build();
+        buddyRepository.save(requestedBuddy);
+        buddyRepository.save(matchedBuddy);
+        matchRequestRepository.delete(matchRequest);
+        Chatroom chatroom = chatService.createChatroom(student, matchedStudent);
+        notificationService.sendMatchSuccessNotification(student, chatroom.getId());
+        notificationService.sendMatchSuccessNotification(matchedStudent, chatroom.getId());
+        return CreateChatroomResponse.from(chatroom, matchedStudent, true);
+    }
+
+    private CreateChatroomResponse createMatchRequest(Student student, boolean isKorean) {
+        MatchRequest matchRequest = MatchRequest.builder()
+                .student(student)
+                .isKorean(isKorean)
+                .build();
+        matchRequestRepository.save(matchRequest);
+        return CreateChatroomResponse.from();
     }
 }
