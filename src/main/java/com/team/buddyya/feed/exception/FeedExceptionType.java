@@ -7,7 +7,7 @@ public enum FeedExceptionType implements BaseExceptionType {
 
     FEED_NOT_FOUND(4000, HttpStatus.NOT_FOUND, "해당 피드를 찾지 못했습니다."),
     CATEGORY_NOT_FOUND(4000, HttpStatus.NOT_FOUND, "해당 카테고리를 찾지 못했습니다."),
-    NOT_FEED_OWNER(4001, HttpStatus.FORBIDDEN, "해당 피드의 글쓴이기 아닙니다."),
+    NOT_FEED_OWNER(4001, HttpStatus.FORBIDDEN, "해당 피드의 글쓴이가 아닙니다."),
     FEED_ALREADY_LIKED(4002, HttpStatus.CONFLICT, "이미 좋아요를 누른 게시글입니다."),
     FEED_NOT_LIKED(4003, HttpStatus.NOT_FOUND, "좋아요를 누르지 않은 게시글입니다."),
     FEED_ALREADY_BOOKMARKED(4004, HttpStatus.CONFLICT, "이미 북마크한 게시글입니다."),
