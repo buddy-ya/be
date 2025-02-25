@@ -4,9 +4,10 @@ import com.team.buddyya.chatting.domain.Chatroom;
 import com.team.buddyya.chatting.dto.response.CreateChatroomResponse;
 import com.team.buddyya.chatting.service.ChatRequestService;
 import com.team.buddyya.chatting.service.ChatService;
-import com.team.buddyya.match.domain.Buddy;
+import com.team.buddyya.match.domain.MatchedHistory;
 import com.team.buddyya.match.domain.MatchRequest;
 import com.team.buddyya.match.dto.request.MatchCreateRequest;
+import com.team.buddyya.match.dto.response.MatchCreateResponse;
 import com.team.buddyya.match.repositorry.BuddyRepository;
 import com.team.buddyya.match.repositorry.MatchRequestRepository;
 import com.team.buddyya.notification.service.NotificationService;
@@ -31,11 +32,13 @@ public class MatchService {
     private final ChatService chatService;
     private final NotificationService notificationService;
 
+    private final String MATCH_STATUS_PENDING = "pending";
+    private final String MATCH_STATUS_SUCCESS = "success";
     private final String SAME_UNIVERSITY_TYPE = "SAME_UNIVERSITY";
     private final String DIFFERENT_UNIVERSITY_TYPE = "DIFFERENT_UNIVERSITY";
     private final String SAME_GENDER_TYPE = "SAME_GENDER";
 
-    public CreateChatroomResponse requestMatch(Long studentId, MatchCreateRequest request) {
+    public MatchCreateResponse requestMatch(Long studentId, MatchCreateRequest request) {
         Student student = findStudentService.findByStudentId(studentId);
         boolean isKorean = student.getIsKorean();
         Long universityId = student.getUniversity().getId();
@@ -60,8 +63,8 @@ public class MatchService {
             Student student, boolean isKorean, String universityType, String genderType,
             Long universityId, String studentGender, Set<Long> existingBuddies) {
         return matchRequestRepository.findAllMatches(isKorean).stream()
-                .filter(matchedRequest -> {
-                    Student matchedStudent = matchedRequest.getStudent();
+                .filter(matchRequest -> {
+                    Student matchedStudent = matchRequest.getStudent();
                     Long matchedUniversityId = matchedStudent.getUniversity().getId();
                     String matchedGender = matchedStudent.getGender().name();
                     if (existingBuddies.contains(matchedStudent.getId())) {
@@ -84,31 +87,31 @@ public class MatchService {
                 .findFirst();
     }
 
-    private CreateChatroomResponse processMatchSuccess(Student student, MatchRequest matchRequest) {
+    private MatchCreateResponse processMatchSuccess(Student student, MatchRequest matchRequest) {
         Student matchedStudent = matchRequest.getStudent();
-        Buddy requestedBuddy = Buddy.builder()
+        MatchedHistory requestedMatchedHistory = MatchedHistory.builder()
                 .student(student)
                 .buddyId(matchedStudent.getId())
                 .build();
-        Buddy matchedBuddy = Buddy.builder()
+        MatchedHistory matchedMatchedHistory = MatchedHistory.builder()
                 .student(matchedStudent)
                 .buddyId(student.getId())
                 .build();
-        buddyRepository.save(requestedBuddy);
-        buddyRepository.save(matchedBuddy);
+        buddyRepository.save(requestedMatchedHistory);
+        buddyRepository.save(matchedMatchedHistory);
         matchRequestRepository.delete(matchRequest);
         Chatroom chatroom = chatService.createChatroom(student, matchedStudent);
         notificationService.sendMatchSuccessNotification(student, chatroom.getId());
         notificationService.sendMatchSuccessNotification(matchedStudent, chatroom.getId());
-        return CreateChatroomResponse.from(chatroom, matchedStudent, true);
+        return MatchCreateResponse.from(chatroom, matchedStudent, true, MATCH_STATUS_SUCCESS);
     }
 
-    private CreateChatroomResponse createMatchRequest(Student student, boolean isKorean) {
+    private MatchCreateResponse createMatchRequest(Student student, boolean isKorean) {
         MatchRequest matchRequest = MatchRequest.builder()
                 .student(student)
                 .isKorean(isKorean)
                 .build();
         matchRequestRepository.save(matchRequest);
-        return CreateChatroomResponse.from();
+        return MatchCreateResponse.from(MATCH_STATUS_PENDING);
     }
 }
