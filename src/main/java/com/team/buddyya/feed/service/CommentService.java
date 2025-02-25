@@ -35,12 +35,12 @@ public class CommentService {
     private final BlockRepository blockRepository;
 
     @Transactional(readOnly = true)
-    public Feed findFeedByFeedId(Long feedId) {
+    protected Feed findFeedByFeedId(Long feedId) {
         return feedRepository.findById(feedId).orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND));
     }
 
     @Transactional(readOnly = true)
-    public Comment findCommentByCommentId(Long commentId) {
+    protected Comment findCommentByCommentId(Long commentId) {
         return commentRepository.findById(commentId)
                 .orElseThrow(() -> new FeedException(FeedExceptionType.COMMENT_NOT_FOUND));
     }

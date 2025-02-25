@@ -40,9 +40,6 @@ public class Report {
     @Column(name = "reason", columnDefinition = "TEXT", nullable = false)
     private String reason;
 
-//    @OneToMany(mappedBy = "report", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<ReportImage> images = new ArrayList<>();
-
     @Builder
     public Report(ReportType type, Long reportedId, Long reportUserId, Long reportedUserId,
                   String title, String content, String reason) {
@@ -53,9 +50,5 @@ public class Report {
         this.title = title;
         this.content = content;
         this.reason = reason;
-//        if (images != null) {
-//            this.images.addAll(images);
-//            this.images.forEach(image -> image.setReport(this));
-//        }
     }
 }
