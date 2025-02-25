@@ -1,13 +1,16 @@
 package com.team.buddyya.admin.service;
 
 import com.team.buddyya.admin.dto.request.StudentVerificationRequest;
-import com.team.buddyya.admin.dto.response.AdminReportsResponse;
-import com.team.buddyya.admin.dto.response.StudentIdCardListResponse;
-import com.team.buddyya.admin.dto.response.StudentIdCardResponse;
-import com.team.buddyya.admin.dto.response.StudentVerificationResponse;
+import com.team.buddyya.admin.dto.response.*;
 import com.team.buddyya.certification.domain.StudentIdCard;
 import com.team.buddyya.certification.exception.CertificateException;
 import com.team.buddyya.certification.repository.StudentIdCardRepository;
+import com.team.buddyya.chatting.domain.Chat;
+import com.team.buddyya.chatting.domain.Chatroom;
+import com.team.buddyya.chatting.exception.ChatException;
+import com.team.buddyya.chatting.exception.ChatExceptionType;
+import com.team.buddyya.chatting.repository.ChatRepository;
+import com.team.buddyya.chatting.repository.ChatroomRepository;
 import com.team.buddyya.common.service.S3UploadService;
 import com.team.buddyya.notification.service.NotificationService;
 import com.team.buddyya.report.repository.ReportRepository;
@@ -39,6 +42,8 @@ public class AdminService {
     private final NotificationService notificationService;
     private final StudentIdCardRepository studentIdCardRepository;
     private final ReportRepository reportRepository;
+    private final ChatRepository chatRepository;
+    private final ChatroomRepository chatroomRepository;
 
     @Transactional(readOnly = true)
     public StudentIdCardListResponse getStudentIdCards() {
@@ -79,5 +84,14 @@ public class AdminService {
     public void unbanStudent(Long studentId) {
         Student student = findStudentService.findByStudentId(studentId);
         student.unban();
+    }
+
+    public List<AdminChatMessageResponse> getAllChatMessages(Long chatroomId) {
+        Chatroom chatroom = chatroomRepository.findById(chatroomId)
+                .orElseThrow(() -> new ChatException(ChatExceptionType.CHATROOM_NOT_FOUND));
+        List<Chat> chats = chatRepository.findByChatroom(chatroom);
+        return chats.stream()
+                .map(AdminChatMessageResponse::from)
+                .toList();
     }
 }
