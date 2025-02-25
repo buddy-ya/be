@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "buddy")
-public class Buddy {
+public class MatchedHistory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +25,7 @@ public class Buddy {
     private Long buddyId;
 
     @Builder
-    public Buddy(Student student, Long buddyId) {
+    public MatchedHistory(Student student, Long buddyId) {
         this.student = student;
         this.buddyId = buddyId;
     }
