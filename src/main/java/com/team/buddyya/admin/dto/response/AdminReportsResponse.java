@@ -4,7 +4,6 @@ import com.team.buddyya.report.domain.Report;
 import com.team.buddyya.report.domain.ReportType;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public record AdminReportsResponse(
         Long id,
@@ -17,7 +16,7 @@ public record AdminReportsResponse(
         String reason,
         List<String> imageUrls
 ) {
-    public static AdminReportsResponse from(Report report) {
+    public static AdminReportsResponse from(Report report, List<String> imageUrls) {
         return new AdminReportsResponse(
                 report.getId(),
                 report.getType(),
@@ -27,7 +26,7 @@ public record AdminReportsResponse(
                 report.getType() == ReportType.FEED ? report.getTitle() : null,
                 getContent(report),
                 report.getReason(),
-                getImageUrls(report)
+                imageUrls
         );
     }
 
@@ -37,14 +36,4 @@ public record AdminReportsResponse(
             default -> null;
         };
     }
-
-    private static List<String> getImageUrls(Report report) {
-        if (report.getImages() == null || report.getImages().isEmpty()) {
-            return null;
-        }
-        return report.getImages().stream()
-                .map(image -> image.getImageUrl())
-                .collect(Collectors.toList());
-    }
-
 }

@@ -26,11 +26,8 @@ public class ReportImage {
     private String imageUrl;
 
     @Builder
-    public ReportImage(String imageUrl) {
+    public ReportImage(String imageUrl, Report report) {
         this.imageUrl = imageUrl;
-    }
-
-    public void setReport(Report report) {
         this.report = report;
     }
 }

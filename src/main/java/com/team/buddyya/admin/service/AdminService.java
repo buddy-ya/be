@@ -8,6 +8,8 @@ import com.team.buddyya.admin.dto.response.StudentVerificationResponse;
 import com.team.buddyya.certification.repository.StudentIdCardRepository;
 import com.team.buddyya.common.service.S3UploadService;
 import com.team.buddyya.notification.service.NotificationService;
+import com.team.buddyya.report.domain.ReportImage;
+import com.team.buddyya.report.repository.ReportImageRepository;
 import com.team.buddyya.report.repository.ReportRepository;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.service.FindStudentService;
@@ -36,6 +38,7 @@ public class AdminService {
     private final NotificationService notificationService;
     private final StudentIdCardRepository studentIdCardRepository;
     private final ReportRepository reportRepository;
+    private final ReportImageRepository reportImageRepository;
 
     @Transactional(readOnly = true)
     public StudentIdCardListResponse getStudentIdCards() {
@@ -56,7 +59,13 @@ public class AdminService {
 
     public List<AdminReportsResponse> getAllReports() {
         return reportRepository.findAll().stream()
-                .map(AdminReportsResponse::from)
+                .map(report -> AdminReportsResponse.from(report, getImageUrlsByReportId(report.getId())))
+                .collect(Collectors.toList());
+    }
+
+    private List<String> getImageUrlsByReportId(Long reportId) {
+        return reportImageRepository.findByReportId(reportId).stream()
+                .map(ReportImage::getImageUrl)
                 .collect(Collectors.toList());
     }
 }
