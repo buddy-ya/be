@@ -1,11 +1,8 @@
 package com.team.buddyya.certification.service;
 
-import static com.team.buddyya.common.domain.S3DirectoryName.STUDENT_ID_CARD;
-
 import com.team.buddyya.auth.domain.StudentInfo;
 import com.team.buddyya.certification.domain.StudentEmail;
 import com.team.buddyya.certification.domain.StudentIdCard;
-import com.team.buddyya.certification.dto.request.EmailCertificationRequest;
 import com.team.buddyya.certification.dto.request.EmailCodeRequest;
 import com.team.buddyya.certification.dto.request.SendStudentIdCardRequest;
 import com.team.buddyya.certification.dto.response.CertificationResponse;
@@ -18,20 +15,14 @@ import com.team.buddyya.certification.repository.StudentIdCardRepository;
 import com.team.buddyya.common.service.S3UploadService;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.service.FindStudentService;
-import com.team.buddyya.student.service.StudentService;
-
-import java.util.Optional;
-import java.util.Random;
-
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.MailException;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Optional;
+
+import static com.team.buddyya.common.domain.S3DirectoryName.STUDENT_ID_CARD;
 
 @Service
 @RequiredArgsConstructor
@@ -107,7 +98,7 @@ public class CertificationService {
     public StudentIdCardResponse getStudentIdCard(StudentInfo studentInfo) {
         StudentIdCard studentIdCard = studentIdCardRepository.findByStudent_Id(studentInfo.id())
                 .orElseThrow(() -> new CertificateException(CertificateExceptionType.STUDENT_ID_CARD_NOT_FOUND));
-        return StudentIdCardResponse.from(studentIdCard.getImageUrl());
+        return StudentIdCardResponse.from(studentIdCard.getImageUrl(), studentIdCard.getRejectionReason());
     }
 
     public void refreshStudentCertification(StudentInfo studentInfo) {

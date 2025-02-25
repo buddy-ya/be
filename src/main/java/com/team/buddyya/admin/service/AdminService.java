@@ -5,6 +5,8 @@ import com.team.buddyya.admin.dto.response.AdminReportsResponse;
 import com.team.buddyya.admin.dto.response.StudentIdCardListResponse;
 import com.team.buddyya.admin.dto.response.StudentIdCardResponse;
 import com.team.buddyya.admin.dto.response.StudentVerificationResponse;
+import com.team.buddyya.certification.domain.StudentIdCard;
+import com.team.buddyya.certification.exception.CertificateException;
 import com.team.buddyya.certification.repository.StudentIdCardRepository;
 import com.team.buddyya.common.service.S3UploadService;
 import com.team.buddyya.notification.service.NotificationService;
@@ -19,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.team.buddyya.certification.exception.CertificateExceptionType.STUDENT_ID_CARD_NOT_FOUND;
 import static com.team.buddyya.common.domain.S3DirectoryName.STUDENT_ID_CARD;
 
 @Service
@@ -47,11 +50,19 @@ public class AdminService {
 
     public StudentVerificationResponse verifyStudentIdCard(StudentVerificationRequest request) {
         Student student = findStudentService.findByStudentId(request.id());
-        studentIdCardRepository.deleteByStudent(student);
-        s3UploadService.deleteFile(STUDENT_ID_CARD.getDirectoryName(), request.imageUrl());
-        studentService.updateStudentCertification(student);
-        notificationService.sendAuthorizationNotification(student, true);
-        return new StudentVerificationResponse(VERIFICATION_COMPLETED_MESSAGE);
+        StudentIdCard studentIdCard = studentIdCardRepository.findByStudent(student)
+                .orElseThrow(() -> new CertificateException(STUDENT_ID_CARD_NOT_FOUND));
+        if (request.isApproved()) {
+            s3UploadService.deleteFile(STUDENT_ID_CARD.getDirectoryName(), request.imageUrl());
+            studentIdCardRepository.delete(studentIdCard);
+            studentService.updateStudentCertification(student);
+            notificationService.sendAuthorizationNotification(student, true);
+            return new StudentVerificationResponse(VERIFICATION_COMPLETED_MESSAGE);
+        } else {
+            studentIdCard.updateRejectionReason(request.rejectionReason());
+            notificationService.sendAuthorizationNotification(student, false);
+            return new StudentVerificationResponse(REQUEST_REJECTED_MESSAGE);
+        }
     }
 
     public List<AdminReportsResponse> getAllReports() {
