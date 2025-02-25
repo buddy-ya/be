@@ -20,14 +20,28 @@ public record AdminReportResponse(
         return new AdminReportResponse(
                 report.getId(),
                 report.getType(),
-                report.getType() == ReportType.CHATROOM ? report.getReportedId() : null,
+                getReportedId(report),
                 report.getReportUserId(),
                 report.getReportedUserId(),
-                report.getType() == ReportType.FEED ? report.getTitle() : null,
+                getTitle(report),
                 getContent(report),
                 report.getReason(),
                 imageUrls
         );
+    }
+
+    private static Long getReportedId(Report report) {
+        if (report.getType() == ReportType.CHATROOM) {
+            return report.getReportedId();
+        }
+        return null;
+    }
+
+    private static String getTitle(Report report) {
+        if (report.getType() == ReportType.FEED) {
+            return report.getTitle();
+        }
+        return null;
     }
 
     private static String getContent(Report report) {
