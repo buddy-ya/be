@@ -5,7 +5,7 @@ import com.team.buddyya.report.domain.ReportType;
 
 import java.util.List;
 
-public record AdminReportsResponse(
+public record AdminReportResponse(
         Long id,
         ReportType type,
         Long reportedId,
@@ -16,8 +16,8 @@ public record AdminReportsResponse(
         String reason,
         List<String> imageUrls
 ) {
-    public static AdminReportsResponse from(Report report, List<String> imageUrls) {
-        return new AdminReportsResponse(
+    public static AdminReportResponse from(Report report, List<String> imageUrls) {
+        return new AdminReportResponse(
                 report.getId(),
                 report.getType(),
                 report.getType() == ReportType.CHATROOM ? report.getReportedId() : null,

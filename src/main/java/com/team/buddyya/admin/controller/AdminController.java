@@ -1,7 +1,7 @@
 package com.team.buddyya.admin.controller;
 
 import com.team.buddyya.admin.dto.request.StudentVerificationRequest;
-import com.team.buddyya.admin.dto.response.AdminReportsResponse;
+import com.team.buddyya.admin.dto.response.AdminReportResponse;
 import com.team.buddyya.admin.dto.response.StudentIdCardListResponse;
 import com.team.buddyya.admin.dto.response.StudentVerificationResponse;
 import com.team.buddyya.admin.service.AdminService;
@@ -29,7 +29,7 @@ public class AdminController {
     }
 
     @GetMapping("/reports")
-    public ResponseEntity<List<AdminReportsResponse>> getReports() {
+    public ResponseEntity<List<AdminReportResponse>> getReports() {
         return ResponseEntity.ok(adminService.getAllReports());
     }
 }

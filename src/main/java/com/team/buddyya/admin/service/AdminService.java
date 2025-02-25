@@ -1,7 +1,7 @@
 package com.team.buddyya.admin.service;
 
 import com.team.buddyya.admin.dto.request.StudentVerificationRequest;
-import com.team.buddyya.admin.dto.response.AdminReportsResponse;
+import com.team.buddyya.admin.dto.response.AdminReportResponse;
 import com.team.buddyya.admin.dto.response.StudentIdCardListResponse;
 import com.team.buddyya.admin.dto.response.StudentIdCardResponse;
 import com.team.buddyya.admin.dto.response.StudentVerificationResponse;
@@ -57,9 +57,9 @@ public class AdminService {
         return new StudentVerificationResponse(VERIFICATION_COMPLETED_MESSAGE);
     }
 
-    public List<AdminReportsResponse> getAllReports() {
+    public List<AdminReportResponse> getAllReports() {
         return reportRepository.findAll().stream()
-                .map(report -> AdminReportsResponse.from(report, getImageUrlsByReportId(report.getId())))
+                .map(report -> AdminReportResponse.from(report, getImageUrlsByReportId(report.getId())))
                 .collect(Collectors.toList());
     }
 
