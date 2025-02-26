@@ -165,9 +165,6 @@ public class StudentService {
     public UserBanStatusResponse checkBanEndTimeOrUpdate(StudentInfo studentId) {
         Student student = findStudentService.findByStudentId(studentId.id());
         boolean isBanned = student.checkAndUpdateBanStatus();
-        if (!isBanned) {
-            studentRepository.save(student);
-        }
         return new UserBanStatusResponse(isBanned, student.getBanEndTime());
     }
 }
