@@ -68,6 +68,12 @@ public class NotificationService {
     private static final String MATCH_SUCCESS_BODY_KR = "지금 바로 채팅을 시작해 보세요.";
     private static final String MATCH_SUCCESS_BODY_EN = "Start chatting now.";
 
+    private static final String CHAT_ACCEPT_TITLE_KR = "이 채팅 요청을 수락했습니다.";
+    private static final String CHAT_ACCEPT_TITLE_EN = "have accepted your chat request.";
+
+    private static final String CHAT_ACCEPT_BODY_KR = "대화를 시작해보세요!";
+    private static final String CHAT_ACCEPT_BODY_EN = "Start the conversation now!";
+
     @Value("${EXPO.API.URL}")
     private String expoApiUrl;
 
@@ -256,6 +262,37 @@ public class NotificationService {
         return isKorean
                 ? senderName + CHAT_REQUEST_BODY_KR
                 : senderName + CHAT_REQUEST_BODY_EN;
+    }
+
+    public void sendChatAcceptNotification(Student student, String senderName, Long roomId){
+        try{
+            String token = getTokenByUserId(student.getId());
+            Map<String, Object> data = Map.of(
+                    "roomId", roomId,
+                    "type", "CHAT_ACCEPT"
+            );
+            boolean isKorean = student.getIsKorean();
+            String title = getChatAcceptTitle(isKorean);
+            String body = getChatAcceptBody(isKorean, senderName);
+            sendToExpo(RequestNotification.builder()
+                    .to(token)
+                    .title(title)
+                    .body(body)
+                    .data(data).build()
+            );
+        } catch (NotificationException e) {
+            log.warn("채팅 수락 알림 전송 실패: {}", e.exceptionType().errorMessage());
+        }
+    }
+
+    private String getChatAcceptTitle(boolean isKorean) {
+        return isKorean ? CHAT_ACCEPT_TITLE_KR : CHAT_ACCEPT_TITLE_EN;
+    }
+
+    private String getChatAcceptBody(boolean isKorean, String senderName) {
+        return isKorean
+                ? senderName + CHAT_ACCEPT_BODY_KR
+                : senderName + CHAT_ACCEPT_BODY_EN;
     }
 
     private void sendToExpo(RequestNotification notification) {

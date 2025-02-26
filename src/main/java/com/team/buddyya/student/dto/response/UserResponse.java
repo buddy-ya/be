@@ -5,6 +5,8 @@ import com.team.buddyya.student.domain.Student;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.team.buddyya.student.domain.UserProfileDefaultImage.isDefaultUserProfileImage;
+
 public record UserResponse(
         Long id,
         String name,
@@ -15,6 +17,7 @@ public record UserResponse(
         Boolean isCertificated,
         Boolean isStudentIdCardRequested,
         Boolean isKorean,
+        Boolean isDefaultProfileImage,
         List<String> majors,
         List<String> languages,
         List<String> interests,
@@ -34,6 +37,7 @@ public record UserResponse(
                 student.getIsCertificated(),
                 isStudentIdCardRequested,
                 student.getIsKorean(),
+                isDefaultUserProfileImage(student),
                 convertToStringList(student.getMajors()),
                 convertToStringList(student.getLanguages()),
                 convertToStringList(student.getInterests()),
@@ -54,6 +58,7 @@ public record UserResponse(
                 null,
                 null,
                 null,
+                isDefaultUserProfileImage(student),
                 convertToStringList(student.getMajors()),
                 convertToStringList(student.getLanguages()),
                 convertToStringList(student.getInterests()),
@@ -74,6 +79,7 @@ public record UserResponse(
                 student.getIsCertificated(),
                 isStudentIdCardRequested,
                 student.getIsKorean(),
+                isDefaultUserProfileImage(student),
                 convertToStringList(student.getMajors()),
                 convertToStringList(student.getLanguages()),
                 convertToStringList(student.getInterests()),
@@ -94,6 +100,7 @@ public record UserResponse(
                 student.getIsCertificated(),
                 isStudentIdCardRequested,
                 student.getIsKorean(),
+                isDefaultUserProfileImage(student),
                 convertToStringList(student.getMajors()),
                 convertToStringList(student.getLanguages()),
                 convertToStringList(student.getInterests()),
@@ -114,6 +121,7 @@ public record UserResponse(
                 false,
                 false,
                 null,
+                true,
                 null,
                 null,
                 null,
