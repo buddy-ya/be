@@ -45,13 +45,13 @@ public class FeedService {
     private final BlockRepository blockRepository;
 
     @Transactional(readOnly = true)
-    public Feed findFeedByFeedId(Long feedId) {
+    protected Feed findFeedByFeedId(Long feedId) {
         return feedRepository.findById(feedId)
                 .orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND));
     }
 
     @Transactional(readOnly = true)
-    public Student findStudentByStudentId(Long studentId) {
+    protected Student findStudentByStudentId(Long studentId) {
         return findStudentService.findByStudentId(studentId);
     }
 

@@ -4,9 +4,8 @@ import com.team.buddyya.report.domain.Report;
 import com.team.buddyya.report.domain.ReportType;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-public record AdminReportsResponse(
+public record AdminReportResponse(
         Long id,
         ReportType type,
         Long reportedId,
@@ -17,18 +16,33 @@ public record AdminReportsResponse(
         String reason,
         List<String> imageUrls
 ) {
-    public static AdminReportsResponse from(Report report) {
-        return new AdminReportsResponse(
+
+    public static AdminReportResponse from(Report report, List<String> imageUrls) {
+        return new AdminReportResponse(
                 report.getId(),
                 report.getType(),
-                report.getType() == ReportType.CHATROOM ? report.getReportedId() : null,
+                getReportedId(report),
                 report.getReportUserId(),
                 report.getReportedUserId(),
-                report.getType() == ReportType.FEED ? report.getTitle() : null,
+                getTitle(report),
                 getContent(report),
                 report.getReason(),
-                getImageUrls(report)
+                imageUrls
         );
+    }
+
+    private static Long getReportedId(Report report) {
+        if (report.getType() == ReportType.CHATROOM) {
+            return report.getReportedId();
+        }
+        return null;
+    }
+
+    private static String getTitle(Report report) {
+        if (report.getType() == ReportType.FEED) {
+            return report.getTitle();
+        }
+        return null;
     }
 
     private static String getContent(Report report) {
@@ -37,14 +51,4 @@ public record AdminReportsResponse(
             default -> null;
         };
     }
-
-    private static List<String> getImageUrls(Report report) {
-        if (report.getImages() == null || report.getImages().isEmpty()) {
-            return null;
-        }
-        return report.getImages().stream()
-                .map(image -> image.getImageUrl())
-                .collect(Collectors.toList());
-    }
-
 }
