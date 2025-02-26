@@ -62,6 +62,12 @@ public class NotificationService {
     private static final String CHAT_REQUEST_BODY_KR = "님이 채팅 요청을 보냈습니다. 확인하고 대화를 시작해 보세요!";
     private static final String CHAT_REQUEST_BODY_EN = " has sent you a chat request. Check it out and start a conversation!";
 
+    private static final String MATCH_SUCCESS_TITLE_KR = "새로운 매칭이 이루어졌습니다!";
+    private static final String MATCH_SUCCESS_TITLE_EN = "A new match has been made!";
+
+    private static final String MATCH_SUCCESS_BODY_KR = "지금 바로 채팅을 시작해 보세요.";
+    private static final String MATCH_SUCCESS_BODY_EN = "Start chatting now.";
+
     private static final String CHAT_ACCEPT_TITLE_KR = "이 채팅 요청을 수락했습니다.";
     private static final String CHAT_ACCEPT_TITLE_EN = "have accepted your chat request.";
 
@@ -93,10 +99,39 @@ public class NotificationService {
         expoTokenRepository.save(Token);
     }
 
+    public void sendMatchSuccessNotification(Student student, Long roomId){
+        try{
+            String token = getTokenByUserId(student.getId());
+            Map<String, Object> data = Map.of(
+                    "roomId", roomId,
+                    "type", "MATCH"
+            );
+            boolean isKorean = student.getIsKorean();
+            String title = getMatchSuccessNotificationTitle(isKorean);
+            String body = getMatchSuccessNotificationBody(isKorean);
+            sendToExpo(RequestNotification.builder()
+                    .to(token)
+                    .title(title)
+                    .body(body)
+                    .data(data).build()
+            );
+        } catch (NotificationException e) {
+            log.warn("매칭 성공 알림 전송 실패: {}", e.exceptionType().errorMessage());
+        }
+    }
+
+    private String getMatchSuccessNotificationTitle(boolean isKorean) {
+        return isKorean ? MATCH_SUCCESS_TITLE_KR: MATCH_SUCCESS_TITLE_EN;
+    }
+
+    private String getMatchSuccessNotificationBody(boolean isKorean) {
+        return isKorean ? MATCH_SUCCESS_BODY_KR: MATCH_SUCCESS_BODY_EN;
+    }
+
     public void sendCommentReplyNotification(Feed feed, Comment parent, String commentContent){
         try{
             Student recipient = parent.getStudent();
-            String token = recipient.getExpoToken().getToken();
+            String token = getTokenByUserId(recipient.getId());
             Map<String, Object> data = Map.of(
                     "feedId", feed.getId(),
                     "type", "FEED"
