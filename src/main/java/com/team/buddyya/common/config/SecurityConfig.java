@@ -46,7 +46,7 @@ public class SecurityConfig {
                                 "/auth/reissue", "/auth/test").permitAll()
                         .requestMatchers("/auth/fail", "/admin/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/users", "/auth/success", "/certification/**", "/feeds/**", "/chatrooms/**",
-                                "/report", "/chat-requests/**").hasAuthority("ROLE_STUDENT")
+                                "/report", "/chat-requests/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_STUDENT")
                         .anyRequest().authenticated()
                 );
         return http.build();
