@@ -1,0 +1,15 @@
+ALTER TABLE report CHANGE COLUMN content reason TEXT NOT NULL;
+
+ALTER TABLE report ADD COLUMN content TEXT NULL;
+
+ALTER TABLE report MODIFY COLUMN reported_id BIGINT NULL;
+
+ALTER TABLE report ADD COLUMN title VARCHAR(255) NULL;
+
+CREATE TABLE report_image
+(
+    id        BIGINT AUTO_INCREMENT PRIMARY KEY,
+    report_id BIGINT       NOT NULL,
+    image_url VARCHAR(500) NOT NULL,
+    FOREIGN KEY (report_id) REFERENCES report (id) ON DELETE CASCADE
+);

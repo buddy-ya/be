@@ -22,7 +22,7 @@ public class Report {
     @Column(name = "type", nullable = false)
     private ReportType type;
 
-    @Column(name = "reported_id", nullable = false)
+    @Column(name = "reported_id")
     private Long reportedId;
 
     @Column(name = "report_user_id", nullable = false)
@@ -31,15 +31,24 @@ public class Report {
     @Column(name = "reported_user_id", nullable = false)
     private Long reportedUserId;
 
-    @Column(name = "content", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "title")
+    private String title;
+
+    @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
+    @Column(name = "reason", columnDefinition = "TEXT", nullable = false)
+    private String reason;
+
     @Builder
-    public Report(ReportType type, Long reportedId, Long reportUserId, Long reportedUserId, String content) {
+    public Report(ReportType type, Long reportedId, Long reportUserId, Long reportedUserId,
+                  String title, String content, String reason) {
         this.type = type;
         this.reportedId = reportedId;
         this.reportUserId = reportUserId;
         this.reportedUserId = reportedUserId;
+        this.title = title;
         this.content = content;
+        this.reason = reason;
     }
 }

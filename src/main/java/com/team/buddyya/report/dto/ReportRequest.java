@@ -6,6 +6,6 @@ public record ReportRequest(
         ReportType type,
         Long reportedId,
         Long reportedUserId,
-        String content
+        String reason
 ) {
 }
