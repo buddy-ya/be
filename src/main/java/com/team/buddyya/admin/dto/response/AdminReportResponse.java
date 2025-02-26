@@ -16,6 +16,7 @@ public record AdminReportResponse(
         String reason,
         List<String> imageUrls
 ) {
+
     public static AdminReportResponse from(Report report, List<String> imageUrls) {
         return new AdminReportResponse(
                 report.getId(),
