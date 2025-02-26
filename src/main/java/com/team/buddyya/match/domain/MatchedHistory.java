@@ -1,6 +1,5 @@
 package com.team.buddyya.match.domain;
 
-import com.team.buddyya.common.domain.BaseTime;
 import com.team.buddyya.student.domain.Student;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -11,23 +10,23 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "match_request")
-public class MatchRequest extends BaseTime {
+@Table(name = "matched_history")
+public class MatchedHistory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id", nullable = false)
     private Student student;
 
-    @Column(name = "korean", nullable = false)
-    private Boolean isKorean;
+    @Column(name = "buddy_id", nullable = false)
+    private Long buddyId;
 
     @Builder
-    public MatchRequest(Student student, Boolean isKorean) {
+    public MatchedHistory(Student student, Long buddyId) {
         this.student = student;
-        this.isKorean = isKorean;
+        this.buddyId = buddyId;
     }
 }
