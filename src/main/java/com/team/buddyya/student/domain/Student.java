@@ -46,7 +46,7 @@ public class Student extends BaseTime {
     @Column(name = "korean", nullable = false)
     private Boolean isKorean;
 
-    @Column(name = "is_deleted", nullable = false)
+    @Column(name = "deleted", nullable = false)
     private Boolean isDeleted;
 
     @OneToOne(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
@@ -94,8 +94,8 @@ public class Student extends BaseTime {
     @OneToMany(mappedBy = "student", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<ChatroomStudent> chatroomStudents;
 
-    @Column(name = "is_banned", nullable = false)
-    private Boolean isBanned = false;
+    @Column(name = "banned", nullable = false)
+    private Boolean isBanned;
 
     @Column(name = "ban_end_time")
     private LocalDateTime banEndTime;

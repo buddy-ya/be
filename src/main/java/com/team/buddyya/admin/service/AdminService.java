@@ -1,13 +1,20 @@
 package com.team.buddyya.admin.service;
 
 import com.team.buddyya.admin.dto.request.StudentVerificationRequest;
-import com.team.buddyya.admin.dto.response.AdminReportsResponse;
-import com.team.buddyya.admin.dto.response.StudentIdCardListResponse;
-import com.team.buddyya.admin.dto.response.StudentIdCardResponse;
-import com.team.buddyya.admin.dto.response.StudentVerificationResponse;
+import com.team.buddyya.admin.dto.response.*;
+import com.team.buddyya.certification.domain.StudentIdCard;
+import com.team.buddyya.certification.exception.CertificateException;
 import com.team.buddyya.certification.repository.StudentIdCardRepository;
+import com.team.buddyya.chatting.domain.Chat;
+import com.team.buddyya.chatting.domain.Chatroom;
+import com.team.buddyya.chatting.exception.ChatException;
+import com.team.buddyya.chatting.exception.ChatExceptionType;
+import com.team.buddyya.chatting.repository.ChatRepository;
+import com.team.buddyya.chatting.repository.ChatroomRepository;
 import com.team.buddyya.common.service.S3UploadService;
 import com.team.buddyya.notification.service.NotificationService;
+import com.team.buddyya.report.domain.ReportImage;
+import com.team.buddyya.report.repository.ReportImageRepository;
 import com.team.buddyya.report.repository.ReportRepository;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.service.FindStudentService;
@@ -19,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.team.buddyya.certification.exception.CertificateExceptionType.STUDENT_ID_CARD_NOT_FOUND;
 import static com.team.buddyya.common.domain.S3DirectoryName.STUDENT_ID_CARD;
 
 @Service
@@ -36,6 +44,10 @@ public class AdminService {
     private final NotificationService notificationService;
     private final StudentIdCardRepository studentIdCardRepository;
     private final ReportRepository reportRepository;
+    private final ReportImageRepository reportImageRepository;
+    private final ChatroomRepository chatroomRepository;
+    private final ChatRepository chatRepository;
+
 
     @Transactional(readOnly = true)
     public StudentIdCardListResponse getStudentIdCards() {
