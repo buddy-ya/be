@@ -1,6 +1,7 @@
 package com.team.buddyya.match.domain;
 
 import com.team.buddyya.common.domain.BaseTime;
+import com.team.buddyya.student.domain.Gender;
 import com.team.buddyya.student.domain.Student;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -22,12 +23,31 @@ public class MatchRequest extends BaseTime {
     @JoinColumn(name = "student_id", nullable = false)
     private Student student;
 
+    @Column(name = "university_id", nullable = false)
+    private Long universityId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "university_type", nullable = false)
+    private UniversityType universityType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "gender_type", nullable = false)
+    private GenderType genderType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "gender", nullable = false)
+    private Gender gender;
+
     @Column(name = "korean", nullable = false)
     private Boolean isKorean;
 
     @Builder
-    public MatchRequest(Student student, Boolean isKorean) {
+    public MatchRequest(Student student, Boolean isKorean, Long universityId, UniversityType universityType, GenderType genderType, Gender gender) {
         this.student = student;
         this.isKorean = isKorean;
+        this.universityId = universityId;
+        this.universityType = universityType;
+        this.genderType = genderType;
+        this.gender = gender;
     }
 }
