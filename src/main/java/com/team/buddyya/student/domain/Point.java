@@ -15,12 +15,12 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Point extends BaseTime {
 
+    private static final int MIN_POINT = 0;
+    private static final int MAX_POINT = 100_000;
+
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
-
-    private static final int MIN_POINT = 0;
-    private static final int MAX_POINT = 100_000;
 
     @OneToOne(fetch = LAZY)
     @JoinColumn(name = "student_id", nullable = false, unique = true)
