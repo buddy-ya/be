@@ -4,6 +4,8 @@ import com.team.buddyya.student.domain.Point;
 import com.team.buddyya.student.domain.PointStatus;
 import com.team.buddyya.student.domain.PointType;
 import com.team.buddyya.student.domain.Student;
+import com.team.buddyya.student.exception.StudentException;
+import com.team.buddyya.student.exception.StudentExceptionType;
 import com.team.buddyya.student.repository.PointRepository;
 import com.team.buddyya.student.repository.PointStatusRepository;
 import lombok.RequiredArgsConstructor;
@@ -54,8 +56,8 @@ public class PointService {
         pointStatusRepository.save(pointStatus);
     }
 
-    public Point getPoint(Student student){
+    public Point getPoint(Student student) {
         return pointRepository.findByStudent(student)
-                .orElseGet(() -> Point.builder().student(student).currentPoint(0).build());
+                .orElseThrow(() -> new StudentException(StudentExceptionType.POINT_NOT_FOUND));
     }
 }

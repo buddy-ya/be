@@ -19,7 +19,8 @@ public enum StudentExceptionType implements BaseExceptionType {
     ALREADY_BLOCKED(2011, HttpStatus.CONFLICT, "이미 차단된 사용자입니다."),
     INVALID_POINT_TYPE(2012, HttpStatus.BAD_REQUEST, "유효하지 않는 포인트 타입입니다."),
     NEGATIVE_POINT(2013, HttpStatus.BAD_REQUEST, "포인트는 0 미만이 될 수 없습니다."),
-    EXCEED_MAX_POINT(2014, HttpStatus.BAD_REQUEST, "최대 보유 포인트를 초과할 수 없습니다.");
+    EXCEED_MAX_POINT(2014, HttpStatus.BAD_REQUEST, "최대 보유 포인트를 초과할 수 없습니다."),
+    POINT_NOT_FOUND(2015, HttpStatus.NOT_FOUND, "해당 학생의 포인트가 존재하지 않습니다");
 
     private final int errorCode;
     private final HttpStatus httpStatus;
