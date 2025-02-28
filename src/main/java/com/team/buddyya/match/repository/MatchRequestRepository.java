@@ -1,4 +1,4 @@
-package com.team.buddyya.match.repositorry;
+package com.team.buddyya.match.repository;
 
 import com.team.buddyya.match.domain.MatchRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,4 +16,7 @@ public interface MatchRequestRepository extends JpaRepository<MatchRequest, Long
                 ORDER BY m.createdDate ASC
             """)
     List<MatchRequest> findAllMatches(boolean isKorean);
+
+
+    boolean existsByStudentId(Long studentId);
 }

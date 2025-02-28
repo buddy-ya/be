@@ -37,6 +37,7 @@ public class BasicMatchService implements MatchService {
 
     private static final String MATCH_STATUS_PENDING = "pending";
     private static final String MATCH_STATUS_SUCCESS = "success";
+    private static final String MATCH_STATUS_NOT_REQUESTED = "not_requested";
 
     @Override
     public MatchCreateResponse requestMatch(Long studentId, MatchCreateRequest request) {
@@ -59,6 +60,12 @@ public class BasicMatchService implements MatchService {
             return processMatchSuccess(student, optionalMatchRequest.get());
         }
         return createMatchRequest(student, isKorean, universityType, genderType, universityId, gender);
+    }
+
+    @Override
+    public MatchStatusResponse findMatchStatus(Long studentId) {
+        boolean exists = matchRequestRepository.existsByStudentId(studentId);
+        return MatchStatusResponse.from(exists ? MATCH_STATUS_PENDING : MATCH_STATUS_NOT_REQUESTED);
     }
 
     private Optional<MatchRequest> findValidMatchRequest(
