@@ -1,4 +1,4 @@
-package com.team.buddyya.match.repositorry;
+package com.team.buddyya.match.repository;
 
 import com.team.buddyya.match.domain.MatchedHistory;
 import org.springframework.data.jpa.repository.JpaRepository;
