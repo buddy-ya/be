@@ -17,7 +17,6 @@ public enum FeedExceptionType implements BaseExceptionType {
     COMMENT_NOT_LIKED(4003, HttpStatus.NOT_FOUND, "좋아요를 누르지 않는 댓글입니다."),
     COMMENT_DEPTH_LIMIT(4008, HttpStatus.FORBIDDEN, "대댓글의 대댓글은 작성할 수 없습니다.");
 
-
     private final int errorCode;
     private final HttpStatus httpStatus;
     private final String errorMessage;

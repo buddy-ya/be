@@ -11,7 +11,6 @@ public enum ChatExceptionType implements BaseExceptionType {
     CHAT_REQUEST_ALREADY_EXISTS(5004, HttpStatus.BAD_REQUEST, "이미 채팅 요청을 보낸 사용자입니다."),
     CHATROOM_ALREADY_EXISTS(5005, HttpStatus.BAD_REQUEST, "이미 채팅방이 존재합니다.");
 
-
     private final int errorCode;
     private final HttpStatus httpStatus;
     private final String errorMessage;
