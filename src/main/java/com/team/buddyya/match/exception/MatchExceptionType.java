@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 
 public enum MatchExceptionType implements BaseExceptionType {
 
-    INVALID_MATCH_TYPE(5000, HttpStatus.BAD_REQUEST, "유효하지 않은 매칭 타입입니다.");
+    INVALID_MATCH_TYPE(6000, HttpStatus.BAD_REQUEST, "유효하지 않은 매칭 타입입니다.");
 
     private final int errorCode;
     private final HttpStatus httpStatus;
