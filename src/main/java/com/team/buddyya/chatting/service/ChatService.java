@@ -13,6 +13,7 @@ import com.team.buddyya.chatting.dto.response.*;
 import com.team.buddyya.chatting.exception.ChatException;
 import com.team.buddyya.chatting.exception.ChatExceptionType;
 import com.team.buddyya.chatting.repository.ChatRepository;
+import com.team.buddyya.chatting.repository.ChatRequestRepository;
 import com.team.buddyya.chatting.repository.ChatroomRepository;
 import com.team.buddyya.chatting.repository.ChatroomStudentRepository;
 import com.team.buddyya.common.service.S3UploadService;
@@ -53,6 +54,7 @@ public class ChatService {
     private final S3UploadService s3UploadService;
     private final ChatRepository chatRepository;
     private final ChatroomRepository chatRoomRepository;
+    private final ChatRequestRepository chatRequestRepository;
     private final ChatroomStudentRepository chatroomStudentRepository;
     private final Map<Long, Set<WebSocketSession>> sessionsPerRoom = new ConcurrentHashMap<>();
     private final Map<WebSocketSession, Long> lastPongTimestamps = new ConcurrentHashMap<>();
@@ -176,7 +178,8 @@ public class ChatService {
         int totalUnreadCount = chatroomResponses.stream()
                 .mapToInt(ChatroomResponse::unreadCount)
                 .sum();
-        return ChatroomListResponse.from(chatroomResponses, totalUnreadCount);
+        boolean hasChatRequest = chatRequestRepository.existsByReceiver(student);
+        return ChatroomListResponse.from(chatroomResponses, totalUnreadCount, hasChatRequest);
     }
 
     @Transactional(readOnly = true)
