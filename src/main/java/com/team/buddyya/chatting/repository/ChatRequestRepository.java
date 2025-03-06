@@ -10,6 +10,8 @@ public interface ChatRequestRepository extends JpaRepository<ChatRequest, Long> 
 
     List<ChatRequest> findAllByReceiver(Student receiver);
 
+    boolean existsByReceiver(Student receiver);
+
     boolean existsBySenderAndReceiver(Student sender, Student receiver);
 
     List<ChatRequest> findAllByCreatedDateBefore(LocalDateTime createdDate);
