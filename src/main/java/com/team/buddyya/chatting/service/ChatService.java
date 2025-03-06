@@ -175,9 +175,9 @@ public class ChatService {
                 .filter(Objects::nonNull)
                 .sorted((a, b) -> b.lastMessageDate().compareTo(a.lastMessageDate()))
                 .collect(Collectors.toList());
-        int totalUnreadCount = chatroomResponses.stream()
-                .mapToInt(ChatroomResponse::unreadCount)
-                .sum();
+        int totalUnreadCount = (int) chatroomResponses.stream()
+                .filter(chatroomResponse -> chatroomResponse.unreadCount() > 0)
+                .count();
         boolean hasChatRequest = chatRequestRepository.existsByReceiver(student);
         return ChatroomListResponse.from(chatroomResponses, totalUnreadCount, hasChatRequest);
     }
