@@ -164,4 +164,12 @@ public class StudentService {
                 .build());
         return BlockResponse.from(BLOCK_SUCCESS_MESSAGE);
     }
+
+    public void logout(StudentInfo studentInfo) {
+        Student student = findStudentService.findByStudentId(studentInfo.id());
+        if (student.getExpoToken() != null) {
+            expoTokenRepository.delete(student.getExpoToken());
+        }
+        student.getAvatar().setLoggedOut(true);
+    }
 }

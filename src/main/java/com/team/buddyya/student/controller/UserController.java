@@ -79,4 +79,10 @@ public class UserController {
         BlockResponse response = studentService.blockStudent(userDetails.getStudentInfo().id(), userId);
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        studentService.logout(userDetails.getStudentInfo());
+        return ResponseEntity.noContent().build();
+    }
 }
