@@ -6,6 +6,7 @@ import com.team.buddyya.feed.service.FeedService;
 import com.team.buddyya.student.dto.request.MyPageUpdateRequest;
 import com.team.buddyya.student.dto.request.OnBoardingRequest;
 import com.team.buddyya.student.dto.response.BlockResponse;
+import com.team.buddyya.student.dto.response.UniversityResponse;
 import com.team.buddyya.student.dto.response.UserResponse;
 import com.team.buddyya.student.dto.request.UpdateProfileImageRequest;
 import com.team.buddyya.student.service.OnBoardingService;
@@ -18,6 +19,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
@@ -26,6 +29,11 @@ public class UserController {
     private final OnBoardingService onBoardingService;
     private final StudentService studentService;
     private final FeedService feedService;
+
+    @GetMapping("/universities")
+    public ResponseEntity<List<UniversityResponse>> getActiveUniversity() {
+        return ResponseEntity.ok(studentService.getActiveUniversities());
+    }
 
     @PostMapping
     public ResponseEntity<UserResponse> onboard(@RequestBody OnBoardingRequest request) {
