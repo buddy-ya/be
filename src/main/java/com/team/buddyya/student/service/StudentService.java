@@ -168,13 +168,4 @@ public class StudentService {
                 .build());
         return BlockResponse.from(BLOCK_SUCCESS_MESSAGE);
     }
-
-    @Transactional(readOnly = true)
-    public List<UniversityResponse> getActiveUniversities() {
-        return universityRepository.findAll().stream()
-                .filter(University::getIsActive)
-                .map(UniversityResponse::from)
-                .collect(Collectors.toList());
-    }
-
 }

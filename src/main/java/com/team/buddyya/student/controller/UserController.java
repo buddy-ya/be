@@ -11,6 +11,7 @@ import com.team.buddyya.student.dto.response.UserResponse;
 import com.team.buddyya.student.dto.request.UpdateProfileImageRequest;
 import com.team.buddyya.student.service.OnBoardingService;
 import com.team.buddyya.student.service.StudentService;
+import com.team.buddyya.student.service.UniversityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -29,11 +30,7 @@ public class UserController {
     private final OnBoardingService onBoardingService;
     private final StudentService studentService;
     private final FeedService feedService;
-
-    @GetMapping("/universities")
-    public ResponseEntity<List<UniversityResponse>> getActiveUniversity() {
-        return ResponseEntity.ok(studentService.getActiveUniversities());
-    }
+    private final UniversityService universityService;
 
     @PostMapping
     public ResponseEntity<UserResponse> onboard(@RequestBody OnBoardingRequest request) {
@@ -86,5 +83,10 @@ public class UserController {
                                                       @PathVariable("userId") Long userId) {
         BlockResponse response = studentService.blockStudent(userDetails.getStudentInfo().id(), userId);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/universities")
+    public ResponseEntity<List<UniversityResponse>> getActiveUniversity() {
+        return ResponseEntity.ok(universityService.getActiveUniversities());
     }
 }
