@@ -5,15 +5,15 @@ import org.springframework.http.HttpStatus;
 
 public enum AuthExceptionType implements BaseExceptionType {
 
-    INVALID_TOKEN(3000, HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
-    UNSUPPORTED_TOKEN(3000, HttpStatus.BAD_REQUEST, "지원되지 않는 토큰입니다."),
-    EMPTY_CLAIMS(3000, HttpStatus.BAD_REQUEST, "빈 토큰값입니다."),
-    ACCESS_DENIED(3000, HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
-    UNAUTHORIZED_USER(3001, HttpStatus.UNAUTHORIZED, "인가되지 않은 사용자입니다."),
-    EXPIRED_TOKEN(3002, HttpStatus.UNAUTHORIZED, "만료된 토큰입니다."),
-    INVALID_MEMBER_ID(3003, HttpStatus.BAD_REQUEST, "유효하지 않은 사용자 ID 타입입니다."),
-    REFRESH_TOKEN_NOT_FOUND(3005, HttpStatus.NOT_FOUND, "리프레시 토큰을 찾을 수 없습니다."),
-    INVALID_REFRESH_TOKEN(3005, HttpStatus.UNAUTHORIZED, "유효하지 않은 리프레시 토큰입니다.");
+    INVALID_TOKEN(3000, HttpStatus.UNAUTHORIZED, "Invalid token."),
+    UNSUPPORTED_TOKEN(3000, HttpStatus.BAD_REQUEST, "Unsupported token."),
+    EMPTY_CLAIMS(3000, HttpStatus.BAD_REQUEST, "Empty token value."),
+    ACCESS_DENIED(3000, HttpStatus.FORBIDDEN, "Access denied."),
+    UNAUTHORIZED_USER(3001, HttpStatus.UNAUTHORIZED, "Unauthorized user."),
+    EXPIRED_TOKEN(3002, HttpStatus.UNAUTHORIZED, "Expired token."),
+    INVALID_MEMBER_ID(3003, HttpStatus.BAD_REQUEST, "Invalid user ID type."),
+    REFRESH_TOKEN_NOT_FOUND(3005, HttpStatus.NOT_FOUND, "Refresh token not found."),
+    INVALID_REFRESH_TOKEN(3005, HttpStatus.UNAUTHORIZED, "Invalid refresh token.");
 
     private final int errorCode;
     private final HttpStatus httpStatus;
