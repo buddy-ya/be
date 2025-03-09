@@ -51,7 +51,11 @@ public class CommentService {
         Set<Long> blockedStudentIds = blockRepository.findBlockedStudentIdByBlockerId(studentInfo.id());
         List<Comment> comments = feed.getComments().stream()
                 .filter(comment -> comment.getParent() == null)
-                .filter(comment -> !blockedStudentIds.contains(comment.getStudent().getId()))
+                .filter(comment -> {
+                    boolean isBlocked = blockedStudentIds.contains(comment.getStudent().getId());
+                    boolean hasChildren = !comment.getChildren().isEmpty();
+                    return hasChildren || !isBlocked;
+                })
                 .toList();
         return comments.stream()
                 .map(comment -> CommentResponse.from(comment, feedId, studentInfo.id(), commentLikeRepository, blockedStudentIds))
