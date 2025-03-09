@@ -1,6 +1,5 @@
 package com.team.buddyya.student.service;
 
-import com.team.buddyya.student.dto.response.UniversityResponse;
 import com.team.buddyya.student.repository.UniversityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,9 +15,9 @@ public class UniversityService {
     private final UniversityRepository universityRepository;
 
     @Transactional(readOnly = true)
-    public List<UniversityResponse> getActiveUniversities() {
+    public List<String> getActiveUniversities() {
         return universityRepository.findByIsActiveTrue().stream()
-                .map(UniversityResponse::from)
+                .map(university -> university.getUniversityName())
                 .toList();
     }
 }

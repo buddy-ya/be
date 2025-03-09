@@ -6,7 +6,6 @@ import com.team.buddyya.feed.service.FeedService;
 import com.team.buddyya.student.dto.request.MyPageUpdateRequest;
 import com.team.buddyya.student.dto.request.OnBoardingRequest;
 import com.team.buddyya.student.dto.response.BlockResponse;
-import com.team.buddyya.student.dto.response.UniversityResponse;
 import com.team.buddyya.student.dto.response.UserResponse;
 import com.team.buddyya.student.dto.request.UpdateProfileImageRequest;
 import com.team.buddyya.student.service.OnBoardingService;
@@ -86,7 +85,7 @@ public class UserController {
     }
 
     @GetMapping("/universities")
-    public ResponseEntity<List<UniversityResponse>> getActiveUniversity() {
+    public ResponseEntity<List<String>> getActiveUniversity() {
         return ResponseEntity.ok(universityService.getActiveUniversities());
     }
 }
