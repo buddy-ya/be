@@ -5,10 +5,11 @@ import com.team.buddyya.feed.dto.response.feed.FeedListResponse;
 import com.team.buddyya.feed.service.FeedService;
 import com.team.buddyya.student.dto.request.MyPageUpdateRequest;
 import com.team.buddyya.student.dto.request.OnBoardingRequest;
+import com.team.buddyya.student.dto.request.UpdateProfileImageRequest;
 import com.team.buddyya.student.dto.response.BlockResponse;
+import com.team.buddyya.student.dto.response.UserBanStatusResponse;
 import com.team.buddyya.student.dto.response.UniversityResponse;
 import com.team.buddyya.student.dto.response.UserResponse;
-import com.team.buddyya.student.dto.request.UpdateProfileImageRequest;
 import com.team.buddyya.student.service.OnBoardingService;
 import com.team.buddyya.student.service.StudentService;
 import com.team.buddyya.student.service.UniversityService;
@@ -83,6 +84,11 @@ public class UserController {
                                                       @PathVariable("userId") Long userId) {
         BlockResponse response = studentService.blockStudent(userDetails.getStudentInfo().id(), userId);
         return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/ban-status")
+    public ResponseEntity<UserBanStatusResponse> checkBanStatusOrUpdate(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.ok(studentService.checkBanEndTimeOrUpdate(userDetails.getStudentInfo()));
     }
 
     @GetMapping("/universities")

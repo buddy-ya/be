@@ -1,11 +1,16 @@
 package com.team.buddyya.admin.service;
 
 import com.team.buddyya.admin.dto.request.StudentVerificationRequest;
-import com.team.buddyya.admin.dto.response.AdminReportResponse;
-import com.team.buddyya.admin.dto.response.StudentIdCardListResponse;
-import com.team.buddyya.admin.dto.response.StudentIdCardResponse;
-import com.team.buddyya.admin.dto.response.StudentVerificationResponse;
+import com.team.buddyya.admin.dto.response.*;
+import com.team.buddyya.certification.domain.StudentIdCard;
+import com.team.buddyya.certification.exception.CertificateException;
 import com.team.buddyya.certification.repository.StudentIdCardRepository;
+import com.team.buddyya.chatting.domain.Chat;
+import com.team.buddyya.chatting.domain.Chatroom;
+import com.team.buddyya.chatting.exception.ChatException;
+import com.team.buddyya.chatting.exception.ChatExceptionType;
+import com.team.buddyya.chatting.repository.ChatRepository;
+import com.team.buddyya.chatting.repository.ChatroomRepository;
 import com.team.buddyya.common.service.S3UploadService;
 import com.team.buddyya.notification.service.NotificationService;
 import com.team.buddyya.report.domain.ReportImage;
@@ -21,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.team.buddyya.certification.exception.CertificateExceptionType.STUDENT_ID_CARD_NOT_FOUND;
 import static com.team.buddyya.common.domain.S3DirectoryName.STUDENT_ID_CARD;
 
 @Service
@@ -39,6 +45,9 @@ public class AdminService {
     private final StudentIdCardRepository studentIdCardRepository;
     private final ReportRepository reportRepository;
     private final ReportImageRepository reportImageRepository;
+    private final ChatroomRepository chatroomRepository;
+    private final ChatRepository chatRepository;
+
 
     @Transactional(readOnly = true)
     public StudentIdCardListResponse getStudentIdCards() {
@@ -50,11 +59,19 @@ public class AdminService {
 
     public StudentVerificationResponse verifyStudentIdCard(StudentVerificationRequest request) {
         Student student = findStudentService.findByStudentId(request.id());
-        studentIdCardRepository.deleteByStudent(student);
-        s3UploadService.deleteFile(STUDENT_ID_CARD.getDirectoryName(), request.imageUrl());
-        studentService.updateStudentCertification(student);
-        notificationService.sendAuthorizationNotification(student, true);
-        return new StudentVerificationResponse(VERIFICATION_COMPLETED_MESSAGE);
+        StudentIdCard studentIdCard = studentIdCardRepository.findByStudent(student)
+                .orElseThrow(() -> new CertificateException(STUDENT_ID_CARD_NOT_FOUND));
+        if (request.isApproved()) {
+            s3UploadService.deleteFile(STUDENT_ID_CARD.getDirectoryName(), request.imageUrl());
+            studentIdCardRepository.delete(studentIdCard);
+            studentService.updateStudentCertification(student);
+            notificationService.sendAuthorizationNotification(student, true);
+            return new StudentVerificationResponse(VERIFICATION_COMPLETED_MESSAGE);
+        } else {
+            studentIdCard.updateRejectionReason(request.rejectionReason());
+            notificationService.sendAuthorizationNotification(student, false);
+            return new StudentVerificationResponse(REQUEST_REJECTED_MESSAGE);
+        }
     }
 
     public List<AdminReportResponse> getAllReports() {
@@ -67,5 +84,24 @@ public class AdminService {
         return reportImageRepository.findByReportId(reportId).stream()
                 .map(ReportImage::getImageUrl)
                 .collect(Collectors.toList());
+    }
+
+    public void banStudent(Long studentId, int days) {
+        Student student = findStudentService.findByStudentId(studentId);
+        student.ban(days);
+    }
+
+    public void unbanStudent(Long studentId) {
+        Student student = findStudentService.findByStudentId(studentId);
+        student.unban();
+    }
+
+    public List<AdminChatMessageResponse> getAllChatMessages(Long chatroomId) {
+        Chatroom chatroom = chatroomRepository.findById(chatroomId)
+                .orElseThrow(() -> new ChatException(ChatExceptionType.CHATROOM_NOT_FOUND));
+        List<Chat> chats = chatRepository.findByChatroom(chatroom);
+        return chats.stream()
+                .map(AdminChatMessageResponse::from)
+                .toList();
     }
 }

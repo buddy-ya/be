@@ -20,8 +20,11 @@ public class StudentIdCard extends CreatedTime {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "image_url", nullable = false)
     private String imageUrl;
+
+    @Column(name = "rejection_reason")
+    private String rejectionReason;
 
     @OneToOne
     @JoinColumn(name = "student_id", nullable = false, unique = true)
@@ -31,10 +34,15 @@ public class StudentIdCard extends CreatedTime {
     public StudentIdCard(String imageUrl, Student student) {
         this.imageUrl = imageUrl;
         this.student = student;
+        this.rejectionReason = null;
     }
 
     public void updateImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public void updateRejectionReason(String rejectionReason) {
+        this.rejectionReason = rejectionReason;
     }
 
     public void setStudent(Student student) {

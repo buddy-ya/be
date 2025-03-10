@@ -27,6 +27,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.Set;
 
+import static com.team.buddyya.student.domain.Role.ADMIN;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -144,7 +146,7 @@ public class FeedService {
 
     public void updateFeed(StudentInfo studentInfo, Long feedId, FeedUpdateRequest request) {
         Feed feed = findFeedByFeedId(feedId);
-        validateFeedOwner(studentInfo.id(), feed);
+        validateFeedOwner(studentInfo, feed);
         Category category = categoryService.getCategory(request.category());
         feed.updateFeed(request.title(), request.content(), category);
         updateImages(feed, request.images());
@@ -152,7 +154,7 @@ public class FeedService {
 
     public void deleteFeed(StudentInfo studentInfo, Long feedId) {
         Feed feed = findFeedByFeedId(feedId);
-        validateFeedOwner(studentInfo.id(), feed);
+        validateFeedOwner(studentInfo, feed);
         feedImageService.deleteS3FeedImages(feed);
         feedRepository.delete(feed);
     }
@@ -164,8 +166,8 @@ public class FeedService {
                 .toList();
     }
 
-    private void validateFeedOwner(Long studentId, Feed feed) {
-        if (!studentId.equals(feed.getStudent().getId())) {
+    private void validateFeedOwner(StudentInfo studentInfo, Feed feed) {
+        if (!studentInfo.id().equals(feed.getStudent().getId()) && !studentInfo.role().equals(ADMIN)) {
             throw new FeedException(FeedExceptionType.NOT_FEED_OWNER);
         }
     }
