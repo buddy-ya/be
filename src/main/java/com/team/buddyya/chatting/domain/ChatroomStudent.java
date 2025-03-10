@@ -37,7 +37,7 @@ public class ChatroomStudent extends CreatedTime {
     public ChatroomStudent(Student student, Chatroom chatroom) {
         this.student = student;
         this.chatroom = chatroom;
-        this.unreadCount = 0;
+        this.unreadCount = 1;
         this.isExited = false;
     }
 

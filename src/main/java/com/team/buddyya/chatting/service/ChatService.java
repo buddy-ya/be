@@ -13,6 +13,7 @@ import com.team.buddyya.chatting.dto.response.*;
 import com.team.buddyya.chatting.exception.ChatException;
 import com.team.buddyya.chatting.exception.ChatExceptionType;
 import com.team.buddyya.chatting.repository.ChatRepository;
+import com.team.buddyya.chatting.repository.ChatRequestRepository;
 import com.team.buddyya.chatting.repository.ChatroomRepository;
 import com.team.buddyya.chatting.repository.ChatroomStudentRepository;
 import com.team.buddyya.common.service.S3UploadService;
@@ -53,6 +54,7 @@ public class ChatService {
     private final S3UploadService s3UploadService;
     private final ChatRepository chatRepository;
     private final ChatroomRepository chatRoomRepository;
+    private final ChatRequestRepository chatRequestRepository;
     private final ChatroomStudentRepository chatroomStudentRepository;
     private final Map<Long, Set<WebSocketSession>> sessionsPerRoom = new ConcurrentHashMap<>();
     private final Map<WebSocketSession, Long> lastPongTimestamps = new ConcurrentHashMap<>();
@@ -173,10 +175,11 @@ public class ChatService {
                 .filter(Objects::nonNull)
                 .sorted((a, b) -> b.lastMessageDate().compareTo(a.lastMessageDate()))
                 .collect(Collectors.toList());
-        int totalUnreadCount = chatroomResponses.stream()
-                .mapToInt(ChatroomResponse::unreadCount)
-                .sum();
-        return ChatroomListResponse.from(chatroomResponses, totalUnreadCount);
+        int totalUnreadCount = (int) chatroomResponses.stream()
+                .filter(chatroomResponse -> chatroomResponse.unreadCount() > 0)
+                .count();
+        boolean hasChatRequest = chatRequestRepository.existsByReceiver(student);
+        return ChatroomListResponse.from(chatroomResponses, totalUnreadCount, hasChatRequest);
     }
 
     @Transactional(readOnly = true)
@@ -188,26 +191,26 @@ public class ChatService {
                 .orElseThrow(() -> new ChatException(ChatExceptionType.USER_NOT_PART_OF_CHATROOM));
         Student buddy = getBuddyFromChatroom(student, chatroom);
         if (buddy == null) {
-            return ChatroomDetailResponse.from(roomId, null, null, null, true);
+            return ChatroomDetailResponse.from(roomId, null, null, null, null, true);
         }
         boolean isBuddyExited = chatroom.getChatroomStudents().stream()
                 .filter(cs -> !cs.getStudent().getId().equals(student.getId()))
                 .anyMatch(ChatroomStudent::getIsExited);
         String buddyProfileImage = getChatroomProfileImage(buddy);
-        return ChatroomDetailResponse.from(roomId, buddy.getName(), buddy.getCountry(), buddyProfileImage, isBuddyExited);
+        return ChatroomDetailResponse.from(roomId, buddy.getName(), buddy.getCountry(), buddyProfileImage, buddy.getId(), isBuddyExited);
     }
 
     private ChatroomResponse createChatroomResponse(ChatroomStudent chatroomStudent) {
         Chatroom chatroom = chatroomStudent.getChatroom();
         Student buddy = getBuddyFromChatroom(chatroomStudent.getStudent(), chatroom);
         if (buddy == null) {
-            return ChatroomResponse.from(chatroom, null, null, chatroomStudent, null, true);
+            return ChatroomResponse.from(chatroom, null, null, chatroomStudent, null, null, true);
         }
         boolean isBuddyExited = chatroom.getChatroomStudents().stream()
                 .filter(cs -> !cs.getStudent().getId().equals(chatroomStudent.getStudent().getId()))
                 .anyMatch(ChatroomStudent::getIsExited);
         String buddyProfileImage = getChatroomProfileImage(buddy);
-        return ChatroomResponse.from(chatroom, buddy.getName(), buddy.getCountry(), chatroomStudent, buddyProfileImage, isBuddyExited);
+        return ChatroomResponse.from(chatroom, buddy.getName(), buddy.getCountry(), chatroomStudent, buddyProfileImage, buddy.getId(), isBuddyExited);
     }
 
     private Student getBuddyFromChatroom(Student student, Chatroom chatroom) {

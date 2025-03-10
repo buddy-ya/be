@@ -21,6 +21,9 @@ public class University {
     @Column(length = 255, nullable = false, unique = true)
     private String universityName;
 
+    @Column(name = "active", nullable = false)
+    private Boolean isActive;
+
     @Builder
     public University(String universityName) {
         this.universityName = universityName;

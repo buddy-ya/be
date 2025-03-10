@@ -4,10 +4,11 @@ import java.util.List;
 
 public record ChatroomListResponse(
         List<ChatroomResponse> rooms,
-        int totalUnreadCount
+        int totalUnreadCount,
+        boolean hasChatRequest
 ) {
 
-    public static ChatroomListResponse from(List<ChatroomResponse> chatroomResponse, int totalUnreadCount) {
-        return new ChatroomListResponse(chatroomResponse, totalUnreadCount);
+    public static ChatroomListResponse from(List<ChatroomResponse> chatroomResponse, int totalUnreadCount, boolean hasChatRequest) {
+        return new ChatroomListResponse(chatroomResponse, totalUnreadCount, hasChatRequest);
     }
 }
