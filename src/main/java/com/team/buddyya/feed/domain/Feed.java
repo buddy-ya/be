@@ -113,7 +113,7 @@ public class Feed extends BaseTime {
         this.images = images;
     }
 
-    public boolean isMine(Long studentId) {
+    public boolean isFeedOwner(Long studentId) {
         return this.student.getId().equals(studentId);
     }
 }

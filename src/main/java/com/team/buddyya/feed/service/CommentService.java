@@ -76,7 +76,7 @@ public class CommentService {
                 .parent(parent)
                 .build();
         commentRepository.save(comment);
-        if(!feed.isMine(studentInfo.id())) {
+        if(!feed.isFeedOwner(studentInfo.id())) {
             notificationService.sendCommentNotification(feed, request.content());
         }
     }
