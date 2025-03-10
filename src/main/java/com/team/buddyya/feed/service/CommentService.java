@@ -80,7 +80,9 @@ public class CommentService {
                 .parent(parent)
                 .build();
         commentRepository.save(comment);
-        notificationService.sendCommentNotification(feed, request.content());
+        if(!feed.isFeedOwner(studentInfo.id())) {
+            notificationService.sendCommentNotification(feed, request.content());
+        }
     }
 
     public void updateComment(StudentInfo studentInfo, Long feedId, Long commentId,
