@@ -88,7 +88,8 @@ public class FeedService {
     public FeedListResponse getMyFeed(StudentInfo studentInfo, Pageable pageable) {
         Pageable customPageable = PageRequest.of(
                 pageable.getPageNumber(),
-                pageable.getPageSize()
+                pageable.getPageSize(),
+                Sort.by(Sort.Direction.DESC, "createdDate")
         );
         Student student = findStudentByStudentId(studentInfo.id());
         Page<Feed> feeds = feedRepository.findAllByStudent(student, customPageable);
