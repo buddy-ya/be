@@ -65,13 +65,16 @@ public class CommentService {
     public void createComment(StudentInfo studentInfo, Long feedId, CommentCreateRequest request) {
         Student student = findStudentService.findByStudentId(studentInfo.id());
         Feed feed = findFeedByFeedId(feedId);
+        boolean isFeedOwner = feed.isFeedOwner(studentInfo.id());
         Comment parent = null;
         if (request.parentId() != null) {
             parent = findCommentByCommentId(request.parentId());
             if (parent.getParent() != null) {
                 throw new FeedException(FeedExceptionType.COMMENT_DEPTH_LIMIT);
             }
-            notificationService.sendCommentReplyNotification(feed, parent, request.content());
+            if(!isFeedOwner) {
+                notificationService.sendCommentReplyNotification(feed, parent, request.content());
+            }
         }
         Comment comment = Comment.builder()
                 .student(student)
@@ -80,7 +83,7 @@ public class CommentService {
                 .parent(parent)
                 .build();
         commentRepository.save(comment);
-        if(!feed.isFeedOwner(studentInfo.id())) {
+        if(!isFeedOwner) {
             notificationService.sendCommentNotification(feed, request.content());
         }
     }
