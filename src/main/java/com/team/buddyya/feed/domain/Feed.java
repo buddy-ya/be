@@ -112,4 +112,8 @@ public class Feed extends BaseTime {
     public void uploadFeedImages(List<FeedImage> images) {
         this.images = images;
     }
+
+    public boolean isMine(Long studentId) {
+        return this.student.getId().equals(studentId);
+    }
 }
