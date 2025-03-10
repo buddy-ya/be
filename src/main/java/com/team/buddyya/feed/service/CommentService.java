@@ -65,8 +65,8 @@ public class CommentService {
     public void createComment(StudentInfo studentInfo, Long feedId, CommentCreateRequest request) {
         Student student = findStudentService.findByStudentId(studentInfo.id());
         Feed feed = findFeedByFeedId(feedId);
-        Comment parent = null;
         boolean isFeedOwner = feed.isFeedOwner(studentInfo.id());
+        Comment parent = null;
         if (request.parentId() != null) {
             parent = findCommentByCommentId(request.parentId());
             if (parent.getParent() != null) {
