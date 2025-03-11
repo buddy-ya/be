@@ -12,6 +12,7 @@ import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.dto.response.UserResponse;
 import com.team.buddyya.student.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +31,9 @@ public class PhoneAuthenticationService {
     private final StudentIdCardRepository studentIdCardRepository;
     private final JwtUtils jwtUtils;
 
+    @Value("${test.phone.number.prefix}")
+    private String testPhoneNumberPrefix;
+
     public SendCodeResponse saveCode(String phoneNumber, String generatedCode) {
         RegisteredPhone registeredPhone = registeredPhoneRepository.findByPhoneNumber(phoneNumber)
                 .orElseGet(() -> new RegisteredPhone(phoneNumber, generatedCode));
@@ -44,6 +48,9 @@ public class PhoneAuthenticationService {
     public void verifyCode(String phoneNumber, String inputCode) {
         RegisteredPhone registeredPhone = registeredPhoneRepository.findByPhoneNumber(phoneNumber)
                 .orElseThrow(() -> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.PHONE_NOT_FOUND));
+        if (phoneNumber.startsWith(testPhoneNumberPrefix)) {
+            return;
+        }
         if (!inputCode.equals(registeredPhone.getAuthenticationCode())) {
             throw new PhoneAuthenticationException(PhoneAuthenticationExceptionType.CODE_MISMATCH);
         }
