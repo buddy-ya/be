@@ -2,6 +2,7 @@ package com.team.buddyya.certification.service;
 
 import com.team.buddyya.certification.exception.PhoneAuthenticationException;
 import com.team.buddyya.certification.exception.PhoneAuthenticationExceptionType;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import net.nurigo.sdk.NurigoApp;
 import net.nurigo.sdk.message.model.Message;
@@ -10,8 +11,6 @@ import net.nurigo.sdk.message.response.SingleMessageSentResponse;
 import net.nurigo.sdk.message.service.DefaultMessageService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import jakarta.annotation.PostConstruct;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Random;
@@ -35,6 +34,9 @@ public class MessageSendService {
     @Value("${solapi.api.number}")
     private String fromPhoneNumber;
 
+    @Value("${test.phone.number.prefix}")
+    private String testPhoneNumberPrefix;
+
     private DefaultMessageService messageService;
 
     @PostConstruct
@@ -44,6 +46,9 @@ public class MessageSendService {
 
     public String sendMessage(String to) {
         String generatedCode = generateRandomNumber();
+        if (to.startsWith(testPhoneNumberPrefix)) {
+            return generatedCode;
+        }
         Message message = createMessage(to, generatedCode);
         SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
         if (!response.getStatusCode().equals(MESSAGE_SEND_SUCCESS_STATUS_CODE)) {
