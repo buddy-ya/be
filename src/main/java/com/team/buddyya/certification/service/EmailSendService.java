@@ -25,6 +25,8 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class EmailSendService {
 
+    private static final String KOREAN_SUBJECT = "[버디야] 대학교 인증을 위한 인증번호를 안내 드립니다.";
+    private static final String ENGLISH_SUBJECT = "[Buddyya] University Email Verification Code";
     private static final int AUTH_CODE_MAX_RANGE = 10_000;
 
     private final JavaMailSender javaMailSender;
@@ -40,7 +42,7 @@ public class EmailSendService {
         String generatedCode = generateRandomNumber();
         try {
             String emailContent = getEmailTemplate(student.getIsKorean(), generatedCode);
-            MimeMessage message = createMail(emailRequest.email(), emailContent);
+            MimeMessage message = createMail(student.getIsKorean(), emailRequest.email(), emailContent);
             javaMailSender.send(message);
             return generatedCode;
         } catch (IOException | MessagingException | MailException e) {
@@ -64,11 +66,11 @@ public class EmailSendService {
         return content.replace("{{code}}", code);
     }
 
-    public MimeMessage createMail(String mail, String emailContent) throws MessagingException {
+    public MimeMessage createMail(boolean isKorean, String mail, String emailContent) throws MessagingException {
         MimeMessage message = javaMailSender.createMimeMessage();
         message.setFrom(senderEmail);
         message.setRecipients(MimeMessage.RecipientType.TO, mail);
-        message.setSubject("[Buddyya] University Email Verification Code");
+        message.setSubject(isKorean ? KOREAN_SUBJECT : ENGLISH_SUBJECT);
         message.setText(emailContent, "UTF-8", "html");
         return message;
     }
