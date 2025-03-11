@@ -11,10 +11,14 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StreamUtils;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Random;
 
 @Service
@@ -35,10 +39,11 @@ public class EmailSendService {
         validateStatusAndEmail(emailRequest, student);
         String generatedCode = generateRandomNumber();
         try {
-            MimeMessage message = createMail(emailRequest.email(), generatedCode);
+            String emailContent = getEmailTemplate(student.getIsKorean(), generatedCode);
+            MimeMessage message = createMail(emailRequest.email(), emailContent);
             javaMailSender.send(message);
             return generatedCode;
-        } catch (MessagingException | MailException e) {
+        } catch (IOException | MessagingException | MailException e) {
             throw new CertificateException(CertificateExceptionType.EMAIL_SEND_FAILED);
         }
     }
@@ -52,31 +57,19 @@ public class EmailSendService {
         }
     }
 
-    public MimeMessage createMail(String mail, String number) throws MessagingException {
-        MimeMessage message = javaMailSender.createMimeMessage();
+    private String getEmailTemplate(boolean isKorean, String code) throws IOException {
+        String templatePath = isKorean ? "templates/email_korean.html" : "templates/email_english.html";
+        ClassPathResource resource = new ClassPathResource(templatePath);
+        String content = StreamUtils.copyToString(resource.getInputStream(), StandardCharsets.UTF_8);
+        return content.replace("{{code}}", code);
+    }
 
+    public MimeMessage createMail(String mail, String emailContent) throws MessagingException {
+        MimeMessage message = javaMailSender.createMimeMessage();
         message.setFrom(senderEmail);
         message.setRecipients(MimeMessage.RecipientType.TO, mail);
-        message.setSubject("[버디야] 대학교 인증을 위한 인증번호를 안내 드립니다.");
-
-        String body = """
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
-                <h1 style="text-align: center; color: #333;">대학교 이메일 인증 안내</h1>
-                <p style="font-size: 16px; color: #555;">안녕하세요, <b>고객님</b></p>
-                <p style="font-size: 16px; color: #555;">
-                    아래 발급된 이메일 인증번호를 복사하거나 직접 입력하여 인증을 완료해주세요.
-                </p>
-                <div style="text-align: center; margin: 20px 0;">
-                    <span style="display: inline-block; font-size: 24px; color: #0073e6; font-weight: bold; padding: 10px 20px; border: 1px dashed #0073e6; border-radius: 5px;">
-                        """ + number + """
-                    </span>
-                </div>
-                <p style="font-size: 16px; color: #555; text-align: center;">감사합니다.</p>
-            </div>
-            """;
-
-        message.setText(body, "UTF-8", "html");
-
+        message.setSubject("[Buddyya] University Email Verification Code");
+        message.setText(emailContent, "UTF-8", "html");
         return message;
     }
 
