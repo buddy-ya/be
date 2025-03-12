@@ -62,6 +62,7 @@ public class ChatController {
     public ResponseEntity<Void> uploadImages(@PathVariable("roomId") Long chatroomId,
                                              @AuthenticationPrincipal CustomUserDetails userDetails,
                                              @ModelAttribute ChatImageRequest request) {
+        System.out.println("아오아오아오아오아오너가문제냐");
         chatService.chatUploadImage(chatroomId, userDetails.getStudentInfo(), request);
         return ResponseEntity.ok().build();
     }
