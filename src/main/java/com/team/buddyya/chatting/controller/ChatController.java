@@ -57,7 +57,6 @@ public class ChatController {
         return ResponseEntity.ok(chatService.leaveChatroom(chatroomId, userDetails.getStudentInfo()));
     }
 
-
 //    @PostMapping("/{roomId}/image")
 //    public ResponseEntity<Void> uploadImages(@PathVariable("roomId") Long chatroomId,
 //                                             @AuthenticationPrincipal CustomUserDetails userDetails,
