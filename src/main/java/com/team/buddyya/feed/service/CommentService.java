@@ -71,10 +71,11 @@ public class CommentService {
         Comment parent = null;
         if (request.parentId() != null) {
             parent = findCommentByCommentId(request.parentId());
+            boolean isParent = parent.isParent(studentInfo.id());
             if (parent.getParent() != null) {
                 throw new FeedException(FeedExceptionType.COMMENT_DEPTH_LIMIT);
             }
-            if(!isFeedOwner) {
+            if(!isFeedOwner && !isParent) {
                 notificationService.sendCommentReplyNotification(feed, parent, request.content());
             }
         }

@@ -91,6 +91,10 @@ public class Comment extends BaseTime {
         this.likeCount--;
     }
 
+    public boolean isParent(Long studentId) {
+        return this.student.getId().equals(studentId);
+    }
+
     @PrePersist
     private void prePersist() {
         feed.increaseCommentCount();
