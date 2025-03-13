@@ -28,7 +28,6 @@ public class PhoneAuthenticationService {
 
     private static final String EXISTING_MEMBER = "EXISTING_MEMBER";
     private static final String NEW_MEMBER = "NEW_MEMBER";
-    private static final Integer INITIAL_AUTHENTICATION_COUNT = 0;
 
     private final RegisteredPhoneRepository registeredPhoneRepository;
     private final StudentRepository studentRepository;
@@ -42,7 +41,6 @@ public class PhoneAuthenticationService {
     public void savePhoneInfo(SavePhoneInfoRequest request){
         phoneInfoRepository.save(PhoneInfo.builder()
                 .deviceId(request.phoneInfo())
-                .sendMessageCount(INITIAL_AUTHENTICATION_COUNT)
                 .build());
     }
 
@@ -57,7 +55,7 @@ public class PhoneAuthenticationService {
     }
 
     @Transactional(readOnly = true)
-    public void verifyCode(String phoneNumber, String inputCode) {
+    public void verifyCode(String phoneNumber, String inputCode, String deviceId) {
         RegisteredPhone registeredPhone = registeredPhoneRepository.findByPhoneNumber(phoneNumber)
                 .orElseThrow(() -> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.PHONE_NOT_FOUND));
         if (phoneNumber.startsWith(testPhoneNumberPrefix)) {
@@ -66,6 +64,9 @@ public class PhoneAuthenticationService {
         if (!inputCode.equals(registeredPhone.getAuthenticationCode())) {
             throw new PhoneAuthenticationException(PhoneAuthenticationExceptionType.CODE_MISMATCH);
         }
+        PhoneInfo phoneInfo = phoneInfoRepository.findPhoneInfoByDeviceId(deviceId)
+                .orElseThrow(()-> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.PHONE_INFO_NOT_FOUND));
+        phoneInfo.resetMessageSendCount();
     }
 
     public UserResponse checkMembership(String phoneNumber) {

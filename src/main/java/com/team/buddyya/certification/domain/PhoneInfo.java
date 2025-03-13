@@ -14,6 +14,7 @@ import static lombok.AccessLevel.PROTECTED;
 @NoArgsConstructor(access = PROTECTED)
 public class PhoneInfo {
 
+    private static final Integer INITIAL_AUTHENTICATION_COUNT = 0;
     private static final int AUTHENTICATION_MAX_RANGE = 10;
 
     @Id
@@ -29,12 +30,18 @@ public class PhoneInfo {
     @Builder
     public PhoneInfo(String deviceId, int sendMessageCount) {
         this.deviceId = deviceId;
-        this.sendMessageCount = sendMessageCount;
+        this.sendMessageCount = INITIAL_AUTHENTICATION_COUNT;
+    }
+
+    public void resetMessageSendCount() {
+        this.sendMessageCount = INITIAL_AUTHENTICATION_COUNT;
     }
 
     public void increaseMessageSendCount() {
         this.sendMessageCount++;
     }
 
-    public boolean isMaxSendMessageCount(){ return this.sendMessageCount> AUTHENTICATION_MAX_RANGE; }
+    public boolean isMaxSendMessageCount() {
+        return this.sendMessageCount > AUTHENTICATION_MAX_RANGE;
+    }
 }
