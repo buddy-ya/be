@@ -39,6 +39,7 @@ public class PhoneAuthenticationController {
 
     @PostMapping("/check-test-account")
     public ResponseEntity<TestAccountResponse> checkTestAccount(@RequestBody TestAccountRequest request) {
-        return ResponseEntity.ok(phoneAuthenticationService.isTestAccount(request.phoneNumber()));
+        TestAccountResponse response = phoneAuthenticationService.isTestAccount(request.phoneNumber());
+        return ResponseEntity.ok(response);
     }
 }
