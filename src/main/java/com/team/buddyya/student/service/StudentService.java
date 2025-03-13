@@ -111,9 +111,9 @@ public class StudentService {
     @Transactional(readOnly = true)
     public UserResponse getUserInfo(StudentInfo studentInfo, Long userId) {
         Student student = findStudentService.findByStudentId(userId);
-        boolean isUser = studentInfo.id() == userId;
+        boolean isUser = studentInfo.id().equals(userId);
         System.out.println("userId : " + userId +" studentInfo.Id : " + studentInfo.id()+ "isUser : "+ isUser);
-        if (studentInfo.id() != userId) {
+        if (!studentInfo.id().equals(userId)) {
             return UserResponse.from(student);
         }
         boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
