@@ -1,5 +1,6 @@
 package com.team.buddyya.certification.controller;
 
+import com.team.buddyya.certification.dto.request.SavePhoneInfoRequest;
 import com.team.buddyya.certification.dto.request.SendCodeRequest;
 import com.team.buddyya.certification.dto.request.VerifyCodeRequest;
 import com.team.buddyya.certification.dto.response.SendCodeResponse;
@@ -21,17 +22,23 @@ public class PhoneAuthenticationController {
     private final PhoneAuthenticationService phoneAuthenticationService;
     private final MessageSendService messageSendService;
 
+    @PostMapping("/save-phone-info")
+    public ResponseEntity<Void> savePhoneInfo(@RequestBody SavePhoneInfoRequest request){
+        phoneAuthenticationService.savePhoneInfo(request);
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/send-code")
-    public ResponseEntity<SendCodeResponse> sendOne(@RequestBody SendCodeRequest sendCodeRequest) {
-        String generatedCode = messageSendService.sendMessage(sendCodeRequest.phoneNumber());
-        SendCodeResponse response = phoneAuthenticationService.saveCode(sendCodeRequest.phoneNumber(), generatedCode);
+    public ResponseEntity<SendCodeResponse> sendOne(@RequestBody SendCodeRequest request) {
+        String generatedCode = messageSendService.sendMessage(request);
+        SendCodeResponse response = phoneAuthenticationService.saveCode(request.phoneNumber(), generatedCode);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/verify-code")
-    public ResponseEntity<UserResponse> verifyCode(@RequestBody VerifyCodeRequest verifyCodeRequest) {
-        phoneAuthenticationService.verifyCode(verifyCodeRequest.phoneNumber(), verifyCodeRequest.code());
-        UserResponse response = phoneAuthenticationService.checkMembership(verifyCodeRequest.phoneNumber());
+    public ResponseEntity<UserResponse> verifyCode(@RequestBody VerifyCodeRequest request) {
+        phoneAuthenticationService.verifyCode(request.phoneNumber(), request.code());
+        UserResponse response = phoneAuthenticationService.checkMembership(request.phoneNumber());
         return ResponseEntity.ok(response);
     }
 }
