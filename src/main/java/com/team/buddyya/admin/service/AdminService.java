@@ -1,7 +1,10 @@
 package com.team.buddyya.admin.service;
 
 import com.team.buddyya.admin.dto.request.StudentVerificationRequest;
-import com.team.buddyya.admin.dto.response.*;
+import com.team.buddyya.admin.dto.response.AdminChatMessageResponse;
+import com.team.buddyya.admin.dto.response.AdminReportResponse;
+import com.team.buddyya.admin.dto.response.StudentIdCardResponse;
+import com.team.buddyya.admin.dto.response.StudentVerificationResponse;
 import com.team.buddyya.certification.domain.StudentIdCard;
 import com.team.buddyya.certification.exception.CertificateException;
 import com.team.buddyya.certification.repository.StudentIdCardRepository;
@@ -50,11 +53,10 @@ public class AdminService {
 
 
     @Transactional(readOnly = true)
-    public StudentIdCardListResponse getStudentIdCards() {
-        List<StudentIdCardResponse> studentIdCards = studentIdCardRepository.findAllByOrderByCreatedDateAsc().stream()
+    public List<StudentIdCardResponse> getStudentIdCards() {
+        return studentIdCardRepository.findAllByOrderByCreatedDateAsc().stream()
                 .map(StudentIdCardResponse::from)
                 .collect(Collectors.toList());
-        return StudentIdCardListResponse.from(studentIdCards);
     }
 
     public StudentVerificationResponse verifyStudentIdCard(StudentVerificationRequest request) {

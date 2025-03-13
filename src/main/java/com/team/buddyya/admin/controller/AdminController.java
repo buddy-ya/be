@@ -4,7 +4,7 @@ import com.team.buddyya.admin.dto.request.BanRequest;
 import com.team.buddyya.admin.dto.request.StudentVerificationRequest;
 import com.team.buddyya.admin.dto.response.AdminChatMessageResponse;
 import com.team.buddyya.admin.dto.response.AdminReportResponse;
-import com.team.buddyya.admin.dto.response.StudentIdCardListResponse;
+import com.team.buddyya.admin.dto.response.StudentIdCardResponse;
 import com.team.buddyya.admin.dto.response.StudentVerificationResponse;
 import com.team.buddyya.admin.service.AdminService;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ public class AdminController {
     private final AdminService adminService;
 
     @GetMapping("/student-id-cards")
-    public ResponseEntity<StudentIdCardListResponse> getStudentIdCards() {
+    public ResponseEntity<List<StudentIdCardResponse>> getStudentIdCards() {
         return ResponseEntity.ok(adminService.getStudentIdCards());
     }
 
