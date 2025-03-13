@@ -68,7 +68,7 @@ public class NotificationService {
     private static final String MATCH_SUCCESS_BODY_KR = "지금 바로 채팅을 시작해 보세요.";
     private static final String MATCH_SUCCESS_BODY_EN = "Start chatting now.";
 
-    private static final String CHAT_ACCEPT_TITLE_KR = "이 채팅 요청을 수락했습니다.";
+    private static final String CHAT_ACCEPT_TITLE_KR = "님이 채팅 요청을 수락했습니다.";
     private static final String CHAT_ACCEPT_TITLE_EN = "have accepted your chat request.";
 
     private static final String CHAT_ACCEPT_BODY_KR = "대화를 시작해보세요!";
@@ -272,8 +272,8 @@ public class NotificationService {
                     "type", "CHAT_ACCEPT"
             );
             boolean isKorean = student.getIsKorean();
-            String title = getChatAcceptTitle(isKorean);
-            String body = getChatAcceptBody(isKorean, senderName);
+            String title = senderName + " " + getChatAcceptTitle(isKorean);
+            String body = getChatAcceptBody(isKorean);
             sendToExpo(RequestNotification.builder()
                     .to(token)
                     .title(title)
@@ -289,10 +289,8 @@ public class NotificationService {
         return isKorean ? CHAT_ACCEPT_TITLE_KR : CHAT_ACCEPT_TITLE_EN;
     }
 
-    private String getChatAcceptBody(boolean isKorean, String senderName) {
-        return isKorean
-                ? senderName + CHAT_ACCEPT_BODY_KR
-                : senderName + CHAT_ACCEPT_BODY_EN;
+    private String getChatAcceptBody(boolean isKorean) {
+        return isKorean ? CHAT_ACCEPT_BODY_KR : CHAT_ACCEPT_BODY_EN;
     }
 
     private void sendToExpo(RequestNotification notification) {
