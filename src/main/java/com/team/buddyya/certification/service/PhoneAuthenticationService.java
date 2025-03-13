@@ -2,10 +2,13 @@ package com.team.buddyya.certification.service;
 
 import com.team.buddyya.auth.dto.request.TokenInfoRequest;
 import com.team.buddyya.auth.jwt.JwtUtils;
+import com.team.buddyya.certification.domain.PhoneInfo;
 import com.team.buddyya.certification.domain.RegisteredPhone;
+import com.team.buddyya.certification.dto.request.SavePhoneInfoRequest;
 import com.team.buddyya.certification.dto.response.SendCodeResponse;
 import com.team.buddyya.certification.exception.PhoneAuthenticationException;
 import com.team.buddyya.certification.exception.PhoneAuthenticationExceptionType;
+import com.team.buddyya.certification.repository.PhoneInfoRepository;
 import com.team.buddyya.certification.repository.RegisteredPhoneRepository;
 import com.team.buddyya.certification.repository.StudentIdCardRepository;
 import com.team.buddyya.student.domain.Student;
@@ -25,14 +28,23 @@ public class PhoneAuthenticationService {
 
     private static final String EXISTING_MEMBER = "EXISTING_MEMBER";
     private static final String NEW_MEMBER = "NEW_MEMBER";
+    private static final Integer INITIAL_AUTHENTICATION_COUNT = 0;
 
     private final RegisteredPhoneRepository registeredPhoneRepository;
     private final StudentRepository studentRepository;
     private final StudentIdCardRepository studentIdCardRepository;
+    private final PhoneInfoRepository phoneInfoRepository;
     private final JwtUtils jwtUtils;
 
     @Value("${test.phone.number.prefix}")
     private String testPhoneNumberPrefix;
+
+    public void savePhoneInfo(SavePhoneInfoRequest request){
+        phoneInfoRepository.save(PhoneInfo.builder()
+                .deviceId(request.phoneInfo())
+                .sendMessageCount(INITIAL_AUTHENTICATION_COUNT)
+                .build());
+    }
 
     public SendCodeResponse saveCode(String phoneNumber, String generatedCode) {
         RegisteredPhone registeredPhone = registeredPhoneRepository.findByPhoneNumber(phoneNumber)

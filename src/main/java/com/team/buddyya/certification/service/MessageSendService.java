@@ -1,7 +1,10 @@
 package com.team.buddyya.certification.service;
 
+import com.team.buddyya.certification.domain.PhoneInfo;
+import com.team.buddyya.certification.dto.request.SendCodeRequest;
 import com.team.buddyya.certification.exception.PhoneAuthenticationException;
 import com.team.buddyya.certification.exception.PhoneAuthenticationExceptionType;
+import com.team.buddyya.certification.repository.PhoneInfoRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import net.nurigo.sdk.NurigoApp;
@@ -38,22 +41,29 @@ public class MessageSendService {
     private String testPhoneNumberPrefix;
 
     private DefaultMessageService messageService;
+    private final PhoneInfoRepository phoneInfoRepository;
 
     @PostConstruct
     private void initMessageService() {
         this.messageService = NurigoApp.INSTANCE.initialize(apiKey, apiSecret, SOLAPI_API_URL);
     }
 
-    public String sendMessage(String to) {
+    public String sendMessage(SendCodeRequest request) {
+        PhoneInfo phoneInfo = phoneInfoRepository.findPhoneInfoByDeviceId(request.phoneInfo())
+                .orElseThrow(() -> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.PHONE_INFO_NOT_FOUND));
+        if (phoneInfo.isMaxSendMessageCount()) {
+            throw new PhoneAuthenticationException(PhoneAuthenticationExceptionType.MAX_SMS_SEND_COUNT);
+        }
         String generatedCode = generateRandomNumber();
-        if (to.startsWith(testPhoneNumberPrefix)) {
+        if (request.phoneNumber().startsWith(testPhoneNumberPrefix)) {
             return generatedCode;
         }
-        Message message = createMessage(to, generatedCode);
+        Message message = createMessage(request.phoneNumber(), generatedCode);
         SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
         if (!response.getStatusCode().equals(MESSAGE_SEND_SUCCESS_STATUS_CODE)) {
             throw new PhoneAuthenticationException(PhoneAuthenticationExceptionType.SMS_SEND_FAILED);
         }
+        phoneInfo.increaseMessageSendCount();
         return generatedCode;
     }
 
