@@ -20,6 +20,7 @@ import com.team.buddyya.report.domain.ReportImage;
 import com.team.buddyya.report.repository.ReportImageRepository;
 import com.team.buddyya.report.repository.ReportRepository;
 import com.team.buddyya.student.domain.Student;
+import com.team.buddyya.student.exception.StudentException;
 import com.team.buddyya.student.service.FindStudentService;
 import com.team.buddyya.student.service.StudentService;
 import lombok.RequiredArgsConstructor;
@@ -27,10 +28,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.team.buddyya.certification.exception.CertificateExceptionType.STUDENT_ID_CARD_NOT_FOUND;
 import static com.team.buddyya.common.domain.S3DirectoryName.STUDENT_ID_CARD;
+import static com.team.buddyya.student.exception.StudentExceptionType.STUDENT_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -60,11 +63,12 @@ public class AdminService {
     }
 
     public StudentVerificationResponse verifyStudentIdCard(StudentVerificationRequest request) {
-        Student student = findStudentService.findByStudentId(request.id());
-        StudentIdCard studentIdCard = studentIdCardRepository.findByStudent(student)
+        StudentIdCard studentIdCard = studentIdCardRepository.findById(request.id())
                 .orElseThrow(() -> new CertificateException(STUDENT_ID_CARD_NOT_FOUND));
+        Student student = Optional.ofNullable(studentIdCard.getStudent())
+                .orElseThrow(() -> new StudentException(STUDENT_NOT_FOUND));
         if (request.isApproved()) {
-            s3UploadService.deleteFile(STUDENT_ID_CARD.getDirectoryName(), request.imageUrl());
+            s3UploadService.deleteFile(STUDENT_ID_CARD.getDirectoryName(), studentIdCard.getImageUrl());
             studentIdCardRepository.delete(studentIdCard);
             studentService.updateStudentCertification(student);
             notificationService.sendAuthorizationNotification(student, true);
