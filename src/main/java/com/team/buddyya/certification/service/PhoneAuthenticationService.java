@@ -6,11 +6,13 @@ import com.team.buddyya.certification.domain.PhoneInfo;
 import com.team.buddyya.certification.domain.RegisteredPhone;
 import com.team.buddyya.certification.dto.request.SavePhoneInfoRequest;
 import com.team.buddyya.certification.dto.response.SendCodeResponse;
+import com.team.buddyya.certification.dto.response.TestAccountResponse;
 import com.team.buddyya.certification.exception.PhoneAuthenticationException;
 import com.team.buddyya.certification.exception.PhoneAuthenticationExceptionType;
 import com.team.buddyya.certification.repository.PhoneInfoRepository;
 import com.team.buddyya.certification.repository.RegisteredPhoneRepository;
 import com.team.buddyya.certification.repository.StudentIdCardRepository;
+import com.team.buddyya.certification.repository.TestAccountRepository;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.dto.response.UserResponse;
 import com.team.buddyya.student.repository.StudentRepository;
@@ -33,6 +35,7 @@ public class PhoneAuthenticationService {
     private final StudentRepository studentRepository;
     private final StudentIdCardRepository studentIdCardRepository;
     private final PhoneInfoRepository phoneInfoRepository;
+    private final TestAccountRepository testAccountRepository;
     private final JwtUtils jwtUtils;
 
     @Value("${test.phone.number.prefix}")
@@ -58,7 +61,7 @@ public class PhoneAuthenticationService {
     public void verifyCode(String phoneNumber, String inputCode, String deviceId) {
         RegisteredPhone registeredPhone = registeredPhoneRepository.findByPhoneNumber(phoneNumber)
                 .orElseThrow(() -> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.PHONE_NOT_FOUND));
-        if (phoneNumber.startsWith(testPhoneNumberPrefix)) {
+        if (testAccountRepository.findByPhoneNumber(phoneNumber).isPresent()) {
             return;
         }
         if (!inputCode.equals(registeredPhone.getAuthenticationCode())) {
@@ -79,5 +82,12 @@ public class PhoneAuthenticationService {
             return UserResponse.from(student, isStudentIdCardRequested, EXISTING_MEMBER, accessToken, refreshToken);
         }
         return UserResponse.from(NEW_MEMBER);
+    }
+
+    public TestAccountResponse isTestAccount(String phoneNumber) {
+        if (testAccountRepository.findByPhoneNumber(phoneNumber).isPresent()) {
+            return new TestAccountResponse(true);
+        }
+        return new TestAccountResponse(false);
     }
 }

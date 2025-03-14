@@ -4,6 +4,7 @@ import com.team.buddyya.certification.domain.PhoneInfo;
 import com.team.buddyya.certification.dto.request.SendCodeRequest;
 import com.team.buddyya.certification.exception.PhoneAuthenticationException;
 import com.team.buddyya.certification.exception.PhoneAuthenticationExceptionType;
+import com.team.buddyya.certification.repository.TestAccountRepository;
 import com.team.buddyya.certification.repository.PhoneInfoRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,8 @@ public class MessageSendService {
     private static final String MESSAGE_SEND_SUCCESS_STATUS_CODE = "2000";
     private static final int AUTH_CODE_MAX_RANGE = 1_000_000;
 
+    private final TestAccountRepository testAccountRepository;
+
     @Value("${solapi.api.key}")
     private String apiKey;
 
@@ -36,9 +39,6 @@ public class MessageSendService {
 
     @Value("${solapi.api.number}")
     private String fromPhoneNumber;
-
-    @Value("${test.phone.number.prefix}")
-    private String testPhoneNumberPrefix;
 
     private DefaultMessageService messageService;
     private final PhoneInfoRepository phoneInfoRepository;
@@ -55,7 +55,7 @@ public class MessageSendService {
             throw new PhoneAuthenticationException(PhoneAuthenticationExceptionType.MAX_SMS_SEND_COUNT);
         }
         String generatedCode = generateRandomNumber();
-        if (request.phoneNumber().startsWith(testPhoneNumberPrefix)) {
+        if (testAccountRepository.findByPhoneNumber(request.phoneNumber()).isPresent()) {
             return generatedCode;
         }
         Message message = createMessage(request.phoneNumber(), generatedCode);
