@@ -154,8 +154,8 @@ public class Student extends BaseTime {
     public void markAsDeleted() {
         this.isDeleted = true;
         this.isCertificated = false;
-        this.phoneNumber = "deleted_" + UUID.randomUUID().toString().substring(0, 3);
-        this.email = "deleted_" + UUID.randomUUID().toString().substring(0, 4);
+        this.phoneNumber = "d_" + UUID.randomUUID().toString().substring(0, 9);
+        this.email = "d_" + UUID.randomUUID().toString().substring(0, 9);
         this.name = "UNKNOWN";
     }
 
