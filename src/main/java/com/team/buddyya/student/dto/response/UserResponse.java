@@ -23,6 +23,7 @@ public record UserResponse(
         List<String> languages,
         List<String> interests,
         String status,
+        Boolean isBanned,
         String accessToken,
         String refreshToken
 ) {
@@ -43,6 +44,7 @@ public record UserResponse(
                 convertToStringList(student.getLanguages()),
                 convertToStringList(student.getInterests()),
                 null,
+                student.getIsBanned(),
                 null,
                 null
         );
@@ -64,6 +66,7 @@ public record UserResponse(
                 convertToStringList(student.getLanguages()),
                 convertToStringList(student.getInterests()),
                 null,
+                student.getIsBanned(),
                 null,
                 null
         );
@@ -85,6 +88,7 @@ public record UserResponse(
                 convertToStringList(student.getLanguages()),
                 convertToStringList(student.getInterests()),
                 null,
+                student.getIsBanned(),
                 accessToken,
                 refreshToken
         );
@@ -106,6 +110,7 @@ public record UserResponse(
                 convertToStringList(student.getLanguages()),
                 convertToStringList(student.getInterests()),
                 status,
+                student.getIsBanned(),
                 accessToken,
                 refreshToken
         );
@@ -127,6 +132,7 @@ public record UserResponse(
                 null,
                 null,
                 status,
+                false,
                 null,
                 null
         );

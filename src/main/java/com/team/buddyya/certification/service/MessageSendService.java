@@ -2,6 +2,8 @@ package com.team.buddyya.certification.service;
 
 import com.team.buddyya.certification.exception.PhoneAuthenticationException;
 import com.team.buddyya.certification.exception.PhoneAuthenticationExceptionType;
+import com.team.buddyya.certification.repository.TestAccountRepository;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import net.nurigo.sdk.NurigoApp;
 import net.nurigo.sdk.message.model.Message;
@@ -10,8 +12,6 @@ import net.nurigo.sdk.message.response.SingleMessageSentResponse;
 import net.nurigo.sdk.message.service.DefaultMessageService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import jakarta.annotation.PostConstruct;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Random;
@@ -25,6 +25,8 @@ public class MessageSendService {
     private static final String MESSAGE_TEXT_FORMAT = "[버디야] 본인 확인 인증번호[%s]를 화면에 입력해주세요";
     private static final String MESSAGE_SEND_SUCCESS_STATUS_CODE = "2000";
     private static final int AUTH_CODE_MAX_RANGE = 1_000_000;
+
+    private final TestAccountRepository testAccountRepository;
 
     @Value("${solapi.api.key}")
     private String apiKey;
@@ -44,6 +46,9 @@ public class MessageSendService {
 
     public String sendMessage(String to) {
         String generatedCode = generateRandomNumber();
+        if (testAccountRepository.findByPhoneNumber(to).isPresent()) {
+            return generatedCode;
+        }
         Message message = createMessage(to, generatedCode);
         SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
         if (!response.getStatusCode().equals(MESSAGE_SEND_SUCCESS_STATUS_CODE)) {

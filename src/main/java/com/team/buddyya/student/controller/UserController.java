@@ -5,11 +5,14 @@ import com.team.buddyya.feed.dto.response.feed.FeedListResponse;
 import com.team.buddyya.feed.service.FeedService;
 import com.team.buddyya.student.dto.request.MyPageUpdateRequest;
 import com.team.buddyya.student.dto.request.OnBoardingRequest;
-import com.team.buddyya.student.dto.response.BlockResponse;
-import com.team.buddyya.student.dto.response.UserResponse;
 import com.team.buddyya.student.dto.request.UpdateProfileImageRequest;
+import com.team.buddyya.student.dto.response.BlockResponse;
+import com.team.buddyya.student.dto.response.UserBanStatusResponse;
+import com.team.buddyya.student.dto.response.UniversityResponse;
+import com.team.buddyya.student.dto.response.UserResponse;
 import com.team.buddyya.student.service.OnBoardingService;
 import com.team.buddyya.student.service.StudentService;
+import com.team.buddyya.student.service.UniversityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -17,6 +20,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -26,6 +31,7 @@ public class UserController {
     private final OnBoardingService onBoardingService;
     private final StudentService studentService;
     private final FeedService feedService;
+    private final UniversityService universityService;
 
     @PostMapping
     public ResponseEntity<UserResponse> onboard(@RequestBody OnBoardingRequest request) {
@@ -84,5 +90,15 @@ public class UserController {
     public ResponseEntity<Void> logout(@AuthenticationPrincipal CustomUserDetails userDetails) {
         studentService.logout(userDetails.getStudentInfo());
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/ban-status")
+    public ResponseEntity<UserBanStatusResponse> checkBanStatusOrUpdate(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.ok(studentService.checkBanEndTimeOrUpdate(userDetails.getStudentInfo()));
+    }
+
+    @GetMapping("/universities")
+    public ResponseEntity<List<UniversityResponse>> getActiveUniversity() {
+        return ResponseEntity.ok(universityService.getActiveUniversities());
     }
 }
