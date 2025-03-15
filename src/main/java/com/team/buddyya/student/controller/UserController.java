@@ -86,6 +86,12 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        studentService.logout(userDetails.getStudentInfo());
+        return ResponseEntity.noContent().build();
+    }
+
     @PatchMapping("/ban-status")
     public ResponseEntity<UserBanStatusResponse> checkBanStatusOrUpdate(@AuthenticationPrincipal CustomUserDetails userDetails) {
         return ResponseEntity.ok(studentService.checkBanEndTimeOrUpdate(userDetails.getStudentInfo()));

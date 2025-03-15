@@ -166,6 +166,14 @@ public class StudentService {
         return BlockResponse.from(BLOCK_SUCCESS_MESSAGE);
     }
 
+    public void logout(StudentInfo studentInfo) {
+        Student student = findStudentService.findByStudentId(studentInfo.id());
+        if (student.getExpoToken() != null) {
+            expoTokenRepository.delete(student.getExpoToken());
+        }
+        student.getAvatar().setLoggedOut(true);
+    }
+
     public UserBanStatusResponse checkBanEndTimeOrUpdate(StudentInfo studentId) {
         Student student = findStudentService.findByStudentId(studentId.id());
         boolean isBanned = student.checkAndUpdateBanStatus();

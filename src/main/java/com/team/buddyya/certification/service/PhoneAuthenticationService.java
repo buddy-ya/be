@@ -65,6 +65,7 @@ public class PhoneAuthenticationService {
             Student student = optionalStudent.get();
             String accessToken = jwtUtils.createAccessToken(new TokenInfoRequest(student.getId()));
             String refreshToken = student.getAuthToken().getRefreshToken();
+            student.getAvatar().setLoggedOut(false);
             boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student).isPresent();
             return UserResponse.from(student, isStudentIdCardRequested, EXISTING_MEMBER, accessToken, refreshToken);
         }
