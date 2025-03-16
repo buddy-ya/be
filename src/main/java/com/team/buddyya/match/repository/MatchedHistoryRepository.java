@@ -8,8 +8,11 @@ import org.springframework.stereotype.Repository;
 import java.util.Set;
 
 @Repository
-public interface BuddyRepository extends JpaRepository<MatchedHistory, Long> {
+public interface MatchedHistoryRepository extends JpaRepository<MatchedHistory, Long> {
 
     @Query("SELECT b.buddyId FROM MatchedHistory b WHERE b.student.id = :studentId")
     Set<Long> findBuddyIdsByStudentId(Long studentId);
+
+    @Query("SELECT m FROM MatchedHistory m WHERE m.student.id = :studentId ORDER BY m.id DESC LIMIT 1")
+    MatchedHistory findMostRecentMatchedHistoryByStudentId(Long studentId);
 }
