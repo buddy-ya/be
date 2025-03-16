@@ -8,8 +8,9 @@ import java.util.Arrays;
 
 @Getter
 public enum UniversityType {
-    SAME_UNIVERSITY("same"),
-    DIFFERENT_UNIVERSITY("different");
+
+    SAME_UNIVERSITY("SAME"),
+    DIFFERENT_UNIVERSITY("DIFFERENT");
 
     private final String displayName;
 

@@ -8,8 +8,9 @@ import java.util.Arrays;
 
 @Getter
 public enum GenderType {
-    SAME_GENDER("same"),
-    ALL_GENDER("all");
+
+    SAME_GENDER("SAME"),
+    ALL_GENDER("ALL");
 
     private final String displayName;
 
