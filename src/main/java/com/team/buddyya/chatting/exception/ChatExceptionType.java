@@ -9,7 +9,8 @@ public enum ChatExceptionType implements BaseExceptionType {
     USER_NOT_PART_OF_CHATROOM(5002, HttpStatus.FORBIDDEN, "사용자가 채팅방에 속해 있지 않습니다."),
     SELF_CHAT_REQUEST_NOT_ALLOWED(5003, HttpStatus.BAD_REQUEST, "본인에게 채팅 요청을 할 수 없습니다."),
     CHAT_REQUEST_ALREADY_EXISTS(5004, HttpStatus.BAD_REQUEST, "이미 채팅 요청을 보낸 사용자입니다."),
-    CHATROOM_ALREADY_EXISTS(5005, HttpStatus.BAD_REQUEST, "이미 채팅방이 존재합니다.");
+    CHATROOM_ALREADY_EXISTS(5005, HttpStatus.BAD_REQUEST, "이미 채팅방이 존재합니다."),
+    CHATROOM_ALREADY_EXITED(5006, HttpStatus.BAD_REQUEST, "This chat room has already been left.");
 
     private final int errorCode;
     private final HttpStatus httpStatus;
