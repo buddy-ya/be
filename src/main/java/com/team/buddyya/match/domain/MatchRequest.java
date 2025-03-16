@@ -35,6 +35,10 @@ public class MatchRequest extends BaseTime {
     private GenderType genderType;
 
     @Enumerated(EnumType.STRING)
+    @Column(name="match_request_status", nullable = false)
+    private  MatchRequestStatus matchRequestStatus;
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "gender", nullable = false)
     private Gender gender;
 
@@ -42,12 +46,17 @@ public class MatchRequest extends BaseTime {
     private Boolean isKorean;
 
     @Builder
-    public MatchRequest(Student student, Boolean isKorean, Long universityId, UniversityType universityType, GenderType genderType, Gender gender) {
+    public MatchRequest(Student student, Boolean isKorean, Long universityId, UniversityType universityType, GenderType genderType, MatchRequestStatus matchRequestStatus, Gender gender) {
         this.student = student;
         this.isKorean = isKorean;
         this.universityId = universityId;
         this.universityType = universityType;
+        this.matchRequestStatus = matchRequestStatus;
         this.genderType = genderType;
         this.gender = gender;
+    }
+
+    public void updateMatchRequestStatusSuccess(){
+        this.matchRequestStatus = MatchRequestStatus.MATCH_SUCCESS;
     }
 }
