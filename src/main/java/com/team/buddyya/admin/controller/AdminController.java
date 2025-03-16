@@ -1,6 +1,8 @@
 package com.team.buddyya.admin.controller;
 
+import com.team.buddyya.admin.dto.request.BanRequest;
 import com.team.buddyya.admin.dto.request.StudentVerificationRequest;
+import com.team.buddyya.admin.dto.response.AdminChatMessageResponse;
 import com.team.buddyya.admin.dto.response.AdminReportResponse;
 import com.team.buddyya.admin.dto.response.StudentIdCardListResponse;
 import com.team.buddyya.admin.dto.response.StudentVerificationResponse;
@@ -31,5 +33,25 @@ public class AdminController {
     @GetMapping("/reports")
     public ResponseEntity<List<AdminReportResponse>> getReports() {
         return ResponseEntity.ok(adminService.getAllReports());
+    }
+
+    @PatchMapping("/ban/{studentId}")
+    public ResponseEntity<Void> banStudent(
+            @PathVariable("studentId") Long studentId,
+            @RequestBody BanRequest request) {
+        adminService.banStudent(studentId, request.days());
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/unban/{studentId}")
+    public ResponseEntity<Void> unbanStudent(@PathVariable("studentId") Long studentId) {
+        adminService.unbanStudent(studentId);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/chatroom/{roomId}/chats")
+    public ResponseEntity<List<AdminChatMessageResponse>> getAllChatMessages(@PathVariable("roomId") Long roomId) {
+        List<AdminChatMessageResponse> response = adminService.getAllChatMessages(roomId);
+        return ResponseEntity.ok(response);
     }
 }
