@@ -1,11 +1,12 @@
 package com.team.buddyya.match.service;
 
 import com.team.buddyya.match.dto.request.MatchCreateRequest;
-import com.team.buddyya.match.dto.response.MatchCreateResponse;
-import com.team.buddyya.match.dto.response.MatchStatusResponse;
+import com.team.buddyya.match.dto.response.MatchResponse;
 
 public interface MatchService {
-    MatchCreateResponse requestMatch(Long studentId, MatchCreateRequest request);
+    MatchResponse requestMatch(Long studentId, MatchCreateRequest request);
 
-    MatchStatusResponse findMatchStatus(Long studentId);
+    void deleteMatch(Long studentId);
+
+    MatchResponse findMatchStatus(Long studentId);
 }

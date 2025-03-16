@@ -23,6 +23,12 @@ public class MatchController {
         return ResponseEntity.ok(response);
     }
 
+    @DeleteMapping
+    public ResponseEntity<Void> deleteMatch(@AuthenticationPrincipal CustomUserDetails userDetails){
+        matchService.deleteMatch(userDetails.getStudentInfo().id());
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/status")
     public ResponseEntity<MatchResponse> findMatchStatus(@AuthenticationPrincipal CustomUserDetails userDetails) {
         MatchResponse response = matchService.findMatchStatus(userDetails.getStudentInfo().id());
