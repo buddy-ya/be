@@ -16,7 +16,10 @@ import com.team.buddyya.chatting.repository.ChatRepository;
 import com.team.buddyya.chatting.repository.ChatroomRepository;
 import com.team.buddyya.common.service.S3UploadService;
 import com.team.buddyya.notification.service.NotificationService;
+import com.team.buddyya.report.domain.Report;
 import com.team.buddyya.report.domain.ReportImage;
+import com.team.buddyya.report.domain.ReportType;
+import com.team.buddyya.report.exception.ReportException;
 import com.team.buddyya.report.repository.ReportImageRepository;
 import com.team.buddyya.report.repository.ReportRepository;
 import com.team.buddyya.student.domain.Student;
@@ -33,6 +36,7 @@ import java.util.stream.Collectors;
 
 import static com.team.buddyya.certification.exception.CertificateExceptionType.STUDENT_ID_CARD_NOT_FOUND;
 import static com.team.buddyya.common.domain.S3DirectoryName.STUDENT_ID_CARD;
+import static com.team.buddyya.report.exception.ReportExceptionType.REPORT_NOT_FOUND;
 import static com.team.buddyya.student.exception.StudentExceptionType.STUDENT_NOT_FOUND;
 
 @Service
@@ -80,11 +84,23 @@ public class AdminService {
         }
     }
 
-    public List<AdminReportResponse> getAllReports() {
-        return reportRepository.findAll().stream()
+    @Transactional(readOnly = true)
+    public List<AdminReportResponse> getReportsByType(ReportType type) {
+        return reportRepository.findByType(type).stream()
                 .map(report -> AdminReportResponse.from(report, getImageUrlsByReportId(report.getId())))
                 .collect(Collectors.toList());
     }
+
+    public void deleteReport(Long reportId) {
+        List<ReportImage> reportImages = reportImageRepository.findByReportId(reportId);
+        if (!reportImages.isEmpty()) {
+            reportImageRepository.deleteAll(reportImages);
+        }
+        Report report = reportRepository.findById(reportId)
+                .orElseThrow(() -> new ReportException(REPORT_NOT_FOUND));
+        reportRepository.delete(report);
+    }
+
 
     private List<String> getImageUrlsByReportId(Long reportId) {
         return reportImageRepository.findByReportId(reportId).stream()

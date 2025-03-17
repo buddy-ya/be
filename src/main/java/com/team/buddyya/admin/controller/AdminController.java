@@ -7,6 +7,7 @@ import com.team.buddyya.admin.dto.response.AdminReportResponse;
 import com.team.buddyya.admin.dto.response.StudentIdCardResponse;
 import com.team.buddyya.admin.dto.response.StudentVerificationResponse;
 import com.team.buddyya.admin.service.AdminService;
+import com.team.buddyya.report.domain.ReportType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,9 +31,15 @@ public class AdminController {
         return ResponseEntity.ok(adminService.verifyStudentIdCard(request));
     }
 
-    @GetMapping("/reports")
-    public ResponseEntity<List<AdminReportResponse>> getReports() {
-        return ResponseEntity.ok(adminService.getAllReports());
+    @GetMapping("/reports/{type}")
+    public ResponseEntity<List<AdminReportResponse>> getReportsByType(@PathVariable("type") ReportType type) {
+        return ResponseEntity.ok(adminService.getReportsByType(type));
+    }
+
+    @DeleteMapping("/reports/{reportId}")
+    public ResponseEntity<Void> deleteReport(@PathVariable("reportId") Long reportId) {
+        adminService.deleteReport(reportId);
+        return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/ban/{studentId}")
