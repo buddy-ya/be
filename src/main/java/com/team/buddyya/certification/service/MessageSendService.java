@@ -2,6 +2,7 @@ package com.team.buddyya.certification.service;
 
 import com.team.buddyya.certification.exception.PhoneAuthenticationException;
 import com.team.buddyya.certification.exception.PhoneAuthenticationExceptionType;
+import com.team.buddyya.certification.repository.TestAccountRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import net.nurigo.sdk.NurigoApp;
@@ -25,6 +26,8 @@ public class MessageSendService {
     private static final String MESSAGE_SEND_SUCCESS_STATUS_CODE = "2000";
     private static final int AUTH_CODE_MAX_RANGE = 1_000_000;
 
+    private final TestAccountRepository testAccountRepository;
+
     @Value("${solapi.api.key}")
     private String apiKey;
 
@@ -33,9 +36,6 @@ public class MessageSendService {
 
     @Value("${solapi.api.number}")
     private String fromPhoneNumber;
-
-    @Value("${test.phone.number.prefix}")
-    private String testPhoneNumberPrefix;
 
     private DefaultMessageService messageService;
 
@@ -46,7 +46,7 @@ public class MessageSendService {
 
     public String sendMessage(String to) {
         String generatedCode = generateRandomNumber();
-        if (to.startsWith(testPhoneNumberPrefix)) {
+        if (testAccountRepository.findByPhoneNumber(to).isPresent()) {
             return generatedCode;
         }
         Message message = createMessage(to, generatedCode);

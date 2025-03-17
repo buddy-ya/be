@@ -111,7 +111,7 @@ public class StudentService {
     @Transactional(readOnly = true)
     public UserResponse getUserInfo(StudentInfo studentInfo, Long userId) {
         Student student = findStudentService.findByStudentId(userId);
-        if (studentInfo.id() != userId) {
+        if (!studentInfo.id().equals(userId)) {
             return UserResponse.from(student);
         }
         boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
@@ -164,6 +164,14 @@ public class StudentService {
                 .blockedStudentId(blockerId)
                 .build());
         return BlockResponse.from(BLOCK_SUCCESS_MESSAGE);
+    }
+
+    public void logout(StudentInfo studentInfo) {
+        Student student = findStudentService.findByStudentId(studentInfo.id());
+        if (student.getExpoToken() != null) {
+            expoTokenRepository.delete(student.getExpoToken());
+        }
+        student.getAvatar().setLoggedOut(true);
     }
 
     public UserBanStatusResponse checkBanEndTimeOrUpdate(StudentInfo studentId) {
