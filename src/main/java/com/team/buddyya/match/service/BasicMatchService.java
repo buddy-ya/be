@@ -60,8 +60,8 @@ public class BasicMatchService implements MatchService {
         if (optionalMatchRequest.isPresent()) {
             return processMatchSuccess(student, universityType, genderType, optionalMatchRequest.get());
         }
-        createMatchRequest(student, universityType, genderType, MatchRequestStatus.MATCH_PENDING, universityId, gender);
-        return MatchResponse.from(MatchRequestStatus.MATCH_PENDING.getDisplayName());
+        MatchRequest newMatchRequest = createMatchRequest(student, universityType, genderType, MatchRequestStatus.MATCH_PENDING, universityId, gender);
+        return MatchResponse.from(newMatchRequest);
     }
 
     @Override
@@ -78,7 +78,7 @@ public class BasicMatchService implements MatchService {
         }
         MatchRequestStatus status = matchRequest.get().getMatchRequestStatus();
         if (status.equals(MatchRequestStatus.MATCH_PENDING)) {
-            return MatchResponse.from(MatchRequestStatus.MATCH_PENDING.getDisplayName());
+            return MatchResponse.from(matchRequest.get());
         }
         if (status.equals(MatchRequestStatus.MATCH_SUCCESS)) {
             MatchedHistory recentMatchedHistory = matchedHistoryRepository.findMostRecentMatchedHistoryByStudentId(studentId);
@@ -90,7 +90,7 @@ public class BasicMatchService implements MatchService {
                 throw new ChatException(ChatExceptionType.CHATROOM_ALREADY_EXITED);
             }
             Student matchedStudent = findStudentService.findByStudentId(recentMatchedHistory.getBuddyId());
-            return MatchResponse.from(chatroom, matchedStudent, matchRequest.get().getMatchRequestStatus().getDisplayName());
+            return MatchResponse.from(chatroom, matchedStudent, matchRequest.get());
         }
         throw new MatchException(MatchExceptionType.UNEXPECTED_MATCH_STATUS);
     }
@@ -150,12 +150,12 @@ public class BasicMatchService implements MatchService {
                 .build();
         matchedHistoryRepository.save(requestedMatchedHistory);
         matchedHistoryRepository.save(existingMatchedHistory);
-        createMatchRequest(student, universityType, genderType, MatchRequestStatus.MATCH_SUCCESS, student.getUniversity().getId(), student.getGender());
+        MatchRequest newMatchRequest = createMatchRequest(student, universityType, genderType, MatchRequestStatus.MATCH_SUCCESS, student.getUniversity().getId(), student.getGender());
         matchRequest.updateMatchRequestStatusSuccess();
         Chatroom chatroom = chatService.createChatroom(student, matchedStudent);
         notificationService.sendMatchSuccessNotification(student, chatroom.getId());
         notificationService.sendMatchSuccessNotification(matchedStudent, chatroom.getId());
-        return MatchResponse.from(chatroom, matchedStudent, MatchRequestStatus.MATCH_SUCCESS.getDisplayName());
+        return MatchResponse.from(chatroom, matchedStudent, newMatchRequest);
     }
 
     private MatchRequest createMatchRequest(Student student,
