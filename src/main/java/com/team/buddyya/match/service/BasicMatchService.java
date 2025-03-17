@@ -98,7 +98,7 @@ public class BasicMatchService implements MatchService {
     private Optional<MatchRequest> findValidMatchRequest(
             boolean isKorean, UniversityType universityType, GenderType genderType,
             Long universityId, Gender studentGender, Set<Long> existingBuddies) {
-        return matchRequestRepository.findAllMatches(isKorean).stream()
+        return matchRequestRepository.findAllPendingMatches(isKorean).stream()
                 .filter(matchRequest -> isValidMatchRequest(matchRequest, universityType, genderType, universityId, studentGender, existingBuddies))
                 .findFirst();
     }

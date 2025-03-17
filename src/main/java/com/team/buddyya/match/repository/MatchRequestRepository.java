@@ -13,11 +13,12 @@ import java.util.Optional;
 public interface MatchRequestRepository extends JpaRepository<MatchRequest, Long> {
 
     @Query("""
-                SELECT m FROM MatchRequest m 
-                WHERE m.isKorean <> :isKorean 
-                ORDER BY m.createdDate ASC
-            """)
-    List<MatchRequest> findAllMatches(boolean isKorean);
+        SELECT m FROM MatchRequest m 
+        WHERE m.isKorean <> :isKorean 
+        AND m.matchRequestStatus = 'MATCH_PENDING'
+        ORDER BY m.createdDate ASC
+    """)
+    List<MatchRequest> findAllPendingMatches(boolean isKorean);
 
     void deleteByStudent(Student student);
 
