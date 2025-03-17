@@ -24,7 +24,7 @@ public class MatchController {
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> deleteMatch(@AuthenticationPrincipal CustomUserDetails userDetails){
+    public ResponseEntity<Void> deleteMatch(@AuthenticationPrincipal CustomUserDetails userDetails) {
         matchService.deleteMatch(userDetails.getStudentInfo().id());
         return ResponseEntity.noContent().build();
     }

@@ -35,8 +35,8 @@ public class MatchRequest extends BaseTime {
     private GenderType genderType;
 
     @Enumerated(EnumType.STRING)
-    @Column(name="match_request_status", nullable = false)
-    private  MatchRequestStatus matchRequestStatus;
+    @Column(name = "match_request_status", nullable = false)
+    private MatchRequestStatus matchRequestStatus;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "gender", nullable = false)
@@ -56,7 +56,7 @@ public class MatchRequest extends BaseTime {
         this.gender = gender;
     }
 
-    public void updateMatchRequestStatusSuccess(){
+    public void updateMatchRequestStatusSuccess() {
         this.matchRequestStatus = MatchRequestStatus.MATCH_SUCCESS;
     }
 }

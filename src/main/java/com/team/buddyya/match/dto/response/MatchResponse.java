@@ -27,7 +27,7 @@ public record MatchResponse(
         );
     }
 
-    public static MatchResponse from(String matchStatus){
+    public static MatchResponse from(String matchStatus) {
         return new MatchResponse(
                 null,
                 null,
