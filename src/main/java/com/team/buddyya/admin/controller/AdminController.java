@@ -23,17 +23,20 @@ public class AdminController {
 
     @GetMapping("/student-id-cards")
     public ResponseEntity<List<StudentIdCardResponse>> getStudentIdCards() {
-        return ResponseEntity.ok(adminService.getStudentIdCards());
+        List<StudentIdCardResponse> response = adminService.getStudentIdCards();
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/student-id-cards/verify")
     public ResponseEntity<StudentVerificationResponse> verifyStudentIdCard(@RequestBody StudentVerificationRequest request) {
-        return ResponseEntity.ok(adminService.verifyStudentIdCard(request));
+        StudentVerificationResponse response = adminService.verifyStudentIdCard(request);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/reports/{type}")
     public ResponseEntity<List<AdminReportResponse>> getReportsByType(@PathVariable("type") ReportType type) {
-        return ResponseEntity.ok(adminService.getReportsByType(type));
+        List<AdminReportResponse> response = adminService.getReportsByType(type);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/reports/{reportId}")
