@@ -58,7 +58,6 @@ public class AdminService {
     private final ChatroomRepository chatroomRepository;
     private final ChatRepository chatRepository;
 
-
     @Transactional(readOnly = true)
     public List<StudentIdCardResponse> getStudentIdCards() {
         return studentIdCardRepository.findAllByOrderByCreatedDateAsc().stream()
