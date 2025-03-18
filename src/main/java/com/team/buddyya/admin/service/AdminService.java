@@ -71,16 +71,24 @@ public class AdminService {
         Student student = Optional.ofNullable(studentIdCard.getStudent())
                 .orElseThrow(() -> new StudentException(STUDENT_NOT_FOUND));
         if (request.isApproved()) {
-            s3UploadService.deleteFile(STUDENT_ID_CARD.getDirectoryName(), studentIdCard.getImageUrl());
-            studentIdCardRepository.delete(studentIdCard);
-            studentService.updateStudentCertification(student);
-            notificationService.sendAuthorizationNotification(student, true);
-            return new StudentVerificationResponse(VERIFICATION_COMPLETED_MESSAGE);
+            return approveStudentIdCard(studentIdCard, student);
         } else {
-            studentIdCard.updateRejectionReason(request.rejectionReason());
-            notificationService.sendAuthorizationNotification(student, false);
-            return new StudentVerificationResponse(REQUEST_REJECTED_MESSAGE);
+            return rejectStudentIdCard(request, studentIdCard, student);
         }
+    }
+
+    private StudentVerificationResponse approveStudentIdCard(StudentIdCard studentIdCard, Student student) {
+        s3UploadService.deleteFile(STUDENT_ID_CARD.getDirectoryName(), studentIdCard.getImageUrl());
+        studentIdCardRepository.delete(studentIdCard);
+        studentService.updateStudentCertification(student);
+        notificationService.sendAuthorizationNotification(student, true);
+        return new StudentVerificationResponse(VERIFICATION_COMPLETED_MESSAGE);
+    }
+
+    private StudentVerificationResponse rejectStudentIdCard(StudentVerificationRequest request, StudentIdCard studentIdCard, Student student) {
+        studentIdCard.updateRejectionReason(request.rejectionReason());
+        notificationService.sendAuthorizationNotification(student, false);
+        return new StudentVerificationResponse(REQUEST_REJECTED_MESSAGE);
     }
 
     @Transactional(readOnly = true)
