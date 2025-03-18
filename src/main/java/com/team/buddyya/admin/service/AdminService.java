@@ -100,7 +100,6 @@ public class AdminService {
         reportRepository.delete(report);
     }
 
-
     private List<String> getImageUrlsByReportId(Long reportId) {
         return reportImageRepository.findByReportId(reportId).stream()
                 .map(ReportImage::getImageUrl)
