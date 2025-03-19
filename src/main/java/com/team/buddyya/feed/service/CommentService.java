@@ -15,11 +15,14 @@ import com.team.buddyya.notification.service.NotificationService;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.repository.BlockRepository;
 import com.team.buddyya.student.service.FindStudentService;
-import java.util.List;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Set;
+
+import static com.team.buddyya.student.domain.Role.ADMIN;
 
 @Service
 @Transactional
@@ -34,12 +37,12 @@ public class CommentService {
     private final BlockRepository blockRepository;
 
     @Transactional(readOnly = true)
-    Feed findFeedByFeedId(Long feedId) {
+    protected Feed findFeedByFeedId(Long feedId) {
         return feedRepository.findById(feedId).orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND));
     }
 
     @Transactional(readOnly = true)
-    Comment findCommentByCommentId(Long commentId) {
+    protected Comment findCommentByCommentId(Long commentId) {
         return commentRepository.findById(commentId)
                 .orElseThrow(() -> new FeedException(FeedExceptionType.COMMENT_NOT_FOUND));
     }
@@ -50,7 +53,11 @@ public class CommentService {
         Set<Long> blockedStudentIds = blockRepository.findBlockedStudentIdByBlockerId(studentInfo.id());
         List<Comment> comments = feed.getComments().stream()
                 .filter(comment -> comment.getParent() == null)
-                .filter(comment -> !blockedStudentIds.contains(comment.getStudent().getId()))
+                .filter(comment -> {
+                    boolean isBlocked = blockedStudentIds.contains(comment.getStudent().getId());
+                    boolean hasChildren = !comment.getChildren().isEmpty();
+                    return hasChildren || !isBlocked;
+                })
                 .toList();
         return comments.stream()
                 .map(comment -> CommentResponse.from(comment, feedId, studentInfo.id(), commentLikeRepository, blockedStudentIds))
@@ -60,13 +67,17 @@ public class CommentService {
     public void createComment(StudentInfo studentInfo, Long feedId, CommentCreateRequest request) {
         Student student = findStudentService.findByStudentId(studentInfo.id());
         Feed feed = findFeedByFeedId(feedId);
+        boolean isFeedOwner = feed.isFeedOwner(studentInfo.id());
         Comment parent = null;
         if (request.parentId() != null) {
             parent = findCommentByCommentId(request.parentId());
+            boolean isParent = parent.isParent(studentInfo.id());
             if (parent.getParent() != null) {
                 throw new FeedException(FeedExceptionType.COMMENT_DEPTH_LIMIT);
             }
-            notificationService.sendCommentReplyNotification(feed,parent, request.content());
+            if(!isFeedOwner && !isParent) {
+                notificationService.sendCommentReplyNotification(feed, parent, request.content());
+            }
         }
         Comment comment = Comment.builder()
                 .student(student)
@@ -75,7 +86,9 @@ public class CommentService {
                 .parent(parent)
                 .build();
         commentRepository.save(comment);
-        notificationService.sendCommentNotification(feed, request.content());
+        if(!isFeedOwner) {
+            notificationService.sendCommentNotification(feed, request.content());
+        }
     }
 
     public void updateComment(StudentInfo studentInfo, Long feedId, Long commentId,
@@ -85,7 +98,7 @@ public class CommentService {
         if (comment.isDeleted()) {
             throw new FeedException(FeedExceptionType.COMMENT_NOT_FOUND);
         }
-        validateCommentOwner(studentInfo.id(), comment);
+        validateCommentOwner(studentInfo, comment);
         comment.updateComment(request.content());
     }
 
@@ -95,7 +108,7 @@ public class CommentService {
         if (comment.isDeleted()) {
             throw new FeedException(FeedExceptionType.COMMENT_NOT_FOUND);
         }
-        validateCommentOwner(studentInfo.id(), comment);
+        validateCommentOwner(studentInfo, comment);
         boolean hasChild = !comment.getChildren().isEmpty();
         if (hasChild) {
             comment.updateIsDeleted(true);
@@ -105,8 +118,8 @@ public class CommentService {
         commentRepository.delete(comment);
     }
 
-    private void validateCommentOwner(Long studentId, Comment comment) {
-        if (!studentId.equals(comment.getStudent().getId())) {
+    private void validateCommentOwner(StudentInfo studentInfo, Comment comment) {
+        if (!studentInfo.id().equals(comment.getStudent().getId()) && !studentInfo.role().equals(ADMIN)) {
             throw new FeedException(FeedExceptionType.NOT_COMMENT_OWNER);
         }
     }

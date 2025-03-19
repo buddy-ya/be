@@ -12,17 +12,18 @@ import com.team.buddyya.student.dto.request.MyPageUpdateRequest;
 import com.team.buddyya.student.dto.request.OnBoardingRequest;
 import com.team.buddyya.student.dto.request.UpdateProfileImageRequest;
 import com.team.buddyya.student.dto.response.BlockResponse;
+import com.team.buddyya.student.dto.response.UniversityResponse;
+import com.team.buddyya.student.dto.response.UserBanStatusResponse;
 import com.team.buddyya.student.dto.response.UserResponse;
 import com.team.buddyya.student.exception.StudentException;
 import com.team.buddyya.student.exception.StudentExceptionType;
 import com.team.buddyya.student.repository.*;
-
-import com.team.buddyya.student.repository.BlockRepository;
-import com.team.buddyya.student.repository.StudentRepository;
-import com.team.buddyya.student.repository.UniversityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.team.buddyya.common.domain.S3DirectoryName.PROFILE_IMAGE;
 import static com.team.buddyya.student.domain.UserProfileDefaultImage.USER_PROFILE_DEFAULT_IMAGE;
@@ -107,7 +108,7 @@ public class StudentService {
     @Transactional(readOnly = true)
     public UserResponse getUserInfo(StudentInfo studentInfo, Long userId) {
         Student student = findStudentService.findByStudentId(userId);
-        if (studentInfo.id() != userId) {
+        if (!studentInfo.id().equals(userId)) {
             return UserResponse.from(student);
         }
         boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
@@ -160,5 +161,19 @@ public class StudentService {
                 .blockedStudentId(blockerId)
                 .build());
         return BlockResponse.from(BLOCK_SUCCESS_MESSAGE);
+    }
+
+    public void logout(StudentInfo studentInfo) {
+        Student student = findStudentService.findByStudentId(studentInfo.id());
+        if (student.getExpoToken() != null) {
+            expoTokenRepository.delete(student.getExpoToken());
+        }
+        student.getAvatar().setLoggedOut(true);
+    }
+
+    public UserBanStatusResponse checkBanEndTimeOrUpdate(StudentInfo studentId) {
+        Student student = findStudentService.findByStudentId(studentId.id());
+        boolean isBanned = student.checkAndUpdateBanStatus();
+        return new UserBanStatusResponse(isBanned, student.getBanEndTime());
     }
 }

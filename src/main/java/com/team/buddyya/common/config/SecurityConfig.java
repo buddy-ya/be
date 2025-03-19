@@ -25,7 +25,7 @@ public class SecurityConfig {
     private final JwtExceptionFilter jwtExceptionFilter;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, LoggingFilter loggingFilter) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(
@@ -33,6 +33,7 @@ public class SecurityConfig {
                 ))
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
+                .addFilterBefore(loggingFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new JwtAuthFilter(customUserDetailsService, jwtUtils),
                         UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtExceptionFilter, JwtAuthFilter.class)
@@ -42,11 +43,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
                         .requestMatchers("/ws/**", "/ws/chat/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/phone-auth/**",
+                        .requestMatchers("/phone-auth/**", "/users/universities",
                                 "/auth/reissue", "/auth/test").permitAll()
                         .requestMatchers("/auth/fail", "/admin/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/users", "/auth/success", "/certification/**", "/feeds/**", "/chatrooms/**",
-                                "/report", "/chat-requests/**").hasAuthority("ROLE_STUDENT")
+                                "/report", "/chat-requests/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_STUDENT")
                         .anyRequest().authenticated()
                 );
         return http.build();

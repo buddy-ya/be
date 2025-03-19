@@ -5,22 +5,22 @@ import org.springframework.http.HttpStatus;
 
 public enum StudentExceptionType implements BaseExceptionType {
 
-    STUDENT_NOT_FOUND(2000, HttpStatus.NOT_FOUND, "해당 학생을 찾지 못하였습니다."),
-    UNIVERSITY_NOT_FOUND(2000, HttpStatus.NOT_FOUND, "해당 대학을 찾지 못하였습니다."),
-    MAJOR_NOT_FOUND(2000, HttpStatus.NOT_FOUND, "해당 전공을 찾지 못하였습니다."),
-    LANGUAGE_NOT_FOUND(2000, HttpStatus.NOT_FOUND, "해당 언어를 찾지 못하였습니다."),
-    INTEREST_NOT_FOUND(2000, HttpStatus.NOT_FOUND, "해당 관심사를 찾지 못하였습니다."),
-    PROFILE_IMAGE_NOT_FOUND(2000, HttpStatus.NOT_FOUND, "해당 학생의 프로필 이미지를 찾지 못하였습니다."),
-    INVALID_GENDER_VALUE(2000, HttpStatus.BAD_REQUEST, "유효하지 않은 성별 값입니다."),
-    INVALID_DEFAULT_IMAGE_KEY(2000, HttpStatus.BAD_REQUEST, "유효하지 않은 프로필 이미지 키값입니다."),
-    INVALID_NAME_UPDATE_REQUEST(2001, HttpStatus.BAD_REQUEST, "이름 업데이트에는 하나의 값만 필요합니다."),
-    UNSUPPORTED_UPDATE_KEY(2002, HttpStatus.BAD_REQUEST, "지원되지 않는 업데이트 키입니다."),
-    CANNOT_BLOCK_SELF(2010, HttpStatus.BAD_REQUEST, "자기 자신을 차단할 수 없습니다."),
-    ALREADY_BLOCKED(2011, HttpStatus.CONFLICT, "이미 차단된 사용자입니다."),
-    INVALID_POINT_TYPE(2012, HttpStatus.BAD_REQUEST, "유효하지 않는 포인트 타입입니다."),
-    NEGATIVE_POINT(2013, HttpStatus.BAD_REQUEST, "포인트는 0 미만이 될 수 없습니다."),
-    EXCEED_MAX_POINT(2014, HttpStatus.BAD_REQUEST, "최대 보유 포인트를 초과할 수 없습니다."),
-    POINT_NOT_FOUND(2015, HttpStatus.NOT_FOUND, "해당 학생의 포인트가 존재하지 않습니다");
+    STUDENT_NOT_FOUND(2000, HttpStatus.NOT_FOUND, "Student not found."),
+    UNIVERSITY_NOT_FOUND(2000, HttpStatus.NOT_FOUND, "University not found."),
+    MAJOR_NOT_FOUND(2000, HttpStatus.NOT_FOUND, "Major not found."),
+    LANGUAGE_NOT_FOUND(2000, HttpStatus.NOT_FOUND, "Language not found."),
+    INTEREST_NOT_FOUND(2000, HttpStatus.NOT_FOUND, "Interest not found."),
+    PROFILE_IMAGE_NOT_FOUND(2000, HttpStatus.NOT_FOUND, "Profile image not found."),
+    INVALID_GENDER_VALUE(2000, HttpStatus.BAD_REQUEST, "Invalid gender value."),
+    INVALID_DEFAULT_IMAGE_KEY(2000, HttpStatus.BAD_REQUEST, "Invalid profile image key."),
+    INVALID_NAME_UPDATE_REQUEST(2001, HttpStatus.BAD_REQUEST, "Only one value is required for name update."),
+    UNSUPPORTED_UPDATE_KEY(2002, HttpStatus.BAD_REQUEST, "Unsupported update key."),
+    CANNOT_BLOCK_SELF(2010, HttpStatus.BAD_REQUEST, "You cannot block yourself."),
+    ALREADY_BLOCKED(2011, HttpStatus.CONFLICT, "User is already blocked."),
+    INVALID_POINT_TYPE(2012, HttpStatus.BAD_REQUEST, "Invalid point type."),
+    NEGATIVE_POINT(2013, HttpStatus.BAD_REQUEST, "Points cannot be less than zero."),
+    EXCEED_MAX_POINT(2014, HttpStatus.BAD_REQUEST, "Exceeding the maximum allowable points is not permitted."),
+    POINT_NOT_FOUND(2015, HttpStatus.NOT_FOUND, "The student's points do not exist.");
 
     private final int errorCode;
     private final HttpStatus httpStatus;

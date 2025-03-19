@@ -5,6 +5,7 @@ import com.team.buddyya.student.domain.Student;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.team.buddyya.student.domain.UserProfileDefaultImage.getChatroomProfileImage;
 import static com.team.buddyya.student.domain.UserProfileDefaultImage.isDefaultUserProfileImage;
 
 public record UserResponse(
@@ -22,6 +23,7 @@ public record UserResponse(
         List<String> languages,
         List<String> interests,
         String status,
+        Boolean isBanned,
         String accessToken,
         String refreshToken
 ) {
@@ -42,6 +44,7 @@ public record UserResponse(
                 convertToStringList(student.getLanguages()),
                 convertToStringList(student.getInterests()),
                 null,
+                student.getIsBanned(),
                 null,
                 null
         );
@@ -54,7 +57,7 @@ public record UserResponse(
                 student.getCountry(),
                 student.getUniversity().getUniversityName(),
                 student.getGender().getDisplayName(),
-                student.getProfileImage().getUrl(),
+                getChatroomProfileImage(student),
                 null,
                 null,
                 null,
@@ -63,6 +66,7 @@ public record UserResponse(
                 convertToStringList(student.getLanguages()),
                 convertToStringList(student.getInterests()),
                 null,
+                student.getIsBanned(),
                 null,
                 null
         );
@@ -84,6 +88,7 @@ public record UserResponse(
                 convertToStringList(student.getLanguages()),
                 convertToStringList(student.getInterests()),
                 null,
+                student.getIsBanned(),
                 accessToken,
                 refreshToken
         );
@@ -105,6 +110,7 @@ public record UserResponse(
                 convertToStringList(student.getLanguages()),
                 convertToStringList(student.getInterests()),
                 status,
+                student.getIsBanned(),
                 accessToken,
                 refreshToken
         );
@@ -126,6 +132,7 @@ public record UserResponse(
                 null,
                 null,
                 status,
+                false,
                 null,
                 null
         );

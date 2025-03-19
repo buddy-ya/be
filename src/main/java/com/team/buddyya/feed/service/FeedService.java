@@ -1,11 +1,7 @@
 package com.team.buddyya.feed.service;
 
 import com.team.buddyya.auth.domain.StudentInfo;
-import com.team.buddyya.feed.domain.Bookmark;
-import com.team.buddyya.feed.domain.Category;
-import com.team.buddyya.feed.domain.Feed;
-import com.team.buddyya.feed.domain.FeedImage;
-import com.team.buddyya.feed.domain.FeedUserAction;
+import com.team.buddyya.feed.domain.*;
 import com.team.buddyya.feed.dto.request.feed.FeedCreateRequest;
 import com.team.buddyya.feed.dto.request.feed.FeedListRequest;
 import com.team.buddyya.feed.dto.request.feed.FeedUpdateRequest;
@@ -19,9 +15,6 @@ import com.team.buddyya.feed.repository.FeedRepository;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.repository.BlockRepository;
 import com.team.buddyya.student.service.FindStudentService;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,6 +23,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+import java.util.Set;
+
+import static com.team.buddyya.student.domain.Role.ADMIN;
 
 @Service
 @Transactional
@@ -47,13 +45,13 @@ public class FeedService {
     private final BlockRepository blockRepository;
 
     @Transactional(readOnly = true)
-    Feed findFeedByFeedId(Long feedId) {
+    protected Feed findFeedByFeedId(Long feedId) {
         return feedRepository.findById(feedId)
                 .orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND));
     }
 
     @Transactional(readOnly = true)
-    Student findStudentByStudentId(Long studentId) {
+    protected Student findStudentByStudentId(Long studentId) {
         return findStudentService.findByStudentId(studentId);
     }
 
@@ -92,7 +90,8 @@ public class FeedService {
     public FeedListResponse getMyFeed(StudentInfo studentInfo, Pageable pageable) {
         Pageable customPageable = PageRequest.of(
                 pageable.getPageNumber(),
-                pageable.getPageSize()
+                pageable.getPageSize(),
+                Sort.by(Sort.Direction.DESC, "createdDate")
         );
         Student student = findStudentByStudentId(studentInfo.id());
         Page<Feed> feeds = feedRepository.findAllByStudent(student, customPageable);
@@ -147,7 +146,7 @@ public class FeedService {
 
     public void updateFeed(StudentInfo studentInfo, Long feedId, FeedUpdateRequest request) {
         Feed feed = findFeedByFeedId(feedId);
-        validateFeedOwner(studentInfo.id(), feed);
+        validateFeedOwner(studentInfo, feed);
         Category category = categoryService.getCategory(request.category());
         feed.updateFeed(request.title(), request.content(), category);
         updateImages(feed, request.images());
@@ -155,7 +154,7 @@ public class FeedService {
 
     public void deleteFeed(StudentInfo studentInfo, Long feedId) {
         Feed feed = findFeedByFeedId(feedId);
-        validateFeedOwner(studentInfo.id(), feed);
+        validateFeedOwner(studentInfo, feed);
         feedImageService.deleteS3FeedImages(feed);
         feedRepository.delete(feed);
     }
@@ -167,8 +166,8 @@ public class FeedService {
                 .toList();
     }
 
-    private void validateFeedOwner(Long studentId, Feed feed) {
-        if (!studentId.equals(feed.getStudent().getId())) {
+    private void validateFeedOwner(StudentInfo studentInfo, Feed feed) {
+        if (!studentInfo.id().equals(feed.getStudent().getId()) && !studentInfo.role().equals(ADMIN)) {
             throw new FeedException(FeedExceptionType.NOT_FEED_OWNER);
         }
     }

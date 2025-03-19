@@ -4,14 +4,17 @@ import com.team.buddyya.auth.dto.request.TokenInfoRequest;
 import com.team.buddyya.auth.jwt.JwtUtils;
 import com.team.buddyya.certification.domain.RegisteredPhone;
 import com.team.buddyya.certification.dto.response.SendCodeResponse;
+import com.team.buddyya.certification.dto.response.TestAccountResponse;
 import com.team.buddyya.certification.exception.PhoneAuthenticationException;
 import com.team.buddyya.certification.exception.PhoneAuthenticationExceptionType;
 import com.team.buddyya.certification.repository.RegisteredPhoneRepository;
 import com.team.buddyya.certification.repository.StudentIdCardRepository;
+import com.team.buddyya.certification.repository.TestAccountRepository;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.dto.response.UserResponse;
 import com.team.buddyya.student.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +31,11 @@ public class PhoneAuthenticationService {
     private final RegisteredPhoneRepository registeredPhoneRepository;
     private final StudentRepository studentRepository;
     private final StudentIdCardRepository studentIdCardRepository;
+    private final TestAccountRepository testAccountRepository;
     private final JwtUtils jwtUtils;
+
+    @Value("${test.phone.number.prefix}")
+    private String testPhoneNumberPrefix;
 
     public SendCodeResponse saveCode(String phoneNumber, String generatedCode) {
         RegisteredPhone registeredPhone = registeredPhoneRepository.findByPhoneNumber(phoneNumber)
@@ -44,6 +51,9 @@ public class PhoneAuthenticationService {
     public void verifyCode(String phoneNumber, String inputCode) {
         RegisteredPhone registeredPhone = registeredPhoneRepository.findByPhoneNumber(phoneNumber)
                 .orElseThrow(() -> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.PHONE_NOT_FOUND));
+        if (testAccountRepository.findByPhoneNumber(phoneNumber).isPresent()) {
+            return;
+        }
         if (!inputCode.equals(registeredPhone.getAuthenticationCode())) {
             throw new PhoneAuthenticationException(PhoneAuthenticationExceptionType.CODE_MISMATCH);
         }
@@ -55,9 +65,17 @@ public class PhoneAuthenticationService {
             Student student = optionalStudent.get();
             String accessToken = jwtUtils.createAccessToken(new TokenInfoRequest(student.getId()));
             String refreshToken = student.getAuthToken().getRefreshToken();
+            student.getAvatar().setLoggedOut(false);
             boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student).isPresent();
             return UserResponse.from(student, isStudentIdCardRequested, EXISTING_MEMBER, accessToken, refreshToken);
         }
         return UserResponse.from(NEW_MEMBER);
+    }
+
+    public TestAccountResponse isTestAccount(String phoneNumber) {
+        if (testAccountRepository.findByPhoneNumber(phoneNumber).isPresent()) {
+            return new TestAccountResponse(true);
+        }
+        return new TestAccountResponse(false);
     }
 }
