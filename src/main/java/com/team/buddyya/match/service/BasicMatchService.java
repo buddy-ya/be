@@ -69,7 +69,7 @@ public class BasicMatchService implements MatchService {
     @Override
     public MatchDeleteResponse deleteMatch(Long studentId) {
         MatchRequest matchRequest = matchRequestRepository.findByStudentId(studentId)
-                .orElseThrow(()-> new MatchException(MatchExceptionType.MATCH_REQUEST_NOT_FOUND));
+                .orElseThrow(() -> new MatchException(MatchExceptionType.MATCH_REQUEST_NOT_FOUND));
         MatchRequestStatus status = matchRequest.getMatchRequestStatus();
         if (status.equals(MatchRequestStatus.MATCH_SUCCESS)) {
             MatchedHistory recentMatchedHistory = matchedHistoryRepository.findMostRecentMatchedHistoryByStudentId(studentId);
@@ -86,6 +86,7 @@ public class BasicMatchService implements MatchService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public MatchResponse findMatchStatus(Long studentId) {
         Optional<MatchRequest> matchRequest = matchRequestRepository.findByStudentId(studentId);
         if (matchRequest.isEmpty()) {
@@ -120,7 +121,8 @@ public class BasicMatchService implements MatchService {
         if (existingBuddies.contains(matchStudent.getId())) {
             return false;
         }
-        if (chatRequestService.isAlreadyExistChatroom(requestedStudent, matchStudent)) {
+        boolean isAlreadyExistChatroom = chatroomRepository.findByUserAndBuddy(requestedStudent.getId(), matchStudent.getId()).isPresent();
+        if (isAlreadyExistChatroom) {
             return false;
         }
         return isUniversityMatch(matchRequest.getUniversityType(), requestedUniversityType, matchRequest.getUniversityId(), requestedUniversityId)
