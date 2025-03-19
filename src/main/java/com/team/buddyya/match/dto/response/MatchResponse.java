@@ -15,10 +15,11 @@ public record MatchResponse(
         String country,
         String university,
         String profileImageUrl,
-        String matchStatus
+        String matchStatus,
+        boolean isExited
 ) {
 
-    public static MatchResponse from(Chatroom chatroom, Student buddy, MatchRequest matchRequest) {
+    public static MatchResponse from(Chatroom chatroom, Student buddy, MatchRequest matchRequest, boolean isExited) {
         return new MatchResponse(
                 matchRequest.getId(),
                 chatroom.getId(),
@@ -27,7 +28,8 @@ public record MatchResponse(
                 buddy.getCountry(),
                 buddy.getUniversity().getUniversityName(),
                 getChatroomProfileImage(buddy),
-                matchRequest.getMatchRequestStatus().getDisplayName()
+                matchRequest.getMatchRequestStatus().getDisplayName(),
+                isExited
         );
     }
 
@@ -40,7 +42,8 @@ public record MatchResponse(
                 null,
                 null,
                 null,
-                matchRequest.getMatchRequestStatus().getDisplayName()
+                matchRequest.getMatchRequestStatus().getDisplayName(),
+                false
         );
     }
 
@@ -53,7 +56,8 @@ public record MatchResponse(
                 null,
                 null,
                 null,
-                status
+                status,
+                false
         );
     }
 }
