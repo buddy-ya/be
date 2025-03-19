@@ -67,8 +67,23 @@ public class BasicMatchService implements MatchService {
 
     @Override
     public void deleteMatch(Long studentId) {
-        Student student = findStudentService.findByStudentId(studentId);
-        matchRequestRepository.deleteByStudent(student);
+        MatchRequest matchRequest = matchRequestRepository.findByStudentId(studentId)
+                .orElseThrow(()-> new MatchException(MatchExceptionType.MATCH_REQUEST_NOT_FOUND));
+        MatchRequestStatus status = matchRequest.getMatchRequestStatus();
+        if (status.equals(MatchRequestStatus.MATCH_PENDING)) {
+            matchRequestRepository.delete(matchRequest);
+        }
+        if (status.equals(MatchRequestStatus.MATCH_SUCCESS)) {
+            MatchedHistory recentMatchedHistory = matchedHistoryRepository.findMostRecentMatchedHistoryByStudentId(studentId);
+            Chatroom chatroom = chatroomRepository.findByUserAndBuddy(studentId, recentMatchedHistory.getBuddyId())
+                    .orElseThrow(() -> new ChatException(ChatExceptionType.CHATROOM_NOT_FOUND));
+            ChatroomStudent chatroomStudent = chatroomStudentRepository.findByChatroomAndStudentId(chatroom, studentId)
+                    .orElseThrow(() -> new ChatException(ChatExceptionType.USER_NOT_PART_OF_CHATROOM));
+            if (chatroomStudent.getIsExited().equals(true)) {
+                throw new ChatException(ChatExceptionType.CHATROOM_ALREADY_EXITED);
+            }
+            matchRequestRepository.delete(matchRequest);
+        }
     }
 
     @Override
@@ -85,11 +100,6 @@ public class BasicMatchService implements MatchService {
             MatchedHistory recentMatchedHistory = matchedHistoryRepository.findMostRecentMatchedHistoryByStudentId(studentId);
             Chatroom chatroom = chatroomRepository.findByUserAndBuddy(studentId, recentMatchedHistory.getBuddyId())
                     .orElseThrow(() -> new ChatException(ChatExceptionType.CHATROOM_NOT_FOUND));
-            ChatroomStudent chatroomStudent = chatroomStudentRepository.findByChatroomAndStudentId(chatroom, studentId)
-                    .orElseThrow(() -> new ChatException(ChatExceptionType.USER_NOT_PART_OF_CHATROOM));
-            if (chatroomStudent.getIsExited().equals(true)) {
-                throw new ChatException(ChatExceptionType.CHATROOM_ALREADY_EXITED);
-            }
             Student matchedStudent = findStudentService.findByStudentId(recentMatchedHistory.getBuddyId());
             return MatchResponse.from(chatroom, matchedStudent, matchRequest.get());
         }

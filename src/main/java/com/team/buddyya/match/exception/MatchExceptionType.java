@@ -5,8 +5,9 @@ import org.springframework.http.HttpStatus;
 
 public enum MatchExceptionType implements BaseExceptionType {
 
-    INVALID_MATCH_TYPE(6000, HttpStatus.BAD_REQUEST, "Invalid match type."),
-    UNEXPECTED_MATCH_STATUS(6001, HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected match status encountered.");
+    MATCH_REQUEST_NOT_FOUND(6000, HttpStatus.NOT_FOUND, "Match request not found."),
+    INVALID_MATCH_TYPE(6001, HttpStatus.BAD_REQUEST, "Invalid match type."),
+    UNEXPECTED_MATCH_STATUS(6002, HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected match status encountered.");
 
     private final int errorCode;
     private final HttpStatus httpStatus;
