@@ -10,6 +10,7 @@ import com.team.buddyya.chatting.service.ChatRequestService;
 import com.team.buddyya.chatting.service.ChatService;
 import com.team.buddyya.match.domain.*;
 import com.team.buddyya.match.dto.request.MatchCreateRequest;
+import com.team.buddyya.match.dto.response.MatchDeleteResponse;
 import com.team.buddyya.match.dto.response.MatchResponse;
 import com.team.buddyya.match.exception.MatchException;
 import com.team.buddyya.match.exception.MatchExceptionType;
@@ -66,24 +67,22 @@ public class BasicMatchService implements MatchService {
     }
 
     @Override
-    public void deleteMatch(Long studentId) {
+    public MatchDeleteResponse deleteMatch(Long studentId) {
         MatchRequest matchRequest = matchRequestRepository.findByStudentId(studentId)
                 .orElseThrow(()-> new MatchException(MatchExceptionType.MATCH_REQUEST_NOT_FOUND));
         MatchRequestStatus status = matchRequest.getMatchRequestStatus();
-        if (status.equals(MatchRequestStatus.MATCH_PENDING)) {
-            matchRequestRepository.delete(matchRequest);
-        }
         if (status.equals(MatchRequestStatus.MATCH_SUCCESS)) {
             MatchedHistory recentMatchedHistory = matchedHistoryRepository.findMostRecentMatchedHistoryByStudentId(studentId);
             Chatroom chatroom = chatroomRepository.findByUserAndBuddy(studentId, recentMatchedHistory.getBuddyId())
                     .orElseThrow(() -> new ChatException(ChatExceptionType.CHATROOM_NOT_FOUND));
             ChatroomStudent chatroomStudent = chatroomStudentRepository.findByChatroomAndStudentId(chatroom, studentId)
                     .orElseThrow(() -> new ChatException(ChatExceptionType.USER_NOT_PART_OF_CHATROOM));
-            if (chatroomStudent.getIsExited().equals(true)) {
-                throw new ChatException(ChatExceptionType.CHATROOM_ALREADY_EXITED);
-            }
+            boolean isExited = chatroomStudent.getIsExited().equals(true);
             matchRequestRepository.delete(matchRequest);
+            return MatchDeleteResponse.from(isExited);
         }
+        matchRequestRepository.delete(matchRequest);
+        return MatchDeleteResponse.from(false);
     }
 
     @Override

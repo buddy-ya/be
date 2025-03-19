@@ -2,6 +2,7 @@ package com.team.buddyya.match.controller;
 
 import com.team.buddyya.auth.domain.CustomUserDetails;
 import com.team.buddyya.match.dto.request.MatchCreateRequest;
+import com.team.buddyya.match.dto.response.MatchDeleteResponse;
 import com.team.buddyya.match.dto.response.MatchResponse;
 import com.team.buddyya.match.service.MatchService;
 import lombok.RequiredArgsConstructor;
@@ -24,9 +25,9 @@ public class MatchController {
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> deleteMatch(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        matchService.deleteMatch(userDetails.getStudentInfo().id());
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<MatchDeleteResponse> deleteMatch(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        MatchDeleteResponse response = matchService.deleteMatch(userDetails.getStudentInfo().id());
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/status")
