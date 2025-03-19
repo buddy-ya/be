@@ -42,9 +42,8 @@ public class PointService {
         pointStatusRepository.save(signUpPointStatus);
     }
 
-    public void updatePoint(Student student, String pointTypeValue){
+    public void updatePoint(Student student, PointType pointType){
         Point point = getPoint(student);
-        PointType pointType = PointType.fromValue(pointTypeValue);
         int pointChange = pointType.getPointChange();
         point.updatePoint(pointChange);
         pointRepository.save(point);
