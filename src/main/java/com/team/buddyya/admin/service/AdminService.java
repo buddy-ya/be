@@ -1,5 +1,6 @@
 package com.team.buddyya.admin.service;
 
+import com.team.buddyya.admin.dto.request.BanRequest;
 import com.team.buddyya.admin.dto.request.StudentVerificationRequest;
 import com.team.buddyya.admin.dto.response.AdminChatMessageResponse;
 import com.team.buddyya.admin.dto.response.AdminReportResponse;
@@ -114,9 +115,9 @@ public class AdminService {
                 .collect(Collectors.toList());
     }
 
-    public void banStudent(Long studentId, int days) {
+    public void banStudent(Long studentId, BanRequest request) {
         Student student = findStudentService.findByStudentId(studentId);
-        student.ban(days);
+        student.ban(request.days(), request.banReason());
     }
 
     public void unbanStudent(Long studentId) {

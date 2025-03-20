@@ -49,7 +49,7 @@ public class AdminController {
     public ResponseEntity<Void> banStudent(
             @PathVariable("studentId") Long studentId,
             @RequestBody BanRequest request) {
-        adminService.banStudent(studentId, request.days());
+        adminService.banStudent(studentId, request);
         return ResponseEntity.ok().build();
     }
 

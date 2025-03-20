@@ -2,6 +2,7 @@ package com.team.buddyya.student.dto.response;
 
 import com.team.buddyya.student.domain.Student;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,6 +25,8 @@ public record UserResponse(
         List<String> interests,
         String status,
         Boolean isBanned,
+        LocalDateTime banExpiration,
+        String banReason,
         String accessToken,
         String refreshToken
 ) {
@@ -44,7 +47,9 @@ public record UserResponse(
                 convertToStringList(student.getLanguages()),
                 convertToStringList(student.getInterests()),
                 null,
-                student.getIsBanned(),
+                null,
+                null,
+                null,
                 null,
                 null
         );
@@ -66,7 +71,9 @@ public record UserResponse(
                 convertToStringList(student.getLanguages()),
                 convertToStringList(student.getInterests()),
                 null,
-                student.getIsBanned(),
+                null,
+                null,
+                null,
                 null,
                 null
         );
@@ -88,7 +95,9 @@ public record UserResponse(
                 convertToStringList(student.getLanguages()),
                 convertToStringList(student.getInterests()),
                 null,
-                student.getIsBanned(),
+                student.checkAndUpdateBanStatus(),
+                student.getBanEndTime(),
+                student.getBanReason(),
                 accessToken,
                 refreshToken
         );
@@ -110,7 +119,9 @@ public record UserResponse(
                 convertToStringList(student.getLanguages()),
                 convertToStringList(student.getInterests()),
                 status,
-                student.getIsBanned(),
+                student.checkAndUpdateBanStatus(),
+                student.getBanEndTime(),
+                student.getBanReason(),
                 accessToken,
                 refreshToken
         );
@@ -133,6 +144,8 @@ public record UserResponse(
                 null,
                 status,
                 false,
+                null,
+                null,
                 null,
                 null
         );
