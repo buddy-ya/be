@@ -91,11 +91,6 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-//    @PatchMapping("/ban-status")
-//    public ResponseEntity<UserBanStatusResponse> checkBanStatusOrUpdate(@AuthenticationPrincipal CustomUserDetails userDetails) {
-//        return ResponseEntity.ok(studentService.checkBanEndTimeOrUpdate(userDetails.getStudentInfo()));
-//    }
-
     @GetMapping("/universities")
     public ResponseEntity<List<UniversityResponse>> getActiveUniversity() {
         return ResponseEntity.ok(universityService.getActiveUniversities());
