@@ -9,7 +9,6 @@ import java.util.Arrays;
 @Getter
 public enum PointType {
 
-    INITIAL("initial", 0),
     SIGNUP("signup", 1),
     UNIVERSITY_AUTH("university_auth",1),
     CHAT_REQUEST("chat_request", -1),

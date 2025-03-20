@@ -28,12 +28,6 @@ public class PointService {
                 .currentPoint(INITIAL_POINT)
                 .build();
         pointRepository.save(point);
-        PointStatus intialPointStatus = PointStatus.builder()
-                .point(point)
-                .pointType(PointType.INITIAL)
-                .changedPoint(PointType.INITIAL.getPointChange())
-                .build();
-        pointStatusRepository.save(intialPointStatus);
         PointStatus signUpPointStatus = PointStatus.builder()
                 .point(point)
                 .pointType(PointType.SIGNUP)
