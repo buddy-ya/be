@@ -15,6 +15,8 @@ import com.team.buddyya.report.domain.Report;
 import com.team.buddyya.report.domain.ReportImage;
 import com.team.buddyya.report.domain.ReportType;
 import com.team.buddyya.report.dto.ReportRequest;
+import com.team.buddyya.report.exception.ReportException;
+import com.team.buddyya.report.exception.ReportExceptionType;
 import com.team.buddyya.report.repository.ReportImageRepository;
 import com.team.buddyya.report.repository.ReportRepository;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +38,7 @@ public class ReportService {
     private final ReportImageRepository reportImageRepository;
 
     public void createReport(StudentInfo studentInfo, ReportRequest request) {
+        validateAlreadyReport(studentInfo, request);
         validateReportedContent(request.type(), request.reportedId());
         Report report = Report.builder()
                 .type(request.type())
@@ -51,36 +54,12 @@ public class ReportService {
         reportImages.forEach(reportImageRepository::save);
     }
 
-    private String getTitle(ReportRequest request) {
-        if (request.type() == ReportType.FEED) {
-            return findFeedById(request.reportedId()).getTitle();
+    private void validateAlreadyReport(StudentInfo studentInfo, ReportRequest request) {
+        boolean alreadyReported = reportRepository.existsByReportUserIdAndTypeAndReportedId(
+                studentInfo.id(), request.type(), request.reportedId());
+        if (alreadyReported) {
+            throw new ReportException(ReportExceptionType.ALREADY_REPORTED);
         }
-        return null;
-    }
-
-    private String getContent(ReportRequest request) {
-        if (request.type() == ReportType.FEED) {
-            return findFeedById(request.reportedId()).getContent();
-        } else if (request.type() == ReportType.COMMENT) {
-            return findCommentById(request.reportedId()).getContent();
-        }
-        return null;
-    }
-
-    private Long getReportedId(ReportRequest request) {
-        if (request.type() == ReportType.CHATROOM) {
-            return request.reportedId();
-        }
-        return null;
-    }
-
-    private List<ReportImage> getReportImages(ReportRequest request, Report report) {
-        if (request.type() == ReportType.FEED) {
-            return findFeedById(request.reportedId()).getImages().stream()
-                    .map(image -> new ReportImage(image.getUrl(), report))
-                    .collect(Collectors.toList());
-        }
-        return List.of();
     }
 
     private void validateReportedContent(ReportType type, Long id) {
@@ -110,5 +89,34 @@ public class ReportService {
     private Chatroom findByChatroomByChatroomId(Long chatroomId) {
         return chatRoomRepository.findById(chatroomId)
                 .orElseThrow(() -> new ChatException(ChatExceptionType.CHATROOM_NOT_FOUND));
+    }
+
+    private String getTitle(ReportRequest request) {
+        if (request.type() == ReportType.FEED) {
+            return findFeedById(request.reportedId()).getTitle();
+        }
+        return null;
+    }
+
+    private String getContent(ReportRequest request) {
+        if (request.type() == ReportType.FEED) {
+            return findFeedById(request.reportedId()).getContent();
+        } else if (request.type() == ReportType.COMMENT) {
+            return findCommentById(request.reportedId()).getContent();
+        }
+        return null;
+    }
+
+    private Long getReportedId(ReportRequest request) {
+        return request.reportedId();
+    }
+
+    private List<ReportImage> getReportImages(ReportRequest request, Report report) {
+        if (request.type() == ReportType.FEED) {
+            return findFeedById(request.reportedId()).getImages().stream()
+                    .map(image -> new ReportImage(image.getUrl(), report))
+                    .collect(Collectors.toList());
+        }
+        return List.of();
     }
 }
