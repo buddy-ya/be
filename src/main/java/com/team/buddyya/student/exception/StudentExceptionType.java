@@ -16,7 +16,11 @@ public enum StudentExceptionType implements BaseExceptionType {
     INVALID_NAME_UPDATE_REQUEST(2001, HttpStatus.BAD_REQUEST, "Only one value is required for name update."),
     UNSUPPORTED_UPDATE_KEY(2002, HttpStatus.BAD_REQUEST, "Unsupported update key."),
     CANNOT_BLOCK_SELF(2010, HttpStatus.BAD_REQUEST, "You cannot block yourself."),
-    ALREADY_BLOCKED(2011, HttpStatus.CONFLICT, "User is already blocked.");
+    ALREADY_BLOCKED(2011, HttpStatus.CONFLICT, "User is already blocked."),
+    INVALID_POINT_TYPE(2012, HttpStatus.BAD_REQUEST, "Invalid point type."),
+    NEGATIVE_POINT(2013, HttpStatus.BAD_REQUEST, "Points cannot be less than zero."),
+    EXCEED_MAX_POINT(2014, HttpStatus.BAD_REQUEST, "Exceeding the maximum allowable points is not permitted."),
+    POINT_NOT_FOUND(2015, HttpStatus.NOT_FOUND, "The student's points do not exist.");
 
     private final int errorCode;
     private final HttpStatus httpStatus;
