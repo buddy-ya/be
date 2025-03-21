@@ -1,8 +1,10 @@
 package com.team.buddyya.certification.controller;
 
+import com.team.buddyya.certification.dto.request.AdminAccountRequest;
 import com.team.buddyya.certification.dto.request.SendCodeRequest;
 import com.team.buddyya.certification.dto.request.TestAccountRequest;
 import com.team.buddyya.certification.dto.request.VerifyCodeRequest;
+import com.team.buddyya.certification.dto.response.AdminAccountResponse;
 import com.team.buddyya.certification.dto.response.SendCodeResponse;
 import com.team.buddyya.certification.dto.response.TestAccountResponse;
 import com.team.buddyya.certification.service.MessageSendService;
@@ -40,6 +42,12 @@ public class PhoneAuthenticationController {
     @PostMapping("/check-test-account")
     public ResponseEntity<TestAccountResponse> checkTestAccount(@RequestBody TestAccountRequest request) {
         TestAccountResponse response = phoneAuthenticationService.isTestAccount(request.phoneNumber());
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/check-admin-account")
+    public ResponseEntity<AdminAccountResponse> checkAdminAccount(@RequestBody AdminAccountRequest request) {
+        AdminAccountResponse response = phoneAuthenticationService.isAdminAccount(request.phoneNumber());
         return ResponseEntity.ok(response);
     }
 }
