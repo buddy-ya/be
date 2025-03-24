@@ -11,6 +11,7 @@ import static com.team.buddyya.student.domain.UserProfileDefaultImage.isDefaultU
 
 public record UserResponse(
         Long id,
+        String role,
         String name,
         String country,
         String university,
@@ -34,6 +35,7 @@ public record UserResponse(
     public static UserResponse from(Student student, boolean isStudentIdCardRequested) {
         return new UserResponse(
                 student.getId(),
+                student.getRole().name(),
                 student.getName(),
                 student.getCountry(),
                 student.getUniversity().getUniversityName(),
@@ -58,6 +60,7 @@ public record UserResponse(
     public static UserResponse from(Student student) {
         return new UserResponse(
                 student.getId(),
+                null,
                 student.getName(),
                 student.getCountry(),
                 student.getUniversity().getUniversityName(),
@@ -82,6 +85,7 @@ public record UserResponse(
     public static UserResponse from(Student student, Boolean isStudentIdCardRequested, String accessToken, String refreshToken) {
         return new UserResponse(
                 student.getId(),
+                student.getRole().name(),
                 student.getName(),
                 student.getCountry(),
                 student.getUniversity().getUniversityName(),
@@ -106,6 +110,7 @@ public record UserResponse(
     public static UserResponse from(Student student, Boolean isStudentIdCardRequested, String status, String accessToken, String refreshToken) {
         return new UserResponse(
                 student.getId(),
+                student.getRole().name(),
                 student.getName(),
                 student.getCountry(),
                 student.getUniversity().getUniversityName(),
@@ -129,6 +134,7 @@ public record UserResponse(
 
     public static UserResponse from(String status) {
         return new UserResponse(
+                null,
                 null,
                 null,
                 null,
