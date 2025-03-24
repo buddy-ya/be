@@ -10,15 +10,21 @@ import com.team.buddyya.chatting.service.ChatRequestService;
 import com.team.buddyya.chatting.service.ChatService;
 import com.team.buddyya.match.domain.*;
 import com.team.buddyya.match.dto.request.MatchCreateRequest;
+import com.team.buddyya.match.dto.response.MatchDeleteResponse;
 import com.team.buddyya.match.dto.response.MatchResponse;
+import com.team.buddyya.match.dto.response.MatchStatusResponse;
 import com.team.buddyya.match.exception.MatchException;
 import com.team.buddyya.match.exception.MatchExceptionType;
 import com.team.buddyya.match.repository.MatchedHistoryRepository;
 import com.team.buddyya.match.repository.MatchRequestRepository;
 import com.team.buddyya.notification.service.NotificationService;
 import com.team.buddyya.student.domain.Gender;
+import com.team.buddyya.student.domain.Point;
+import com.team.buddyya.student.domain.PointType;
 import com.team.buddyya.student.domain.Student;
+import com.team.buddyya.student.repository.PointRepository;
 import com.team.buddyya.student.service.FindStudentService;
+import com.team.buddyya.student.service.PointService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,15 +40,17 @@ public class BasicMatchService implements MatchService {
     private final MatchRequestRepository matchRequestRepository;
     private final MatchedHistoryRepository matchedHistoryRepository;
     private final FindStudentService findStudentService;
-    private final ChatRequestService chatRequestService;
     private final ChatService chatService;
     private final ChatroomRepository chatroomRepository;
     private final ChatroomStudentRepository chatroomStudentRepository;
     private final NotificationService notificationService;
+    private final PointService pointService;
+    private final PointRepository pointRepository;
 
     @Override
     public MatchResponse requestMatch(Long studentId, MatchCreateRequest request) {
         Student student = findStudentService.findByStudentId(studentId);
+        Point point = pointService.updatePoint(student, PointType.MATCH_REQUEST);
         boolean isKorean = student.getIsKorean();
         Long universityId = student.getUniversity().getId();
         Gender gender = student.getGender();
@@ -59,29 +67,37 @@ public class BasicMatchService implements MatchService {
                 existingBuddies
         );
         if (optionalMatchRequest.isPresent()) {
-            return processMatchSuccess(student, universityType, genderType, optionalMatchRequest.get());
+            return processMatchSuccess(student, universityType, genderType, optionalMatchRequest.get(), point);
         }
         MatchRequest newMatchRequest = createMatchRequest(student, universityType, genderType, MatchRequestStatus.MATCH_PENDING, universityId);
-        return MatchResponse.from(newMatchRequest);
+        return MatchResponse.from(newMatchRequest, point);
     }
 
     @Override
-    public void deleteMatch(Long studentId) {
+    public MatchDeleteResponse deleteMatch(Long studentId) {
         MatchRequest matchRequest = matchRequestRepository.findByStudentId(studentId)
                 .orElseThrow(() -> new MatchException(MatchExceptionType.MATCH_REQUEST_NOT_FOUND));
+        MatchRequestStatus matchRequestStatus = matchRequest.getMatchRequestStatus();
+        Point point;
+        if (matchRequestStatus.equals(MatchRequestStatus.MATCH_PENDING)) {
+            point = pointService.updatePoint(matchRequest.getStudent(), PointType.CANCEL_MATCH_REQUEST);
+        } else {
+            point = pointRepository.findByStudent(matchRequest.getStudent()).get();
+        }
         matchRequestRepository.delete(matchRequest);
+        return MatchDeleteResponse.from(point);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public MatchResponse findMatchStatus(Long studentId) {
+    public MatchStatusResponse findMatchStatus(Long studentId) {
         Optional<MatchRequest> matchRequest = matchRequestRepository.findByStudentId(studentId);
         if (matchRequest.isEmpty()) {
-            return MatchResponse.from(MatchRequestStatus.MATCH_NOT_REQUESTED.getDisplayName());
+            return MatchStatusResponse.from(MatchRequestStatus.MATCH_NOT_REQUESTED.getDisplayName());
         }
         MatchRequestStatus status = matchRequest.get().getMatchRequestStatus();
         if (status.equals(MatchRequestStatus.MATCH_PENDING)) {
-            return MatchResponse.from(matchRequest.get());
+            return MatchStatusResponse.from(matchRequest.get());
         }
         if (status.equals(MatchRequestStatus.MATCH_SUCCESS)) {
             MatchedHistory recentMatchedHistory = matchedHistoryRepository.findMostRecentMatchedHistoryByStudentId(studentId);
@@ -91,7 +107,7 @@ public class BasicMatchService implements MatchService {
                     .orElseThrow(() -> new ChatException(ChatExceptionType.USER_NOT_PART_OF_CHATROOM));
             boolean isExited = chatroomStudent.getIsExited().equals(true);
             Student matchedStudent = findStudentService.findByStudentId(recentMatchedHistory.getBuddyId());
-            return MatchResponse.from(chatroom, matchedStudent, matchRequest.get(), isExited);
+            return MatchStatusResponse.from(chatroom, matchedStudent, matchRequest.get(), isExited);
         }
         throw new MatchException(MatchExceptionType.UNEXPECTED_MATCH_STATUS);
     }
@@ -141,7 +157,7 @@ public class BasicMatchService implements MatchService {
         return true;
     }
 
-    private MatchResponse processMatchSuccess(Student student, UniversityType universityType, GenderType genderType, MatchRequest matchRequest) {
+    private MatchResponse processMatchSuccess(Student student, UniversityType universityType, GenderType genderType, MatchRequest matchRequest, Point point) {
         Student matchedStudent = matchRequest.getStudent();
         MatchedHistory requestedMatchedHistory = MatchedHistory.builder()
                 .student(student)
@@ -158,7 +174,7 @@ public class BasicMatchService implements MatchService {
         Chatroom chatroom = chatService.createChatroom(student, matchedStudent);
         notificationService.sendMatchSuccessNotification(student, chatroom.getId());
         notificationService.sendMatchSuccessNotification(matchedStudent, chatroom.getId());
-        return MatchResponse.from(chatroom, matchedStudent, newMatchRequest, false);
+        return MatchResponse.from(chatroom, matchedStudent, newMatchRequest, point, false);
     }
 
     private MatchRequest createMatchRequest(Student student,

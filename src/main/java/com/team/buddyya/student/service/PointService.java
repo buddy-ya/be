@@ -36,7 +36,7 @@ public class PointService {
         pointStatusRepository.save(signUpPointStatus);
     }
 
-    public void updatePoint(Student student, PointType pointType){
+    public Point updatePoint(Student student, PointType pointType){
         Point point = getPoint(student);
         int pointChange = pointType.getPointChange();
         point.updatePoint(pointChange);
@@ -46,6 +46,7 @@ public class PointService {
                 .changedPoint(pointChange)
                 .build();
         pointStatusRepository.save(pointStatus);
+        return point;
     }
 
     public Point getPoint(Student student) {
