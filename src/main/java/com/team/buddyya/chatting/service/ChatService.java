@@ -18,8 +18,12 @@ import com.team.buddyya.chatting.repository.ChatroomRepository;
 import com.team.buddyya.chatting.repository.ChatroomStudentRepository;
 import com.team.buddyya.common.service.S3UploadService;
 import com.team.buddyya.notification.service.NotificationService;
+import com.team.buddyya.student.domain.Point;
+import com.team.buddyya.student.domain.PointType;
 import com.team.buddyya.student.domain.Student;
+import com.team.buddyya.student.repository.PointRepository;
 import com.team.buddyya.student.service.FindStudentService;
+import com.team.buddyya.student.service.PointService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -59,6 +63,8 @@ public class ChatService {
     private final Map<Long, Set<WebSocketSession>> sessionsPerRoom = new ConcurrentHashMap<>();
     private final Map<WebSocketSession, Long> lastPongTimestamps = new ConcurrentHashMap<>();
     private final NotificationService notificationService;
+    private final PointRepository pointRepository;
+    private final PointService pointService;
 
     public CreateChatroomResponse createOrGetChatRoom(CreateChatroomRequest request, StudentInfo studentInfo) {
         Student user = findStudentService.findByStudentId(studentInfo.id());
@@ -66,11 +72,13 @@ public class ChatService {
         Optional<Chatroom> existingRoom = chatRoomRepository.findByUserAndBuddy(user.getId(), buddy.getId());
         if (existingRoom.isPresent()) {
             Chatroom room = existingRoom.get();
-            return CreateChatroomResponse.from(room, buddy, false);
+            Optional<Point> point = pointRepository.findByStudent(user);
+            return CreateChatroomResponse.from(room, buddy, false, point.get());
         }
         Chatroom newChatroom = createChatroom(user, buddy);
         notificationService.sendChatAcceptNotification(buddy, user.getName(), newChatroom.getId());
-        return CreateChatroomResponse.from(newChatroom, buddy, true);
+        Point point = pointService.updatePoint(user, PointType.CHAT_REQUEST);
+        return CreateChatroomResponse.from(newChatroom, buddy, true, point);
     }
 
     public Chatroom createChatroom(Student user, Student buddy) {

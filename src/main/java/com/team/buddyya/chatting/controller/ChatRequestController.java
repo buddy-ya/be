@@ -4,6 +4,7 @@ import com.team.buddyya.auth.domain.CustomUserDetails;
 import com.team.buddyya.chatting.dto.request.CreateChatroomRequest;
 import com.team.buddyya.chatting.dto.response.ChatRequestInfoResponse;
 import com.team.buddyya.chatting.dto.response.ChatRequestResponse;
+import com.team.buddyya.chatting.dto.response.CreateChatRequestResponse;
 import com.team.buddyya.chatting.dto.response.CreateChatroomResponse;
 import com.team.buddyya.chatting.service.ChatRequestService;
 import com.team.buddyya.chatting.service.ChatService;
@@ -41,7 +42,7 @@ public class ChatRequestController {
     }
 
     @PostMapping("/{receiverId}")
-    public ResponseEntity<Void> createChatRequest(@AuthenticationPrincipal CustomUserDetails userDetails
+    public ResponseEntity<CreateChatRequestResponse> createChatRequest(@AuthenticationPrincipal CustomUserDetails userDetails
             , @PathVariable("receiverId") Long receiverId) {
         chatRequestService.createChatRequest(userDetails, receiverId);
         return ResponseEntity.noContent().build();

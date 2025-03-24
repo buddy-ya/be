@@ -4,15 +4,20 @@ import com.team.buddyya.auth.domain.CustomUserDetails;
 import com.team.buddyya.chatting.domain.ChatRequest;
 import com.team.buddyya.chatting.dto.response.ChatRequestInfoResponse;
 import com.team.buddyya.chatting.dto.response.ChatRequestResponse;
+import com.team.buddyya.chatting.dto.response.CreateChatRequestResponse;
 import com.team.buddyya.chatting.exception.ChatException;
 import com.team.buddyya.chatting.exception.ChatExceptionType;
 import com.team.buddyya.chatting.repository.ChatRequestRepository;
 import com.team.buddyya.chatting.repository.ChatroomRepository;
 import com.team.buddyya.notification.service.NotificationService;
+import com.team.buddyya.student.domain.Point;
+import com.team.buddyya.student.domain.PointType;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.service.FindStudentService;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import com.team.buddyya.student.service.PointService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -29,6 +34,7 @@ public class ChatRequestService {
     private final ChatroomRepository chatroomRepository;
     private final FindStudentService findStudentService;
     private final NotificationService notificationService;
+    private final PointService pointService;
 
     @Transactional(readOnly = true)
     public List<ChatRequestResponse> getChatRequests(CustomUserDetails userDetails) {
@@ -59,7 +65,7 @@ public class ChatRequestService {
         return chatroomRepository.findByUserAndBuddy(sender.getId(), receiver.getId()).isPresent();
     }
 
-    public void createChatRequest(CustomUserDetails userDetails, Long receiverId) {
+    public CreateChatRequestResponse createChatRequest(CustomUserDetails userDetails, Long receiverId) {
         Student sender = findStudentService.findByStudentId(userDetails.getStudentInfo().id());
         Student receiver = findStudentService.findByStudentId(receiverId);
         validateChatRequest(sender, receiver);
@@ -70,6 +76,8 @@ public class ChatRequestService {
                 .build();
         notificationService.sendChatRequestNotification(sender,receiver);
         chatRequestRepository.save(chatRequest);
+        Point point = pointService.updatePoint(sender, PointType.CHAT_REQUEST);
+        return CreateChatRequestResponse.from(point);
     }
 
     public void deleteChatRequest(CustomUserDetails userDetails, Long chatRequestId) {
