@@ -45,9 +45,8 @@ import static com.team.buddyya.student.exception.StudentExceptionType.STUDENT_NO
 @Transactional
 public class AdminService {
 
-    private static final String REQUEST_REJECTED_MESSAGE = "인증 요청이 거절되었습니다";
-    private static final String ALREADY_REGISTERED_MESSAGE = "이미 등록된 학번입니다";
-    private static final String VERIFICATION_COMPLETED_MESSAGE = "학생 인증이 완료되었습니다";
+    private static final String REQUEST_REJECTED_MESSAGE = "The verification request has been rejected.";
+    private static final String VERIFICATION_COMPLETED_MESSAGE = "Student verification has been completed.";
 
     private final StudentService studentService;
     private final FindStudentService findStudentService;
