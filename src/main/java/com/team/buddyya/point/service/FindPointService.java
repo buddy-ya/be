@@ -17,8 +17,8 @@ public class FindPointService {
     private final PointRepository pointRepository;
 
     @Transactional(readOnly = true)
-    public Point findByStudent(Student student){
+    public Point findByStudent(Student student) {
         return pointRepository.findByStudent(student)
-                .orElseThrow(()-> new PointException(PointExceptionType.POINT_NOT_FOUND));
+                .orElseThrow(() -> new PointException(PointExceptionType.POINT_NOT_FOUND));
     }
 }

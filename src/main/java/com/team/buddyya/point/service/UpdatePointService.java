@@ -17,7 +17,7 @@ public class UpdatePointService {
     private final FindPointService findPointService;
     private final PointStatusRepository pointStatusRepository;
 
-    public Point updatePoint(Student student, PointType pointType){
+    public Point updatePoint(Student student, PointType pointType) {
         Point point = findPointService.findByStudent(student);
         int pointChange = pointType.getPointChange();
         point.updatePoint(pointChange);
