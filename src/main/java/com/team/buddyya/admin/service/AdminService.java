@@ -72,9 +72,8 @@ public class AdminService {
                 .orElseThrow(() -> new StudentException(STUDENT_NOT_FOUND));
         if (request.isApproved()) {
             return approveStudentIdCard(studentIdCard, student);
-        } else {
-            return rejectStudentIdCard(request, studentIdCard, student);
         }
+        return rejectStudentIdCard(request, studentIdCard, student);
     }
 
     private StudentVerificationResponse approveStudentIdCard(StudentIdCard studentIdCard, Student student) {
