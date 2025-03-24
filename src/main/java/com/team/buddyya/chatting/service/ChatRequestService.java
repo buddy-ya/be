@@ -12,6 +12,7 @@ import com.team.buddyya.chatting.repository.ChatroomRepository;
 import com.team.buddyya.notification.service.NotificationService;
 import com.team.buddyya.point.domain.Point;
 import com.team.buddyya.point.domain.PointType;
+import com.team.buddyya.point.service.UpdatePointService;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.service.FindStudentService;
 import java.time.LocalDateTime;
@@ -34,7 +35,7 @@ public class ChatRequestService {
     private final ChatroomRepository chatroomRepository;
     private final FindStudentService findStudentService;
     private final NotificationService notificationService;
-    private final PointService pointService;
+    private final UpdatePointService updatePointService;
 
     @Transactional(readOnly = true)
     public List<ChatRequestResponse> getChatRequests(CustomUserDetails userDetails) {
@@ -76,7 +77,7 @@ public class ChatRequestService {
                 .build();
         notificationService.sendChatRequestNotification(sender,receiver);
         chatRequestRepository.save(chatRequest);
-        Point point = pointService.updatePoint(sender, PointType.CHAT_REQUEST);
+        Point point = updatePointService.updatePoint(sender, PointType.CHAT_REQUEST);
         return CreateChatRequestResponse.from(point);
     }
 

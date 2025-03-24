@@ -18,6 +18,7 @@ import com.team.buddyya.match.repository.MatchedHistoryRepository;
 import com.team.buddyya.match.repository.MatchRequestRepository;
 import com.team.buddyya.notification.service.NotificationService;
 import com.team.buddyya.point.service.FindPointService;
+import com.team.buddyya.point.service.UpdatePointService;
 import com.team.buddyya.student.domain.Gender;
 import com.team.buddyya.point.domain.Point;
 import com.team.buddyya.point.domain.PointType;
@@ -46,13 +47,13 @@ public class BasicMatchService implements MatchService {
     private final ChatroomRepository chatroomRepository;
     private final ChatroomStudentRepository chatroomStudentRepository;
     private final NotificationService notificationService;
-    private final PointService pointService;
     private final FindPointService findPointService;
+    private final UpdatePointService updatePointService;
 
     @Override
     public MatchResponse requestMatch(Long studentId, MatchCreateRequest request) {
         Student student = findStudentService.findByStudentId(studentId);
-        Point point = pointService.updatePoint(student, PointType.MATCH_REQUEST);
+        Point point = updatePointService.updatePoint(student, PointType.MATCH_REQUEST);
         boolean isKorean = student.getIsKorean();
         Long universityId = student.getUniversity().getId();
         Gender gender = student.getGender();
@@ -82,7 +83,7 @@ public class BasicMatchService implements MatchService {
         MatchRequestStatus matchRequestStatus = matchRequest.getMatchRequestStatus();
         Point point;
         if (matchRequestStatus.equals(MatchRequestStatus.MATCH_PENDING)) {
-            point = pointService.updatePoint(matchRequest.getStudent(), PointType.CANCEL_MATCH_REQUEST);
+            point = updatePointService.updatePoint(matchRequest.getStudent(), PointType.CANCEL_MATCH_REQUEST);
         } else {
             point = findPointService.findByStudent(matchRequest.getStudent());
         }

@@ -19,7 +19,6 @@ public class PointService {
 
     private final PointRepository pointRepository;
     private final PointStatusRepository pointStatusRepository;
-    private final FindPointService findPointService;
 
     public Point createPoint(Student student) {
         Point point = Point.builder()
@@ -33,19 +32,6 @@ public class PointService {
                 .changedPoint(PointType.SIGNUP.getPointChange())
                 .build();
         pointStatusRepository.save(signUpPointStatus);
-        return point;
-    }
-
-    public Point updatePoint(Student student, PointType pointType){
-        Point point = findPointService.findByStudent(student);
-        int pointChange = pointType.getPointChange();
-        point.updatePoint(pointChange);
-        PointStatus pointStatus = PointStatus.builder()
-                .point(point)
-                .pointType(pointType)
-                .changedPoint(pointChange)
-                .build();
-        pointStatusRepository.save(pointStatus);
         return point;
     }
 }
