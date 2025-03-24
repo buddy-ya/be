@@ -72,13 +72,11 @@ public class ChatService {
         Optional<Chatroom> existingRoom = chatRoomRepository.findByUserAndBuddy(user.getId(), buddy.getId());
         if (existingRoom.isPresent()) {
             Chatroom room = existingRoom.get();
-            Optional<Point> point = pointRepository.findByStudent(user);
-            return CreateChatroomResponse.from(room, buddy, false, point.get());
+            return CreateChatroomResponse.from(room, buddy, false);
         }
         Chatroom newChatroom = createChatroom(user, buddy);
         notificationService.sendChatAcceptNotification(buddy, user.getName(), newChatroom.getId());
-        Point point = pointService.updatePoint(user, PointType.CHAT_REQUEST);
-        return CreateChatroomResponse.from(newChatroom, buddy, true, point);
+        return CreateChatroomResponse.from(newChatroom, buddy, true);
     }
 
     public Chatroom createChatroom(Student user, Student buddy) {

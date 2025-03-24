@@ -12,18 +12,16 @@ public record CreateChatroomResponse(
         String name,
         String country,
         String profileImageUrl,
-        Integer point,
         boolean isNew
         ) {
 
-    public static CreateChatroomResponse from(Chatroom chatroom, Student buddy, boolean isNew, Point point) {
+    public static CreateChatroomResponse from(Chatroom chatroom, Student buddy, boolean isNew) {
         return new CreateChatroomResponse(
                 chatroom.getId(),
                 buddy.getId(),
                 buddy.getName(),
                 buddy.getCountry(),
                 getChatroomProfileImage(buddy),
-                point.getCurrentPoint(),
                 isNew
         );
     }
