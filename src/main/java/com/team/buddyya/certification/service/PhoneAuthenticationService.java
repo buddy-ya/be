@@ -10,12 +10,13 @@ import com.team.buddyya.certification.exception.PhoneAuthenticationExceptionType
 import com.team.buddyya.certification.repository.RegisteredPhoneRepository;
 import com.team.buddyya.certification.repository.StudentIdCardRepository;
 import com.team.buddyya.certification.repository.TestAccountRepository;
-import com.team.buddyya.student.domain.Point;
+import com.team.buddyya.point.domain.Point;
+import com.team.buddyya.point.service.FindPointService;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.dto.response.UserResponse;
 import com.team.buddyya.student.exception.StudentException;
 import com.team.buddyya.student.exception.StudentExceptionType;
-import com.team.buddyya.student.repository.PointRepository;
+import com.team.buddyya.point.repository.PointRepository;
 import com.team.buddyya.student.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,7 +37,7 @@ public class PhoneAuthenticationService {
     private final StudentRepository studentRepository;
     private final StudentIdCardRepository studentIdCardRepository;
     private final TestAccountRepository testAccountRepository;
-    private final PointRepository pointRepository;
+    private final FindPointService findPointService;
     private final JwtUtils jwtUtils;
 
     @Value("${test.phone.number.prefix}")
@@ -72,7 +73,7 @@ public class PhoneAuthenticationService {
             String refreshToken = student.getAuthToken().getRefreshToken();
             student.getAvatar().setLoggedOut(false);
             boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student).isPresent();
-            Point point = pointRepository.findByStudent(student).orElseThrow(()-> new StudentException(StudentExceptionType.POINT_NOT_FOUND));
+            Point point = findPointService.findByStudent(student);
             return UserResponse.from(student, isStudentIdCardRequested, EXISTING_MEMBER, accessToken, refreshToken, point);
         }
         return UserResponse.from(NEW_MEMBER);

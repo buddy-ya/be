@@ -6,7 +6,6 @@ import com.team.buddyya.chatting.exception.ChatException;
 import com.team.buddyya.chatting.exception.ChatExceptionType;
 import com.team.buddyya.chatting.repository.ChatroomRepository;
 import com.team.buddyya.chatting.repository.ChatroomStudentRepository;
-import com.team.buddyya.chatting.service.ChatRequestService;
 import com.team.buddyya.chatting.service.ChatService;
 import com.team.buddyya.match.domain.*;
 import com.team.buddyya.match.dto.request.MatchCreateRequest;
@@ -18,15 +17,16 @@ import com.team.buddyya.match.exception.MatchExceptionType;
 import com.team.buddyya.match.repository.MatchedHistoryRepository;
 import com.team.buddyya.match.repository.MatchRequestRepository;
 import com.team.buddyya.notification.service.NotificationService;
+import com.team.buddyya.point.service.FindPointService;
 import com.team.buddyya.student.domain.Gender;
-import com.team.buddyya.student.domain.Point;
-import com.team.buddyya.student.domain.PointType;
+import com.team.buddyya.point.domain.Point;
+import com.team.buddyya.point.domain.PointType;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.exception.StudentException;
 import com.team.buddyya.student.exception.StudentExceptionType;
-import com.team.buddyya.student.repository.PointRepository;
+import com.team.buddyya.point.repository.PointRepository;
 import com.team.buddyya.student.service.FindStudentService;
-import com.team.buddyya.student.service.PointService;
+import com.team.buddyya.point.service.PointService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,7 +47,7 @@ public class BasicMatchService implements MatchService {
     private final ChatroomStudentRepository chatroomStudentRepository;
     private final NotificationService notificationService;
     private final PointService pointService;
-    private final PointRepository pointRepository;
+    private final FindPointService findPointService;
 
     @Override
     public MatchResponse requestMatch(Long studentId, MatchCreateRequest request) {
@@ -84,7 +84,7 @@ public class BasicMatchService implements MatchService {
         if (matchRequestStatus.equals(MatchRequestStatus.MATCH_PENDING)) {
             point = pointService.updatePoint(matchRequest.getStudent(), PointType.CANCEL_MATCH_REQUEST);
         } else {
-            point = pointRepository.findByStudent(matchRequest.getStudent()).orElseThrow(()-> new StudentException(StudentExceptionType.POINT_NOT_FOUND));
+            point = findPointService.findByStudent(matchRequest.getStudent());
         }
         matchRequestRepository.delete(matchRequest);
         return MatchDeleteResponse.from(point);

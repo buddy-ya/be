@@ -10,14 +10,14 @@ import com.team.buddyya.chatting.exception.ChatExceptionType;
 import com.team.buddyya.chatting.repository.ChatRequestRepository;
 import com.team.buddyya.chatting.repository.ChatroomRepository;
 import com.team.buddyya.notification.service.NotificationService;
-import com.team.buddyya.student.domain.Point;
-import com.team.buddyya.student.domain.PointType;
+import com.team.buddyya.point.domain.Point;
+import com.team.buddyya.point.domain.PointType;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.service.FindStudentService;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.team.buddyya.student.service.PointService;
+import com.team.buddyya.point.service.PointService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package com.team.buddyya.student.domain;
+package com.team.buddyya.point.domain;
 
 import com.team.buddyya.common.domain.CreatedTime;
 import jakarta.persistence.*;

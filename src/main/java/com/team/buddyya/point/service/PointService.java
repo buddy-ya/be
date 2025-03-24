@@ -1,13 +1,11 @@
-package com.team.buddyya.student.service;
+package com.team.buddyya.point.service;
 
-import com.team.buddyya.student.domain.Point;
-import com.team.buddyya.student.domain.PointStatus;
-import com.team.buddyya.student.domain.PointType;
+import com.team.buddyya.point.domain.Point;
+import com.team.buddyya.point.domain.PointStatus;
+import com.team.buddyya.point.domain.PointType;
 import com.team.buddyya.student.domain.Student;
-import com.team.buddyya.student.exception.StudentException;
-import com.team.buddyya.student.exception.StudentExceptionType;
-import com.team.buddyya.student.repository.PointRepository;
-import com.team.buddyya.student.repository.PointStatusRepository;
+import com.team.buddyya.point.repository.PointRepository;
+import com.team.buddyya.point.repository.PointStatusRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +19,7 @@ public class PointService {
 
     private final PointRepository pointRepository;
     private final PointStatusRepository pointStatusRepository;
+    private final FindPointService findPointService;
 
     public Point createPoint(Student student) {
         Point point = Point.builder()
@@ -38,7 +37,7 @@ public class PointService {
     }
 
     public Point updatePoint(Student student, PointType pointType){
-        Point point = getPoint(student);
+        Point point = findPointService.findByStudent(student);
         int pointChange = pointType.getPointChange();
         point.updatePoint(pointChange);
         PointStatus pointStatus = PointStatus.builder()
@@ -48,10 +47,5 @@ public class PointService {
                 .build();
         pointStatusRepository.save(pointStatus);
         return point;
-    }
-
-    public Point getPoint(Student student) {
-        return pointRepository.findByStudent(student)
-                .orElseThrow(() -> new StudentException(StudentExceptionType.POINT_NOT_FOUND));
     }
 }

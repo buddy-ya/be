@@ -1,6 +1,6 @@
 package com.team.buddyya.student.dto.response;
 
-import com.team.buddyya.student.domain.Point;
+import com.team.buddyya.point.domain.Point;
 import com.team.buddyya.student.domain.Student;
 
 import java.util.List;

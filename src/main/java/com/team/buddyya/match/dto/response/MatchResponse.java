@@ -2,8 +2,7 @@ package com.team.buddyya.match.dto.response;
 
 import com.team.buddyya.chatting.domain.Chatroom;
 import com.team.buddyya.match.domain.MatchRequest;
-import com.team.buddyya.match.domain.MatchRequestStatus;
-import com.team.buddyya.student.domain.Point;
+import com.team.buddyya.point.domain.Point;
 import com.team.buddyya.student.domain.Student;
 
 import static com.team.buddyya.student.domain.UserProfileDefaultImage.getChatroomProfileImage;

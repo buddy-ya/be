@@ -1,7 +1,6 @@
 package com.team.buddyya.chatting.dto.response;
 
 import com.team.buddyya.chatting.domain.Chatroom;
-import com.team.buddyya.student.domain.Point;
 import com.team.buddyya.student.domain.Student;
 
 import static com.team.buddyya.student.domain.UserProfileDefaultImage.getChatroomProfileImage;
