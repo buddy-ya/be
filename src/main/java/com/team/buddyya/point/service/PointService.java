@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class PointService {
 
-    private static final int INITIAL_POINT = 1;
+    private static final int INITIAL_POINT = 100;
 
     private final PointRepository pointRepository;
     private final PointStatusRepository pointStatusRepository;

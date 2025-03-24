@@ -9,7 +9,7 @@ import java.util.Arrays;
 @Getter
 public enum PointType {
 
-    SIGNUP("signup", 10),
+    SIGNUP("signup", +100),
     UNIVERSITY_AUTH("university_auth",1),
     CHAT_REQUEST("chat_request", -1),
     MATCH_REQUEST("match_request", -1),
