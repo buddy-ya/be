@@ -151,13 +151,10 @@ public class BasicMatchService implements MatchService {
 
     private boolean isGenderMatch(GenderType matchRequestGenderType, GenderType requestedGenderType,
                                   Gender matchRequestGender, Gender requestedGender) {
-        if (matchRequestGenderType == GenderType.SAME_GENDER && requestedGenderType == GenderType.SAME_GENDER) {
-            return matchRequestGender == requestedGender;
+        if (matchRequestGenderType == GenderType.ALL && requestedGenderType == GenderType.ALL) {
+            return true;
         }
-        if (matchRequestGenderType == GenderType.SAME_GENDER || requestedGenderType == GenderType.SAME_GENDER) {
-            return matchRequestGender == requestedGender;
-        }
-        return true;
+        return matchRequestGender == requestedGender;
     }
 
     private MatchResponse processMatchSuccess(Student student, UniversityType universityType, GenderType genderType, MatchRequest matchRequest, Point point) {

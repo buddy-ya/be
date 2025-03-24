@@ -9,8 +9,9 @@ import java.util.Arrays;
 @Getter
 public enum GenderType {
 
-    SAME_GENDER("SAME"),
-    ALL_GENDER("ALL");
+    MALE("MALE"),
+    FEMALE("FEMALE"),
+    ALL("ALL");
 
     private final String displayName;
 
@@ -20,7 +21,7 @@ public enum GenderType {
 
     public static GenderType fromValue(String value) {
         return Arrays.stream(GenderType.values())
-                .filter(type -> type.displayName.equals(value))
+                .filter(type -> type.displayName.equalsIgnoreCase(value))
                 .findFirst()
                 .orElseThrow(() -> new MatchException(MatchExceptionType.INVALID_MATCH_TYPE));
     }
