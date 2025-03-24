@@ -22,6 +22,8 @@ import com.team.buddyya.student.domain.Gender;
 import com.team.buddyya.student.domain.Point;
 import com.team.buddyya.student.domain.PointType;
 import com.team.buddyya.student.domain.Student;
+import com.team.buddyya.student.exception.StudentException;
+import com.team.buddyya.student.exception.StudentExceptionType;
 import com.team.buddyya.student.repository.PointRepository;
 import com.team.buddyya.student.service.FindStudentService;
 import com.team.buddyya.student.service.PointService;
@@ -82,7 +84,7 @@ public class BasicMatchService implements MatchService {
         if (matchRequestStatus.equals(MatchRequestStatus.MATCH_PENDING)) {
             point = pointService.updatePoint(matchRequest.getStudent(), PointType.CANCEL_MATCH_REQUEST);
         } else {
-            point = pointRepository.findByStudent(matchRequest.getStudent()).get();
+            point = pointRepository.findByStudent(matchRequest.getStudent()).orElseThrow(()-> new StudentException(StudentExceptionType.POINT_NOT_FOUND));
         }
         matchRequestRepository.delete(matchRequest);
         return MatchDeleteResponse.from(point);

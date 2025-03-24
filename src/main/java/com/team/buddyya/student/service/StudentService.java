@@ -46,6 +46,7 @@ public class StudentService {
     private final ExpoTokenRepository expoTokenRepository;
     private final RegisteredPhoneRepository registeredPhoneRepository;
     private final StudentEmailRepository studentEmailRepository;
+    private final PointRepository pointRepository;
 
     private static final String BLOCK_SUCCESS_MESSAGE = "차단이 성공적으로 완료되었습니다.";
 
@@ -87,22 +88,24 @@ public class StudentService {
             default:
                 throw new StudentException(StudentExceptionType.UNSUPPORTED_UPDATE_KEY);
         }
+        Point point = pointRepository.findByStudent(student).orElseThrow(()-> new StudentException(StudentExceptionType.POINT_NOT_FOUND));
         boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
                 .isPresent();
-        return UserResponse.from(student, isStudentIdCardRequested);
+        return UserResponse.from(student, isStudentIdCardRequested, point);
     }
 
     public UserResponse updateUserProfileImage(StudentInfo studentInfo, boolean isDefault, UpdateProfileImageRequest request) {
         Student student = findStudentService.findByStudentId(studentInfo.id());
+        Point point = pointRepository.findByStudent(student).orElseThrow(()-> new StudentException(StudentExceptionType.POINT_NOT_FOUND));
         boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
                 .isPresent();
         if (isDefault) {
             profileImageService.updateUserProfileImage(student, USER_PROFILE_DEFAULT_IMAGE.getUrl());
-            return UserResponse.from(student, isStudentIdCardRequested);
+            return UserResponse.from(student, isStudentIdCardRequested, point);
         }
         String imageUrl = s3UploadService.uploadFile(PROFILE_IMAGE.getDirectoryName(), request.profileImage());
         profileImageService.updateUserProfileImage(student, imageUrl);
-        return UserResponse.from(student, isStudentIdCardRequested);
+        return UserResponse.from(student, isStudentIdCardRequested, point);
     }
 
     @Transactional(readOnly = true)
@@ -111,9 +114,10 @@ public class StudentService {
         if (!studentInfo.id().equals(userId)) {
             return UserResponse.from(student);
         }
+        Point point = pointRepository.findByStudent(student).orElseThrow(()-> new StudentException(StudentExceptionType.POINT_NOT_FOUND));
         boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
                 .isPresent();
-        return UserResponse.from(student, isStudentIdCardRequested);
+        return UserResponse.from(student, isStudentIdCardRequested, point);
     }
 
     public void updateStudentCertification(Student student) {

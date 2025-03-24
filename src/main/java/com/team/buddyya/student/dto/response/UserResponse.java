@@ -1,5 +1,6 @@
 package com.team.buddyya.student.dto.response;
 
+import com.team.buddyya.student.domain.Point;
 import com.team.buddyya.student.domain.Student;
 
 import java.util.List;
@@ -24,11 +25,12 @@ public record UserResponse(
         List<String> interests,
         String status,
         Boolean isBanned,
+        Integer point,
         String accessToken,
         String refreshToken
 ) {
 
-    public static UserResponse from(Student student, boolean isStudentIdCardRequested) {
+    public static UserResponse from(Student student, boolean isStudentIdCardRequested, Point point) {
         return new UserResponse(
                 student.getId(),
                 student.getName(),
@@ -45,6 +47,7 @@ public record UserResponse(
                 convertToStringList(student.getInterests()),
                 null,
                 student.getIsBanned(),
+                point.getCurrentPoint(),
                 null,
                 null
         );
@@ -68,11 +71,12 @@ public record UserResponse(
                 null,
                 student.getIsBanned(),
                 null,
+                null,
                 null
         );
     }
 
-    public static UserResponse from(Student student, Boolean isStudentIdCardRequested, String accessToken, String refreshToken) {
+    public static UserResponse from(Student student, Boolean isStudentIdCardRequested, String accessToken, String refreshToken, Point point) {
         return new UserResponse(
                 student.getId(),
                 student.getName(),
@@ -89,12 +93,13 @@ public record UserResponse(
                 convertToStringList(student.getInterests()),
                 null,
                 student.getIsBanned(),
+                point.getCurrentPoint(),
                 accessToken,
                 refreshToken
         );
     }
 
-    public static UserResponse from(Student student, Boolean isStudentIdCardRequested, String status, String accessToken, String refreshToken) {
+    public static UserResponse from(Student student, Boolean isStudentIdCardRequested, String status, String accessToken, String refreshToken, Point point) {
         return new UserResponse(
                 student.getId(),
                 student.getName(),
@@ -111,6 +116,7 @@ public record UserResponse(
                 convertToStringList(student.getInterests()),
                 status,
                 student.getIsBanned(),
+                point.getCurrentPoint(),
                 accessToken,
                 refreshToken
         );
@@ -133,6 +139,7 @@ public record UserResponse(
                 null,
                 status,
                 false,
+                null,
                 null,
                 null
         );

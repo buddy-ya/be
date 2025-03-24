@@ -22,7 +22,7 @@ public class PointService {
     private final PointRepository pointRepository;
     private final PointStatusRepository pointStatusRepository;
 
-    public void createPoint(Student student) {
+    public Point createPoint(Student student) {
         Point point = Point.builder()
                 .student(student)
                 .currentPoint(INITIAL_POINT)
@@ -34,6 +34,7 @@ public class PointService {
                 .changedPoint(PointType.SIGNUP.getPointChange())
                 .build();
         pointStatusRepository.save(signUpPointStatus);
+        return point;
     }
 
     public Point updatePoint(Student student, PointType pointType){
