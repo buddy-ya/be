@@ -15,15 +15,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class PointService {
 
-    private static final int INITIAL_POINT = 100;
-
     private final PointRepository pointRepository;
     private final PointStatusRepository pointStatusRepository;
 
     public Point createPoint(Student student) {
         Point point = Point.builder()
                 .student(student)
-                .currentPoint(INITIAL_POINT)
+                .currentPoint(PointType.SIGNUP.getPointChange())
                 .build();
         pointRepository.save(point);
         PointStatus signUpPointStatus = PointStatus.builder()
