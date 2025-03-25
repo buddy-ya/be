@@ -9,4 +9,6 @@ import java.util.List;
 public interface ReportRepository extends JpaRepository<Report, Long> {
 
     List<Report> findByType(ReportType type);
+
+    boolean existsByReportUserIdAndTypeAndReportedId(Long reportUserId, ReportType type, Long reportedId);
 }

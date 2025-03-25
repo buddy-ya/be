@@ -100,6 +100,9 @@ public class Student extends BaseTime {
     @Column(name = "ban_end_time")
     private LocalDateTime banEndTime;
 
+    @Column(name = "ban_reason")
+    private String banReason;
+
     @Builder
     public Student(String name, String phoneNumber, String country, Boolean isKorean, Role role, University university,
                    Gender gender, String characterProfileImage) {
@@ -117,6 +120,7 @@ public class Student extends BaseTime {
         this.characterProfileImage = characterProfileImage;
         this.isDeleted = false;
         this.isBanned = false;
+        this.banReason = null;
     }
 
     public void updateIsCertificated(boolean isCertificated) {
@@ -169,13 +173,15 @@ public class Student extends BaseTime {
         return this.isBanned;
     }
 
-    public void ban(int days) {
+    public void ban(int days, String banReason) {
         this.isBanned = true;
         this.banEndTime = LocalDateTime.now().plusDays(days);
+        this.banReason = banReason;
     }
 
     public void unban() {
         this.isBanned = false;
         this.banEndTime = null;
+        this.banReason = null;
     }
 }
