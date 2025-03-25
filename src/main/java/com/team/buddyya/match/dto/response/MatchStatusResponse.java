@@ -17,6 +17,7 @@ public record MatchStatusResponse(
         String matchStatus,
         boolean isExited
 ) {
+
     public static MatchStatusResponse from(Chatroom chatroom, Student buddy, MatchRequest matchRequest, boolean isExited) {
         return new MatchStatusResponse(
                 matchRequest.getId(),
