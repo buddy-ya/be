@@ -38,7 +38,7 @@ public class OnBoardingService {
         studentInterestService.createStudentInterests(request.interests(), student);
         studentLanguageService.createStudentLanguages(request.languages(), student);
         Point point = pointService.createPoint(student);
-        return UserResponse.from(student, false, accessToken, refreshToken, point);
+        return UserResponse.fromOnboard(student, false, accessToken, refreshToken, point);
     }
 
     private String createAndSaveToken(Student student) {

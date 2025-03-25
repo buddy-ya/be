@@ -14,9 +14,6 @@ import com.team.buddyya.point.domain.Point;
 import com.team.buddyya.point.service.FindPointService;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.dto.response.UserResponse;
-import com.team.buddyya.student.exception.StudentException;
-import com.team.buddyya.student.exception.StudentExceptionType;
-import com.team.buddyya.point.repository.PointRepository;
 import com.team.buddyya.student.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -74,9 +71,9 @@ public class PhoneAuthenticationService {
             student.getAvatar().setLoggedOut(false);
             boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student).isPresent();
             Point point = findPointService.findByStudent(student);
-            return UserResponse.from(student, isStudentIdCardRequested, EXISTING_MEMBER, accessToken, refreshToken, point);
+            return UserResponse.fromCheckMembership(student, isStudentIdCardRequested, EXISTING_MEMBER, accessToken, refreshToken, point);
         }
-        return UserResponse.from(NEW_MEMBER);
+        return UserResponse.fromCheckMembership(NEW_MEMBER);
     }
 
     public TestAccountResponse isTestAccount(String phoneNumber) {

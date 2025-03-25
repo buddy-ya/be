@@ -89,7 +89,7 @@ public class StudentService {
         Point point = findPointService.findByStudent(student);
         boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
                 .isPresent();
-        return UserResponse.from(student, isStudentIdCardRequested, point);
+        return UserResponse.fromUserInfo(student, isStudentIdCardRequested, point);
     }
 
     public UserResponse updateUserProfileImage(StudentInfo studentInfo, boolean isDefault, UpdateProfileImageRequest request) {
@@ -99,23 +99,23 @@ public class StudentService {
                 .isPresent();
         if (isDefault) {
             profileImageService.updateUserProfileImage(student, USER_PROFILE_DEFAULT_IMAGE.getUrl());
-            return UserResponse.from(student, isStudentIdCardRequested, point);
+            return UserResponse.fromUserInfo(student, isStudentIdCardRequested, point);
         }
         String imageUrl = s3UploadService.uploadFile(PROFILE_IMAGE.getDirectoryName(), request.profileImage());
         profileImageService.updateUserProfileImage(student, imageUrl);
-        return UserResponse.from(student, isStudentIdCardRequested, point);
+        return UserResponse.fromUserInfo(student, isStudentIdCardRequested, point);
     }
 
     @Transactional(readOnly = true)
     public UserResponse getUserInfo(StudentInfo studentInfo, Long userId) {
         Student student = findStudentService.findByStudentId(userId);
         if (!studentInfo.id().equals(userId)) {
-            return UserResponse.from(student);
+            return UserResponse.fromOtherUserInfo(student);
         }
         Point point = findPointService.findByStudent(student);
         boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
                 .isPresent();
-        return UserResponse.from(student, isStudentIdCardRequested, point);
+        return UserResponse.fromUserInfo(student, isStudentIdCardRequested, point);
     }
 
     public void updateStudentCertification(Student student) {

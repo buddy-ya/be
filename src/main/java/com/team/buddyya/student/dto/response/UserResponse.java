@@ -30,7 +30,7 @@ public record UserResponse(
         String refreshToken
 ) {
 
-    public static UserResponse from(Student student, boolean isStudentIdCardRequested, Point point) {
+    public static UserResponse fromUserInfo(Student student, boolean isStudentIdCardRequested, Point point) {
         return new UserResponse(
                 student.getId(),
                 student.getName(),
@@ -53,7 +53,7 @@ public record UserResponse(
         );
     }
 
-    public static UserResponse from(Student student) {
+    public static UserResponse fromOtherUserInfo(Student student) {
         return new UserResponse(
                 student.getId(),
                 student.getName(),
@@ -76,7 +76,7 @@ public record UserResponse(
         );
     }
 
-    public static UserResponse from(Student student, Boolean isStudentIdCardRequested, String accessToken, String refreshToken, Point point) {
+    public static UserResponse fromOnboard(Student student, Boolean isStudentIdCardRequested, String accessToken, String refreshToken, Point point) {
         return new UserResponse(
                 student.getId(),
                 student.getName(),
@@ -99,7 +99,7 @@ public record UserResponse(
         );
     }
 
-    public static UserResponse from(Student student, Boolean isStudentIdCardRequested, String status, String accessToken, String refreshToken, Point point) {
+    public static UserResponse fromCheckMembership(Student student, Boolean isStudentIdCardRequested, String status, String accessToken, String refreshToken, Point point) {
         return new UserResponse(
                 student.getId(),
                 student.getName(),
@@ -122,7 +122,7 @@ public record UserResponse(
         );
     }
 
-    public static UserResponse from(String status) {
+    public static UserResponse fromCheckMembership(String status) {
         return new UserResponse(
                 null,
                 null,
