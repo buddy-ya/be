@@ -3,10 +3,12 @@ package com.team.buddyya.certification.service;
 import com.team.buddyya.auth.dto.request.TokenInfoRequest;
 import com.team.buddyya.auth.jwt.JwtUtils;
 import com.team.buddyya.certification.domain.RegisteredPhone;
+import com.team.buddyya.certification.dto.response.AdminAccountResponse;
 import com.team.buddyya.certification.dto.response.SendCodeResponse;
 import com.team.buddyya.certification.dto.response.TestAccountResponse;
 import com.team.buddyya.certification.exception.PhoneAuthenticationException;
 import com.team.buddyya.certification.exception.PhoneAuthenticationExceptionType;
+import com.team.buddyya.certification.repository.AdminAccountRepository;
 import com.team.buddyya.certification.repository.RegisteredPhoneRepository;
 import com.team.buddyya.certification.repository.StudentIdCardRepository;
 import com.team.buddyya.certification.repository.TestAccountRepository;
@@ -35,6 +37,7 @@ public class PhoneAuthenticationService {
     private final StudentIdCardRepository studentIdCardRepository;
     private final TestAccountRepository testAccountRepository;
     private final FindPointService findPointService;
+    private final AdminAccountRepository adminAccountRepository;
     private final JwtUtils jwtUtils;
 
     @Value("${test.phone.number.prefix}")
@@ -81,5 +84,12 @@ public class PhoneAuthenticationService {
             return new TestAccountResponse(true);
         }
         return new TestAccountResponse(false);
+    }
+
+    public AdminAccountResponse isAdminAccount(String phoneNumber) {
+        if (adminAccountRepository.findByPhoneNumber(phoneNumber).isPresent()) {
+            return new AdminAccountResponse(true);
+        }
+        return new AdminAccountResponse(false);
     }
 }

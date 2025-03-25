@@ -5,7 +5,9 @@ import org.springframework.http.HttpStatus;
 
 public enum ReportExceptionType implements BaseExceptionType {
 
-    REPORT_NOT_FOUND(8000, HttpStatus.NOT_FOUND, "Report not found.");
+    REPORT_NOT_FOUND(8000, HttpStatus.NOT_FOUND, "Report not found."),
+    ALREADY_REPORTED(8001, HttpStatus.CONFLICT, "You have already reported this content.");
+
 
     private final int errorCode;
     private final HttpStatus httpStatus;

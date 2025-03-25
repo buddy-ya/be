@@ -14,7 +14,6 @@ import com.team.buddyya.student.dto.request.MyPageUpdateRequest;
 import com.team.buddyya.student.dto.request.OnBoardingRequest;
 import com.team.buddyya.student.dto.request.UpdateProfileImageRequest;
 import com.team.buddyya.student.dto.response.BlockResponse;
-import com.team.buddyya.student.dto.response.UserBanStatusResponse;
 import com.team.buddyya.student.dto.response.UserResponse;
 import com.team.buddyya.student.exception.StudentException;
 import com.team.buddyya.student.exception.StudentExceptionType;
@@ -106,7 +105,6 @@ public class StudentService {
         return UserResponse.fromUserInfo(student, isStudentIdCardRequested, point);
     }
 
-    @Transactional(readOnly = true)
     public UserResponse getUserInfo(StudentInfo studentInfo, Long userId) {
         Student student = findStudentService.findByStudentId(userId);
         if (!studentInfo.id().equals(userId)) {
@@ -171,11 +169,5 @@ public class StudentService {
             expoTokenRepository.delete(student.getExpoToken());
         }
         student.getAvatar().setLoggedOut(true);
-    }
-
-    public UserBanStatusResponse checkBanEndTimeOrUpdate(StudentInfo studentId) {
-        Student student = findStudentService.findByStudentId(studentId.id());
-        boolean isBanned = student.checkAndUpdateBanStatus();
-        return new UserBanStatusResponse(isBanned, student.getBanEndTime());
     }
 }

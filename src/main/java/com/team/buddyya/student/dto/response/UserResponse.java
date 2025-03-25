@@ -3,6 +3,7 @@ package com.team.buddyya.student.dto.response;
 import com.team.buddyya.point.domain.Point;
 import com.team.buddyya.student.domain.Student;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -11,6 +12,7 @@ import static com.team.buddyya.student.domain.UserProfileDefaultImage.isDefaultU
 
 public record UserResponse(
         Long id,
+        String role,
         String name,
         String country,
         String university,
@@ -25,6 +27,8 @@ public record UserResponse(
         List<String> interests,
         String status,
         Boolean isBanned,
+        LocalDateTime banExpiration,
+        String banReason,
         Integer point,
         String accessToken,
         String refreshToken
@@ -33,6 +37,7 @@ public record UserResponse(
     public static UserResponse fromUserInfo(Student student, boolean isStudentIdCardRequested, Point point) {
         return new UserResponse(
                 student.getId(),
+                student.getRole().name(),
                 student.getName(),
                 student.getCountry(),
                 student.getUniversity().getUniversityName(),
@@ -46,7 +51,9 @@ public record UserResponse(
                 convertToStringList(student.getLanguages()),
                 convertToStringList(student.getInterests()),
                 null,
-                student.getIsBanned(),
+                null,
+                null,
+                null,
                 point.getCurrentPoint(),
                 null,
                 null
@@ -56,6 +63,7 @@ public record UserResponse(
     public static UserResponse fromOtherUserInfo(Student student) {
         return new UserResponse(
                 student.getId(),
+                null,
                 student.getName(),
                 student.getCountry(),
                 student.getUniversity().getUniversityName(),
@@ -69,7 +77,9 @@ public record UserResponse(
                 convertToStringList(student.getLanguages()),
                 convertToStringList(student.getInterests()),
                 null,
-                student.getIsBanned(),
+                null,
+                null,
+                null,
                 null,
                 null,
                 null
@@ -79,6 +89,7 @@ public record UserResponse(
     public static UserResponse fromOnboard(Student student, Boolean isStudentIdCardRequested, String accessToken, String refreshToken, Point point) {
         return new UserResponse(
                 student.getId(),
+                student.getRole().name(),
                 student.getName(),
                 student.getCountry(),
                 student.getUniversity().getUniversityName(),
@@ -92,7 +103,9 @@ public record UserResponse(
                 convertToStringList(student.getLanguages()),
                 convertToStringList(student.getInterests()),
                 null,
-                student.getIsBanned(),
+                student.checkAndUpdateBanStatus(),
+                student.getBanEndTime(),
+                student.getBanReason(),
                 point.getCurrentPoint(),
                 accessToken,
                 refreshToken
@@ -102,6 +115,7 @@ public record UserResponse(
     public static UserResponse fromCheckMembership(Student student, Boolean isStudentIdCardRequested, String status, String accessToken, String refreshToken, Point point) {
         return new UserResponse(
                 student.getId(),
+                student.getRole().name(),
                 student.getName(),
                 student.getCountry(),
                 student.getUniversity().getUniversityName(),
@@ -115,7 +129,9 @@ public record UserResponse(
                 convertToStringList(student.getLanguages()),
                 convertToStringList(student.getInterests()),
                 status,
-                student.getIsBanned(),
+                student.checkAndUpdateBanStatus(),
+                student.getBanEndTime(),
+                student.getBanReason(),
                 point.getCurrentPoint(),
                 accessToken,
                 refreshToken
@@ -124,6 +140,7 @@ public record UserResponse(
 
     public static UserResponse fromCheckMembership(String status) {
         return new UserResponse(
+                null,
                 null,
                 null,
                 null,
@@ -139,6 +156,8 @@ public record UserResponse(
                 null,
                 status,
                 false,
+                null,
+                null,
                 null,
                 null,
                 null
