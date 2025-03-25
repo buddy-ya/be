@@ -13,7 +13,8 @@ public enum PointType {
     UNIVERSITY_AUTH("university_auth",1),
     CHAT_REQUEST("chat_request", -1),
     MATCH_REQUEST("match_request", -1),
-    CANCEL_MATCH_REQUEST("cancel_match_request", +1);
+    CANCEL_MATCH_REQUEST("cancel_match_request", +1),
+    NO_POINT_CHANGE("no_point_change",0);
 
     private final String displayName;
     private final int pointChange;

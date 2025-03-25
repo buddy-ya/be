@@ -73,11 +73,11 @@ public class BasicMatchService implements MatchService {
         if (matchRequest.getMatchRequestStatus().equals(MatchRequestStatus.MATCH_PENDING)) {
             Point point = updatePointService.updatePoint(matchRequest.getStudent(), PointType.CANCEL_MATCH_REQUEST);
             matchRequestRepository.delete(matchRequest);
-            return MatchDeleteResponse.from(point, PointType.CANCEL_MATCH_REQUEST.getPointChange());
+            return MatchDeleteResponse.from(point, PointType.CANCEL_MATCH_REQUEST);
         }
         Point point = findPointService.findByStudent(matchRequest.getStudent());
         matchRequestRepository.delete(matchRequest);
-        return MatchDeleteResponse.from(point, 0);
+        return MatchDeleteResponse.from(point, PointType.NO_POINT_CHANGE);
     }
 
     @Override
