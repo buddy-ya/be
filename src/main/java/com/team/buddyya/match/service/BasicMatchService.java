@@ -80,13 +80,12 @@ public class BasicMatchService implements MatchService {
     public MatchDeleteResponse deleteMatch(Long studentId) {
         MatchRequest matchRequest = matchRequestRepository.findByStudentId(studentId)
                 .orElseThrow(() -> new MatchException(MatchExceptionType.MATCH_REQUEST_NOT_FOUND));
-        MatchRequestStatus matchRequestStatus = matchRequest.getMatchRequestStatus();
-        Point point;
-        if (matchRequestStatus.equals(MatchRequestStatus.MATCH_PENDING)) {
-            point = updatePointService.updatePoint(matchRequest.getStudent(), PointType.CANCEL_MATCH_REQUEST);
-        } else {
-            point = findPointService.findByStudent(matchRequest.getStudent());
+        if (matchRequest.getMatchRequestStatus().equals(MatchRequestStatus.MATCH_PENDING)) {
+            Point point = updatePointService.updatePoint(matchRequest.getStudent(), PointType.CANCEL_MATCH_REQUEST);
+            matchRequestRepository.delete(matchRequest);
+            return MatchDeleteResponse.from(point);
         }
+        Point point = findPointService.findByStudent(matchRequest.getStudent());
         matchRequestRepository.delete(matchRequest);
         return MatchDeleteResponse.from(point);
     }
