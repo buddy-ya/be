@@ -6,7 +6,6 @@ import com.team.buddyya.chatting.exception.ChatException;
 import com.team.buddyya.chatting.exception.ChatExceptionType;
 import com.team.buddyya.chatting.repository.ChatroomRepository;
 import com.team.buddyya.chatting.repository.ChatroomStudentRepository;
-import com.team.buddyya.chatting.service.ChatRequestService;
 import com.team.buddyya.chatting.service.ChatService;
 import com.team.buddyya.match.domain.*;
 import com.team.buddyya.match.dto.request.MatchCreateRequest;
@@ -34,7 +33,6 @@ public class BasicMatchService implements MatchService {
     private final MatchRequestRepository matchRequestRepository;
     private final MatchedHistoryRepository matchedHistoryRepository;
     private final FindStudentService findStudentService;
-    private final ChatRequestService chatRequestService;
     private final ChatService chatService;
     private final ChatroomRepository chatroomRepository;
     private final ChatroomStudentRepository chatroomStudentRepository;
@@ -132,13 +130,10 @@ public class BasicMatchService implements MatchService {
 
     private boolean isGenderMatch(GenderType matchRequestGenderType, GenderType requestedGenderType,
                                   Gender matchRequestGender, Gender requestedGender) {
-        if (matchRequestGenderType == GenderType.SAME_GENDER && requestedGenderType == GenderType.SAME_GENDER) {
-            return matchRequestGender == requestedGender;
+        if (matchRequestGenderType == GenderType.ALL && requestedGenderType == GenderType.ALL) {
+            return true;
         }
-        if (matchRequestGenderType == GenderType.SAME_GENDER || requestedGenderType == GenderType.SAME_GENDER) {
-            return matchRequestGender == requestedGender;
-        }
-        return true;
+        return matchRequestGender == requestedGender;
     }
 
     private MatchResponse processMatchSuccess(Student student, UniversityType universityType, GenderType genderType, MatchRequest matchRequest) {
