@@ -3,6 +3,7 @@ package com.team.buddyya.match.dto.response;
 import com.team.buddyya.chatting.domain.Chatroom;
 import com.team.buddyya.match.domain.MatchRequest;
 import com.team.buddyya.point.domain.Point;
+import com.team.buddyya.point.domain.PointType;
 import com.team.buddyya.student.domain.Student;
 
 import static com.team.buddyya.student.domain.UserProfileDefaultImage.getChatroomProfileImage;
@@ -17,6 +18,7 @@ public record MatchResponse(
         String profileImageUrl,
         String matchStatus,
         Integer point,
+        Integer pointChange,
         boolean isExited
 ) {
 
@@ -31,6 +33,7 @@ public record MatchResponse(
                 getChatroomProfileImage(buddy),
                 matchRequest.getMatchRequestStatus().getDisplayName(),
                 point.getCurrentPoint(),
+                PointType.MATCH_REQUEST.getPointChange(),
                 isExited
         );
     }
@@ -46,6 +49,7 @@ public record MatchResponse(
                 null,
                 matchRequest.getMatchRequestStatus().getDisplayName(),
                 point.getCurrentPoint(),
+                PointType.MATCH_REQUEST.getPointChange(),
                 false
         );
     }
