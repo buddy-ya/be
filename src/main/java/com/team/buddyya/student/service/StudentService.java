@@ -7,6 +7,8 @@ import com.team.buddyya.certification.repository.StudentEmailRepository;
 import com.team.buddyya.certification.repository.StudentIdCardRepository;
 import com.team.buddyya.common.service.S3UploadService;
 import com.team.buddyya.notification.repository.ExpoTokenRepository;
+import com.team.buddyya.point.domain.Point;
+import com.team.buddyya.point.service.FindPointService;
 import com.team.buddyya.student.domain.*;
 import com.team.buddyya.student.dto.request.MyPageUpdateRequest;
 import com.team.buddyya.student.dto.request.OnBoardingRequest;
@@ -41,6 +43,7 @@ public class StudentService {
     private final ExpoTokenRepository expoTokenRepository;
     private final RegisteredPhoneRepository registeredPhoneRepository;
     private final StudentEmailRepository studentEmailRepository;
+    private final FindPointService findPointService;
 
     private static final String BLOCK_SUCCESS_MESSAGE = "차단이 성공적으로 완료되었습니다.";
 
@@ -82,32 +85,35 @@ public class StudentService {
             default:
                 throw new StudentException(StudentExceptionType.UNSUPPORTED_UPDATE_KEY);
         }
+        Point point = findPointService.findByStudent(student);
         boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
                 .isPresent();
-        return UserResponse.from(student, isStudentIdCardRequested);
+        return UserResponse.fromUserInfo(student, isStudentIdCardRequested, point);
     }
 
     public UserResponse updateUserProfileImage(StudentInfo studentInfo, boolean isDefault, UpdateProfileImageRequest request) {
         Student student = findStudentService.findByStudentId(studentInfo.id());
+        Point point = findPointService.findByStudent(student);
         boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
                 .isPresent();
         if (isDefault) {
             profileImageService.updateUserProfileImage(student, USER_PROFILE_DEFAULT_IMAGE.getUrl());
-            return UserResponse.from(student, isStudentIdCardRequested);
+            return UserResponse.fromUserInfo(student, isStudentIdCardRequested, point);
         }
         String imageUrl = s3UploadService.uploadFile(PROFILE_IMAGE.getDirectoryName(), request.profileImage());
         profileImageService.updateUserProfileImage(student, imageUrl);
-        return UserResponse.from(student, isStudentIdCardRequested);
+        return UserResponse.fromUserInfo(student, isStudentIdCardRequested, point);
     }
 
     public UserResponse getUserInfo(StudentInfo studentInfo, Long userId) {
         Student student = findStudentService.findByStudentId(userId);
         if (!studentInfo.id().equals(userId)) {
-            return UserResponse.from(student);
+            return UserResponse.fromOtherUserInfo(student);
         }
+        Point point = findPointService.findByStudent(student);
         boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
                 .isPresent();
-        return UserResponse.from(student, isStudentIdCardRequested);
+        return UserResponse.fromUserInfo(student, isStudentIdCardRequested, point);
     }
 
     public void updateStudentCertification(Student student) {

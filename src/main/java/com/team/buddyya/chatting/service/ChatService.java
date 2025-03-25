@@ -19,7 +19,9 @@ import com.team.buddyya.chatting.repository.ChatroomStudentRepository;
 import com.team.buddyya.common.service.S3UploadService;
 import com.team.buddyya.notification.service.NotificationService;
 import com.team.buddyya.student.domain.Student;
+import com.team.buddyya.point.repository.PointRepository;
 import com.team.buddyya.student.service.FindStudentService;
+import com.team.buddyya.point.service.PointService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -59,6 +61,8 @@ public class ChatService {
     private final Map<Long, Set<WebSocketSession>> sessionsPerRoom = new ConcurrentHashMap<>();
     private final Map<WebSocketSession, Long> lastPongTimestamps = new ConcurrentHashMap<>();
     private final NotificationService notificationService;
+    private final PointRepository pointRepository;
+    private final PointService pointService;
 
     public CreateChatroomResponse createOrGetChatRoom(CreateChatroomRequest request, StudentInfo studentInfo) {
         Student user = findStudentService.findByStudentId(studentInfo.id());

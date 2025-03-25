@@ -12,7 +12,7 @@ public record CreateChatroomResponse(
         String country,
         String profileImageUrl,
         boolean isNew
-) {
+        ) {
 
     public static CreateChatroomResponse from(Chatroom chatroom, Student buddy, boolean isNew) {
         return new CreateChatroomResponse(

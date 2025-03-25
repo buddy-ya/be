@@ -1,6 +1,6 @@
-package com.team.buddyya.student.repository;
+package com.team.buddyya.point.repository;
 
-import com.team.buddyya.student.domain.Point;
+import com.team.buddyya.point.domain.Point;
 import com.team.buddyya.student.domain.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
 

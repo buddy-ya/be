@@ -12,6 +12,8 @@ import com.team.buddyya.certification.repository.AdminAccountRepository;
 import com.team.buddyya.certification.repository.RegisteredPhoneRepository;
 import com.team.buddyya.certification.repository.StudentIdCardRepository;
 import com.team.buddyya.certification.repository.TestAccountRepository;
+import com.team.buddyya.point.domain.Point;
+import com.team.buddyya.point.service.FindPointService;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.dto.response.UserResponse;
 import com.team.buddyya.student.repository.StudentRepository;
@@ -34,6 +36,7 @@ public class PhoneAuthenticationService {
     private final StudentRepository studentRepository;
     private final StudentIdCardRepository studentIdCardRepository;
     private final TestAccountRepository testAccountRepository;
+    private final FindPointService findPointService;
     private final AdminAccountRepository adminAccountRepository;
     private final JwtUtils jwtUtils;
 
@@ -70,9 +73,10 @@ public class PhoneAuthenticationService {
             String refreshToken = student.getAuthToken().getRefreshToken();
             student.getAvatar().setLoggedOut(false);
             boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student).isPresent();
-            return UserResponse.from(student, isStudentIdCardRequested, EXISTING_MEMBER, accessToken, refreshToken);
+            Point point = findPointService.findByStudent(student);
+            return UserResponse.fromCheckMembership(student, isStudentIdCardRequested, EXISTING_MEMBER, accessToken, refreshToken, point);
         }
-        return UserResponse.from(NEW_MEMBER);
+        return UserResponse.fromCheckMembership(NEW_MEMBER);
     }
 
     public TestAccountResponse isTestAccount(String phoneNumber) {

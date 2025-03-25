@@ -1,7 +1,7 @@
-package com.team.buddyya.student.domain;
+package com.team.buddyya.point.domain;
 
-import com.team.buddyya.student.exception.StudentException;
-import com.team.buddyya.student.exception.StudentExceptionType;
+import com.team.buddyya.point.exception.PointException;
+import com.team.buddyya.point.exception.PointExceptionType;
 import lombok.Getter;
 
 import java.util.Arrays;
@@ -9,10 +9,12 @@ import java.util.Arrays;
 @Getter
 public enum PointType {
 
-    SIGNUP("signup", 1),
+    SIGNUP("signup", +100),
     UNIVERSITY_AUTH("university_auth",1),
     CHAT_REQUEST("chat_request", -1),
-    MATCH_REQUEST("match_request", -1);
+    MATCH_REQUEST("match_request", -1),
+    CANCEL_MATCH_REQUEST("cancel_match_request", +1),
+    NO_POINT_CHANGE("no_point_change",0);
 
     private final String displayName;
     private final int pointChange;
@@ -26,6 +28,6 @@ public enum PointType {
         return Arrays.stream(PointType.values())
                 .filter(type -> type.getDisplayName().equals(displayName))
                 .findFirst()
-                .orElseThrow(() -> new StudentException(StudentExceptionType.INVALID_POINT_TYPE));
+                .orElseThrow(() -> new PointException(PointExceptionType.INVALID_POINT_TYPE));
     }
 }

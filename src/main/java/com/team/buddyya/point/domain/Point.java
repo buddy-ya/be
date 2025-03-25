@@ -1,8 +1,9 @@
-package com.team.buddyya.student.domain;
+package com.team.buddyya.point.domain;
 
 import com.team.buddyya.common.domain.BaseTime;
-import com.team.buddyya.student.exception.StudentException;
-import com.team.buddyya.student.exception.StudentExceptionType;
+import com.team.buddyya.point.exception.PointException;
+import com.team.buddyya.point.exception.PointExceptionType;
+import com.team.buddyya.student.domain.Student;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,7 +23,7 @@ public class Point extends BaseTime {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = LAZY)
+    @OneToOne
     @JoinColumn(name = "student_id", nullable = false, unique = true)
     private Student student;
 
@@ -43,10 +44,10 @@ public class Point extends BaseTime {
 
     private void validatePoint(int point) {
         if (point < MIN_POINT) {
-            throw new StudentException(StudentExceptionType.NEGATIVE_POINT);
+            throw new PointException(PointExceptionType.NEGATIVE_POINT);
         }
         if (point > MAX_POINT) {
-            throw new StudentException(StudentExceptionType.EXCEED_MAX_POINT);
+            throw new PointException(PointExceptionType.EXCEED_MAX_POINT);
         }
     }
 }

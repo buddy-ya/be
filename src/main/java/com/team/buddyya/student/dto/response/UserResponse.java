@@ -1,5 +1,6 @@
 package com.team.buddyya.student.dto.response;
 
+import com.team.buddyya.point.domain.Point;
 import com.team.buddyya.student.domain.Student;
 
 import java.time.LocalDateTime;
@@ -28,11 +29,12 @@ public record UserResponse(
         Boolean isBanned,
         LocalDateTime banExpiration,
         String banReason,
+        Integer point,
         String accessToken,
         String refreshToken
 ) {
 
-    public static UserResponse from(Student student, boolean isStudentIdCardRequested) {
+    public static UserResponse fromUserInfo(Student student, boolean isStudentIdCardRequested, Point point) {
         return new UserResponse(
                 student.getId(),
                 student.getRole().name(),
@@ -52,12 +54,13 @@ public record UserResponse(
                 null,
                 null,
                 null,
+                point.getCurrentPoint(),
                 null,
                 null
         );
     }
 
-    public static UserResponse from(Student student) {
+    public static UserResponse fromOtherUserInfo(Student student) {
         return new UserResponse(
                 student.getId(),
                 null,
@@ -78,11 +81,12 @@ public record UserResponse(
                 null,
                 null,
                 null,
+                null,
                 null
         );
     }
 
-    public static UserResponse from(Student student, Boolean isStudentIdCardRequested, String accessToken, String refreshToken) {
+    public static UserResponse fromOnboard(Student student, Boolean isStudentIdCardRequested, String accessToken, String refreshToken, Point point) {
         return new UserResponse(
                 student.getId(),
                 student.getRole().name(),
@@ -102,12 +106,13 @@ public record UserResponse(
                 student.checkAndUpdateBanStatus(),
                 student.getBanEndTime(),
                 student.getBanReason(),
+                point.getCurrentPoint(),
                 accessToken,
                 refreshToken
         );
     }
 
-    public static UserResponse from(Student student, Boolean isStudentIdCardRequested, String status, String accessToken, String refreshToken) {
+    public static UserResponse fromCheckMembership(Student student, Boolean isStudentIdCardRequested, String status, String accessToken, String refreshToken, Point point) {
         return new UserResponse(
                 student.getId(),
                 student.getRole().name(),
@@ -127,12 +132,13 @@ public record UserResponse(
                 student.checkAndUpdateBanStatus(),
                 student.getBanEndTime(),
                 student.getBanReason(),
+                point.getCurrentPoint(),
                 accessToken,
                 refreshToken
         );
     }
 
-    public static UserResponse from(String status) {
+    public static UserResponse fromCheckMembership(String status) {
         return new UserResponse(
                 null,
                 null,
@@ -150,6 +156,7 @@ public record UserResponse(
                 null,
                 status,
                 false,
+                null,
                 null,
                 null,
                 null,
