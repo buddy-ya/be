@@ -44,8 +44,8 @@ public class ChatRequestController {
     @PostMapping("/{receiverId}")
     public ResponseEntity<CreateChatRequestResponse> createChatRequest(@AuthenticationPrincipal CustomUserDetails userDetails
             , @PathVariable("receiverId") Long receiverId) {
-        chatRequestService.createChatRequest(userDetails, receiverId);
-        return ResponseEntity.noContent().build();
+        CreateChatRequestResponse response = chatRequestService.createChatRequest(userDetails, receiverId);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
