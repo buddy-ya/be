@@ -8,7 +8,7 @@ import static com.team.buddyya.student.domain.UserProfileDefaultImage.getChatroo
 
 public record MatchStatusResponse(
         Long id,
-        Long chatRoodId,
+        Long chatRoomId,
         Long buddyId,
         String name,
         String country,
