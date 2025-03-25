@@ -23,7 +23,7 @@ public class Point extends BaseTime {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = LAZY)
+    @OneToOne
     @JoinColumn(name = "student_id", nullable = false, unique = true)
     private Student student;
 
