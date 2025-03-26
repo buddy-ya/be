@@ -9,19 +9,21 @@ import java.util.Arrays;
 @Getter
 public enum PointType {
 
-    SIGNUP("signup", +100),
-    UNIVERSITY_AUTH("university_auth",1),
-    CHAT_REQUEST("chat_request", -1),
-    MATCH_REQUEST("match_request", -1),
-    CANCEL_MATCH_REQUEST("cancel_match_request", +1),
-    NO_POINT_CHANGE("no_point_change",0);
+    SIGNUP("signup", +100, PointChangeType.EARN),
+    UNIVERSITY_AUTH("university_auth", 1, PointChangeType.EARN),
+    CHAT_REQUEST("chat_request", -1, PointChangeType.DEDUCT),
+    MATCH_REQUEST("match_request", -1, PointChangeType.DEDUCT),
+    CANCEL_MATCH_REQUEST("cancel_match_request", +1, PointChangeType.EARN),
+    NO_POINT_CHANGE("no_point_change", 0, PointChangeType.NONE);
 
     private final String displayName;
     private final int pointChange;
+    private final PointChangeType changeType;
 
-    PointType(String displayName, int pointChange) {
+    PointType(String displayName, int pointChange, PointChangeType changeType) {
         this.displayName = displayName;
         this.pointChange = pointChange;
+        this.changeType = changeType;
     }
 
     public static PointType fromValue(String displayName) {
