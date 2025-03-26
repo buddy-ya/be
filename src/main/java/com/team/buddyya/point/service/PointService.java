@@ -45,7 +45,7 @@ public class PointService {
     public PointListResponse getPoints(StudentInfo studentInfo){
         Student student = findStudentService.findByStudentId(studentInfo.id());
         Point point = findPointService.findByStudent(student);
-        List<PointStatus> pointStatuses = pointStatusRepository.findAllByPoint(point);
+        List<PointStatus> pointStatuses = pointStatusRepository.findAllByPointOrderByCreatedDateDesc(point);
         List<PointResponse> pointResponses = pointStatuses.stream()
                 .map(PointResponse::from)
                 .collect(Collectors.toList());
