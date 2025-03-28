@@ -92,12 +92,12 @@ public class BasicMatchService implements MatchService {
             return MatchStatusResponse.from(matchRequest.get());
         }
         if (status.equals(MatchRequestStatus.MATCH_SUCCESS)) {
-            MatchedHistory recentMatchedHistory = matchedHistoryRepository.findMostRecentMatchedHistoryByStudentId(studentId);
-            Chatroom chatroom = chatroomRepository.findByUserAndBuddy(studentId, recentMatchedHistory.getBuddyId())
+            Chatroom chatroom = chatroomRepository.findById(matchRequest.get().getChatRoomId())
                     .orElseThrow(() -> new ChatException(ChatExceptionType.CHATROOM_NOT_FOUND));
             ChatroomStudent chatroomStudent = chatroomStudentRepository.findByChatroomAndStudentId(chatroom, studentId)
                     .orElseThrow(() -> new ChatException(ChatExceptionType.USER_NOT_PART_OF_CHATROOM));
             boolean isExited = chatroomStudent.getIsExited().equals(true);
+            MatchedHistory recentMatchedHistory = matchedHistoryRepository.findMostRecentMatchedHistoryByStudentId(studentId);
             Student matchedStudent = findStudentService.findByStudentId(recentMatchedHistory.getBuddyId());
             return MatchStatusResponse.from(chatroom, matchedStudent, matchRequest.get(), isExited);
         }
