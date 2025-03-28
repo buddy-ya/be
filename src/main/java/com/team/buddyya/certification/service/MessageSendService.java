@@ -49,7 +49,7 @@ public class MessageSendService {
     }
 
     public String sendMessage(SendCodeRequest request) {
-        PhoneInfo phoneInfo = phoneInfoRepository.findPhoneInfoByDeviceId(request.phoneInfo())
+        PhoneInfo phoneInfo = phoneInfoRepository.findPhoneInfoByUdId(request.udId())
                 .orElseThrow(() -> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.PHONE_INFO_NOT_FOUND));
         if (phoneInfo.isMaxSendMessageCount()) {
             throw new PhoneAuthenticationException(PhoneAuthenticationExceptionType.MAX_SMS_SEND_COUNT);
