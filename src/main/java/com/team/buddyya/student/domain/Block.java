@@ -1,5 +1,6 @@
 package com.team.buddyya.student.domain;
 
+import com.team.buddyya.common.domain.CreatedTime;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,7 +13,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Table(name = "block")
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-public class Block {
+public class Block extends CreatedTime{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

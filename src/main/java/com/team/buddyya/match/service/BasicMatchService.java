@@ -1,15 +1,27 @@
 package com.team.buddyya.match.service;
 
 import com.team.buddyya.chatting.domain.Chatroom;
-import com.team.buddyya.chatting.service.ChatRequestService;
+import com.team.buddyya.chatting.domain.ChatroomStudent;
+import com.team.buddyya.chatting.exception.ChatException;
+import com.team.buddyya.chatting.exception.ChatExceptionType;
+import com.team.buddyya.chatting.repository.ChatroomRepository;
+import com.team.buddyya.chatting.repository.ChatroomStudentRepository;
 import com.team.buddyya.chatting.service.ChatService;
-import com.team.buddyya.match.domain.MatchedHistory;
-import com.team.buddyya.match.domain.MatchRequest;
+import com.team.buddyya.match.domain.*;
 import com.team.buddyya.match.dto.request.MatchCreateRequest;
-import com.team.buddyya.match.dto.response.MatchCreateResponse;
-import com.team.buddyya.match.repositorry.BuddyRepository;
-import com.team.buddyya.match.repositorry.MatchRequestRepository;
+import com.team.buddyya.match.dto.response.MatchDeleteResponse;
+import com.team.buddyya.match.dto.response.MatchResponse;
+import com.team.buddyya.match.dto.response.MatchStatusResponse;
+import com.team.buddyya.match.exception.MatchException;
+import com.team.buddyya.match.exception.MatchExceptionType;
+import com.team.buddyya.match.repository.MatchedHistoryRepository;
+import com.team.buddyya.match.repository.MatchRequestRepository;
 import com.team.buddyya.notification.service.NotificationService;
+import com.team.buddyya.point.service.FindPointService;
+import com.team.buddyya.point.service.UpdatePointService;
+import com.team.buddyya.student.domain.Gender;
+import com.team.buddyya.point.domain.Point;
+import com.team.buddyya.point.domain.PointType;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.service.FindStudentService;
 import lombok.RequiredArgsConstructor;
@@ -25,110 +37,146 @@ import java.util.Set;
 public class BasicMatchService implements MatchService {
 
     private final MatchRequestRepository matchRequestRepository;
-    private final BuddyRepository buddyRepository;
+    private final MatchedHistoryRepository matchedHistoryRepository;
     private final FindStudentService findStudentService;
-    private final ChatRequestService chatRequestService;
     private final ChatService chatService;
+    private final ChatroomRepository chatroomRepository;
+    private final ChatroomStudentRepository chatroomStudentRepository;
     private final NotificationService notificationService;
+    private final FindPointService findPointService;
+    private final UpdatePointService updatePointService;
 
-    private final String MATCH_STATUS_PENDING = "pending";
-    private final String MATCH_STATUS_SUCCESS = "success";
-    private final String SAME_UNIVERSITY_TYPE = "SAME_UNIVERSITY";
-    private final String DIFFERENT_UNIVERSITY_TYPE = "DIFFERENT_UNIVERSITY";
-    private final String SAME_GENDER_TYPE = "SAME_GENDER";
-
-    public MatchCreateResponse requestMatch(Long studentId, MatchCreateRequest request) {
+    @Override
+    public MatchResponse requestMatch(Long studentId, MatchCreateRequest request) {
         Student student = findStudentService.findByStudentId(studentId);
-        boolean isKorean = student.getIsKorean();
-        Long universityId = student.getUniversity().getId();
-        String gender = student.getGender().name();
-        Set<Long> existingBuddies = buddyRepository.findBuddyIdsByStudentId(studentId);
+        Point point = updatePointService.updatePoint(student, PointType.MATCH_REQUEST);
+        UniversityType universityType = UniversityType.fromValue(request.universityType());
+        GenderType genderType = GenderType.fromValue(request.genderType());
+        Set<Long> existingBuddies = matchedHistoryRepository.findBuddyIdsByStudentId(studentId);
         Optional<MatchRequest> optionalMatchRequest = findValidMatchRequest(
                 student,
-                isKorean,
-                request.universityType(),
-                request.genderType(),
-                universityId,
-                gender,
+                universityType,
+                genderType,
                 existingBuddies
         );
         if (optionalMatchRequest.isPresent()) {
-            return processMatchSuccess(student, optionalMatchRequest.get());
+            return processMatchSuccess(student, universityType, genderType, optionalMatchRequest.get(), point);
         }
-        return createMatchRequest(student, isKorean);
+        MatchRequest newMatchRequest = createMatchRequest(student, universityType, genderType, MatchRequestStatus.MATCH_PENDING);
+        return MatchResponse.from(newMatchRequest, point);
+    }
+
+    @Override
+    public MatchDeleteResponse deleteMatch(Long studentId) {
+        MatchRequest matchRequest = matchRequestRepository.findByStudentId(studentId)
+                .orElseThrow(() -> new MatchException(MatchExceptionType.MATCH_REQUEST_NOT_FOUND));
+        if (matchRequest.getMatchRequestStatus().equals(MatchRequestStatus.MATCH_PENDING)) {
+            Point point = updatePointService.updatePoint(matchRequest.getStudent(), PointType.CANCEL_MATCH_REQUEST);
+            matchRequestRepository.delete(matchRequest);
+            return MatchDeleteResponse.from(point, PointType.CANCEL_MATCH_REQUEST);
+        }
+        Point point = findPointService.findByStudent(matchRequest.getStudent());
+        matchRequestRepository.delete(matchRequest);
+        return MatchDeleteResponse.from(point, PointType.NO_POINT_CHANGE);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MatchStatusResponse findMatchStatus(Long studentId) {
+        Optional<MatchRequest> matchRequest = matchRequestRepository.findByStudentId(studentId);
+        if (matchRequest.isEmpty()) {
+            return MatchStatusResponse.from(MatchRequestStatus.MATCH_NOT_REQUESTED.getDisplayName());
+        }
+        MatchRequestStatus status = matchRequest.get().getMatchRequestStatus();
+        if (status.equals(MatchRequestStatus.MATCH_PENDING)) {
+            return MatchStatusResponse.from(matchRequest.get());
+        }
+        if (status.equals(MatchRequestStatus.MATCH_SUCCESS)) {
+            MatchedHistory recentMatchedHistory = matchedHistoryRepository.findMostRecentMatchedHistoryByStudentId(studentId);
+            Chatroom chatroom = chatroomRepository.findByUserAndBuddy(studentId, recentMatchedHistory.getBuddyId())
+                    .orElseThrow(() -> new ChatException(ChatExceptionType.CHATROOM_NOT_FOUND));
+            ChatroomStudent chatroomStudent = chatroomStudentRepository.findByChatroomAndStudentId(chatroom, studentId)
+                    .orElseThrow(() -> new ChatException(ChatExceptionType.USER_NOT_PART_OF_CHATROOM));
+            boolean isExited = chatroomStudent.getIsExited().equals(true);
+            Student matchedStudent = findStudentService.findByStudentId(recentMatchedHistory.getBuddyId());
+            return MatchStatusResponse.from(chatroom, matchedStudent, matchRequest.get(), isExited);
+        }
+        throw new MatchException(MatchExceptionType.UNEXPECTED_MATCH_STATUS);
     }
 
     private Optional<MatchRequest> findValidMatchRequest(
-            Student student, boolean isKorean, String universityType, String genderType,
-            Long universityId, String studentGender, Set<Long> existingBuddies) {
-        return matchRequestRepository.findAllMatches(isKorean).stream()
-                .filter(matchRequest -> isValidMatchRequest(student, matchRequest, universityType, genderType, universityId, studentGender, existingBuddies))
+            Student requestedStudent, UniversityType universityType, GenderType genderType, Set<Long> existingBuddies) {
+        return matchRequestRepository.findAllPendingMatches(requestedStudent.getIsKorean()).stream()
+                .filter(matchRequest -> isValidMatchRequest(requestedStudent, matchRequest, universityType, genderType, existingBuddies))
                 .findFirst();
     }
 
     private boolean isValidMatchRequest(
-            Student student, MatchRequest matchRequest, String universityType, String genderType,
-            Long universityId, String studentGender, Set<Long> existingBuddies) {
-        Student matchedStudent = matchRequest.getStudent();
-        Long matchedUniversityId = matchedStudent.getUniversity().getId();
-        String matchedGender = matchedStudent.getGender().name();
-        if (existingBuddies.contains(matchedStudent.getId())) {
+            Student requestedStudent, MatchRequest matchRequest,
+            UniversityType requestedUniversityType, GenderType requestedGenderType, Set<Long> existingBuddies) {
+        Gender requestedGender = requestedStudent.getGender();
+        Long requestedUniversityId = requestedStudent.getUniversity().getId();
+        Student matchStudent = matchRequest.getStudent();
+        if (existingBuddies.contains(matchStudent.getId())) {
             return false;
         }
-        if (chatRequestService.isAlreadyExistChatroom(student, matchedStudent)) {
+        boolean isAlreadyExistChatroom = chatroomRepository.findByUserAndBuddy(requestedStudent.getId(), matchStudent.getId()).isPresent();
+        if (isAlreadyExistChatroom) {
             return false;
         }
-        if (!isUniversityMatch(universityType, matchedUniversityId, universityId)) {
-            return false;
-        }
-        if (!isGenderMatch(genderType, studentGender, matchedGender)) {
-            return false;
-        }
-        return true;
+        return isUniversityMatch(matchRequest.getUniversityType(), requestedUniversityType, matchRequest.getUniversityId(), requestedUniversityId)
+                && isGenderMatch(matchRequest.getGenderType(), requestedGenderType, matchStudent.getGender(), requestedGender);
     }
 
-    private boolean isUniversityMatch(String universityType, Long matchedUniversityId, Long universityId) {
-        if (SAME_UNIVERSITY_TYPE.equals(universityType)) {
-            return matchedUniversityId.equals(universityId);
+    private boolean isUniversityMatch(UniversityType matchRequestUniversityType, UniversityType requestedUniversityType,
+                                      Long matchRequestUniversityId, Long requestedUniversityId) {
+        if (matchRequestUniversityType == UniversityType.SAME_UNIVERSITY && requestedUniversityType == UniversityType.SAME_UNIVERSITY) {
+            return matchRequestUniversityId.equals(requestedUniversityId);
         }
-        if (DIFFERENT_UNIVERSITY_TYPE.equals(universityType)) {
-            return !matchedUniversityId.equals(universityId);
+        if (matchRequestUniversityType == UniversityType.DIFFERENT_UNIVERSITY && requestedUniversityType == UniversityType.DIFFERENT_UNIVERSITY) {
+            return !matchRequestUniversityId.equals(requestedUniversityId);
         }
-        return true;
+        return false;
     }
 
-    private boolean isGenderMatch(String genderType, String studentGender, String matchedGender) {
-        if (SAME_GENDER_TYPE.equals(genderType)) {
-            return studentGender.equals(matchedGender);
+    private boolean isGenderMatch(GenderType matchRequestGenderType, GenderType requestedGenderType,
+                                  Gender matchRequestGender, Gender requestedGender) {
+        if (matchRequestGenderType == GenderType.ALL && requestedGenderType == GenderType.ALL) {
+            return true;
         }
-        return true;
+        return matchRequestGender == requestedGender;
     }
 
-    private MatchCreateResponse processMatchSuccess(Student student, MatchRequest matchRequest) {
+    private MatchResponse processMatchSuccess(Student student, UniversityType universityType, GenderType genderType, MatchRequest matchRequest, Point point) {
         Student matchedStudent = matchRequest.getStudent();
         MatchedHistory requestedMatchedHistory = MatchedHistory.builder()
                 .student(student)
                 .buddyId(matchedStudent.getId())
                 .build();
-        MatchedHistory matchedMatchedHistory = MatchedHistory.builder()
+        MatchedHistory existingMatchedHistory = MatchedHistory.builder()
                 .student(matchedStudent)
                 .buddyId(student.getId())
                 .build();
-        buddyRepository.save(requestedMatchedHistory);
-        buddyRepository.save(matchedMatchedHistory);
-        matchRequestRepository.delete(matchRequest);
+        matchedHistoryRepository.save(requestedMatchedHistory);
+        matchedHistoryRepository.save(existingMatchedHistory);
+        MatchRequest newMatchRequest = createMatchRequest(student, universityType, genderType, MatchRequestStatus.MATCH_SUCCESS);
+        matchRequest.updateMatchRequestStatusSuccess();
         Chatroom chatroom = chatService.createChatroom(student, matchedStudent);
         notificationService.sendMatchSuccessNotification(student, chatroom.getId());
         notificationService.sendMatchSuccessNotification(matchedStudent, chatroom.getId());
-        return MatchCreateResponse.from(chatroom, matchedStudent, true, MATCH_STATUS_SUCCESS);
+        return MatchResponse.from(chatroom, matchedStudent, newMatchRequest, point, false);
     }
 
-    private MatchCreateResponse createMatchRequest(Student student, boolean isKorean) {
+    private MatchRequest createMatchRequest(Student student,
+                                            UniversityType universityType, GenderType genderType, MatchRequestStatus status) {
         MatchRequest matchRequest = MatchRequest.builder()
                 .student(student)
-                .isKorean(isKorean)
+                .isKorean(student.getIsKorean())
+                .universityType(universityType)
+                .genderType(genderType)
+                .matchRequestStatus(status)
+                .universityId(student.getUniversity().getId())
                 .build();
-        matchRequestRepository.save(matchRequest);
-        return MatchCreateResponse.from(MATCH_STATUS_PENDING);
+        return matchRequestRepository.save(matchRequest);
     }
 }

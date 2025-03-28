@@ -4,15 +4,19 @@ import com.team.buddyya.auth.dto.request.TokenInfoRequest;
 import com.team.buddyya.auth.jwt.JwtUtils;
 import com.team.buddyya.certification.domain.PhoneInfo;
 import com.team.buddyya.certification.domain.RegisteredPhone;
+import com.team.buddyya.certification.dto.response.AdminAccountResponse;
 import com.team.buddyya.certification.dto.request.SavePhoneInfoRequest;
 import com.team.buddyya.certification.dto.response.SendCodeResponse;
 import com.team.buddyya.certification.dto.response.TestAccountResponse;
 import com.team.buddyya.certification.exception.PhoneAuthenticationException;
 import com.team.buddyya.certification.exception.PhoneAuthenticationExceptionType;
+import com.team.buddyya.certification.repository.AdminAccountRepository;
 import com.team.buddyya.certification.repository.PhoneInfoRepository;
 import com.team.buddyya.certification.repository.RegisteredPhoneRepository;
 import com.team.buddyya.certification.repository.StudentIdCardRepository;
 import com.team.buddyya.certification.repository.TestAccountRepository;
+import com.team.buddyya.point.domain.Point;
+import com.team.buddyya.point.service.FindPointService;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.dto.response.UserResponse;
 import com.team.buddyya.student.repository.StudentRepository;
@@ -36,6 +40,8 @@ public class PhoneAuthenticationService {
     private final StudentIdCardRepository studentIdCardRepository;
     private final PhoneInfoRepository phoneInfoRepository;
     private final TestAccountRepository testAccountRepository;
+    private final FindPointService findPointService;
+    private final AdminAccountRepository adminAccountRepository;
     private final JwtUtils jwtUtils;
 
     @Value("${test.phone.number.prefix}")
@@ -43,7 +49,7 @@ public class PhoneAuthenticationService {
 
     public void savePhoneInfo(SavePhoneInfoRequest request){
         phoneInfoRepository.save(PhoneInfo.builder()
-                .deviceId(request.phoneInfo())
+                .udId(request.phoneInfo())
                 .build());
     }
 
@@ -78,10 +84,12 @@ public class PhoneAuthenticationService {
             Student student = optionalStudent.get();
             String accessToken = jwtUtils.createAccessToken(new TokenInfoRequest(student.getId()));
             String refreshToken = student.getAuthToken().getRefreshToken();
+            student.getAvatar().setLoggedOut(false);
             boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student).isPresent();
-            return UserResponse.from(student, isStudentIdCardRequested, EXISTING_MEMBER, accessToken, refreshToken);
+            Point point = findPointService.findByStudent(student);
+            return UserResponse.fromCheckMembership(student, isStudentIdCardRequested, EXISTING_MEMBER, accessToken, refreshToken, point);
         }
-        return UserResponse.from(NEW_MEMBER);
+        return UserResponse.fromCheckMembership(NEW_MEMBER);
     }
 
     public TestAccountResponse isTestAccount(String phoneNumber) {
@@ -89,5 +97,12 @@ public class PhoneAuthenticationService {
             return new TestAccountResponse(true);
         }
         return new TestAccountResponse(false);
+    }
+
+    public AdminAccountResponse isAdminAccount(String phoneNumber) {
+        if (adminAccountRepository.findByPhoneNumber(phoneNumber).isPresent()) {
+            return new AdminAccountResponse(true);
+        }
+        return new AdminAccountResponse(false);
     }
 }

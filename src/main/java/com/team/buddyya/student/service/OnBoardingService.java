@@ -4,6 +4,8 @@ import com.team.buddyya.auth.domain.AuthToken;
 import com.team.buddyya.auth.dto.request.TokenInfoRequest;
 import com.team.buddyya.auth.jwt.JwtUtils;
 import com.team.buddyya.auth.repository.AuthTokenRepository;
+import com.team.buddyya.point.domain.Point;
+import com.team.buddyya.point.service.PointService;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.dto.request.OnBoardingRequest;
 import com.team.buddyya.student.dto.response.UserResponse;
@@ -22,6 +24,7 @@ public class OnBoardingService {
     private final StudentLanguageService studentLanguageService;
     private final StudentMajorService studentMajorService;
     private final ProfileImageService profileImageService;
+    private final PointService pointService;
     private final AuthTokenRepository authTokenRepository;
     private final JwtUtils jwtUtils;
 
@@ -34,7 +37,8 @@ public class OnBoardingService {
         studentMajorService.createStudentMajors(request.majors(), student);
         studentInterestService.createStudentInterests(request.interests(), student);
         studentLanguageService.createStudentLanguages(request.languages(), student);
-        return UserResponse.from(student, false, accessToken, refreshToken);
+        Point point = pointService.createPoint(student);
+        return UserResponse.fromOnboard(student, false, accessToken, refreshToken, point);
     }
 
     private String createAndSaveToken(Student student) {
