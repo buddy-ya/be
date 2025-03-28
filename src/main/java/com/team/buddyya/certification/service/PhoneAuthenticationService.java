@@ -64,7 +64,7 @@ public class PhoneAuthenticationService {
     }
 
     @Transactional(readOnly = true)
-    public void verifyCode(String phoneNumber, String inputCode, String deviceId) {
+    public void verifyCode(String phoneNumber, String inputCode, String udId) {
         RegisteredPhone registeredPhone = registeredPhoneRepository.findByPhoneNumber(phoneNumber)
                 .orElseThrow(() -> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.PHONE_NOT_FOUND));
         if (testAccountRepository.findByPhoneNumber(phoneNumber).isPresent()) {
@@ -73,7 +73,7 @@ public class PhoneAuthenticationService {
         if (!inputCode.equals(registeredPhone.getAuthenticationCode())) {
             throw new PhoneAuthenticationException(PhoneAuthenticationExceptionType.CODE_MISMATCH);
         }
-        PhoneInfo phoneInfo = phoneInfoRepository.findPhoneInfoByUdId(deviceId)
+        PhoneInfo phoneInfo = phoneInfoRepository.findPhoneInfoByUdId(udId)
                 .orElseThrow(()-> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.PHONE_INFO_NOT_FOUND));
         phoneInfo.resetMessageSendCount();
     }
