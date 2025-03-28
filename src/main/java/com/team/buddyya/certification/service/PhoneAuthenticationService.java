@@ -49,7 +49,7 @@ public class PhoneAuthenticationService {
 
     public void savePhoneInfo(SavePhoneInfoRequest request){
         phoneInfoRepository.save(PhoneInfo.builder()
-                .udId(request.phoneInfo())
+                .udId(request.udId())
                 .build());
     }
 
@@ -73,7 +73,7 @@ public class PhoneAuthenticationService {
         if (!inputCode.equals(registeredPhone.getAuthenticationCode())) {
             throw new PhoneAuthenticationException(PhoneAuthenticationExceptionType.CODE_MISMATCH);
         }
-        PhoneInfo phoneInfo = phoneInfoRepository.findPhoneInfoByDeviceId(deviceId)
+        PhoneInfo phoneInfo = phoneInfoRepository.findPhoneInfoByUdId(deviceId)
                 .orElseThrow(()-> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.PHONE_INFO_NOT_FOUND));
         phoneInfo.resetMessageSendCount();
     }

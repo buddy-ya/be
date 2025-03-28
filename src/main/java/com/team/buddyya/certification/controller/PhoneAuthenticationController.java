@@ -41,7 +41,7 @@ public class PhoneAuthenticationController {
 
     @PostMapping("/verify-code")
     public ResponseEntity<UserResponse> verifyCode(@RequestBody VerifyCodeRequest request) {
-        phoneAuthenticationService.verifyCode(request.phoneNumber(), request.code(), request.phoneInfo());
+        phoneAuthenticationService.verifyCode(request.phoneNumber(), request.code(), request.udId());
         UserResponse response = phoneAuthenticationService.checkMembership(request.phoneNumber());
         return ResponseEntity.ok(response);
     }
