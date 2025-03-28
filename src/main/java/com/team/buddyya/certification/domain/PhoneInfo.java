@@ -21,15 +21,16 @@ public class PhoneInfo {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String deviceId;
+    @Column(name = "ud_id", nullable = false, unique = true)
+
+    private String udId;
 
     @Column(name = "send_Message_count", nullable = false)
     private int sendMessageCount;
 
     @Builder
-    public PhoneInfo(String deviceId, int sendMessageCount) {
-        this.deviceId = deviceId;
+    public PhoneInfo(String udId, int sendMessageCount) {
+        this.udId = udId;
         this.sendMessageCount = INITIAL_AUTHENTICATION_COUNT;
     }
 
