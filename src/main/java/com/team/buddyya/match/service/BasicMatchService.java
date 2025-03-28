@@ -62,7 +62,7 @@ public class BasicMatchService implements MatchService {
         if (optionalMatchRequest.isPresent()) {
             return processMatchSuccess(student, universityType, genderType, optionalMatchRequest.get(), point);
         }
-        MatchRequest newMatchRequest = createMatchRequest(student, universityType, genderType, MatchRequestStatus.MATCH_PENDING);
+        MatchRequest newMatchRequest = createMatchRequest(student, null, universityType, genderType, MatchRequestStatus.MATCH_PENDING);
         return MatchResponse.from(newMatchRequest, point);
     }
 
@@ -159,18 +159,20 @@ public class BasicMatchService implements MatchService {
                 .build();
         matchedHistoryRepository.save(requestedMatchedHistory);
         matchedHistoryRepository.save(existingMatchedHistory);
-        MatchRequest newMatchRequest = createMatchRequest(student, universityType, genderType, MatchRequestStatus.MATCH_SUCCESS);
-        matchRequest.updateMatchRequestStatusSuccess();
         Chatroom chatroom = chatService.createChatroom(student, matchedStudent);
+        MatchRequest newMatchRequest = createMatchRequest(student, chatroom.getId(), universityType, genderType, MatchRequestStatus.MATCH_SUCCESS);
+        matchRequest.updateMatchRequestStatusSuccess();
+        matchRequest.updateChatRoomId(chatroom.getId());
         notificationService.sendMatchSuccessNotification(student, chatroom.getId());
         notificationService.sendMatchSuccessNotification(matchedStudent, chatroom.getId());
         return MatchResponse.from(chatroom, matchedStudent, newMatchRequest, point, false);
     }
 
-    private MatchRequest createMatchRequest(Student student,
+    private MatchRequest createMatchRequest(Student student, Long chatRoomId,
                                             UniversityType universityType, GenderType genderType, MatchRequestStatus status) {
         MatchRequest matchRequest = MatchRequest.builder()
                 .student(student)
+                .chatRoomId(chatRoomId)
                 .isKorean(student.getIsKorean())
                 .universityType(universityType)
                 .genderType(genderType)
