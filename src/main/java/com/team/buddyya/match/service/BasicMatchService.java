@@ -23,6 +23,7 @@ import com.team.buddyya.student.domain.Gender;
 import com.team.buddyya.point.domain.Point;
 import com.team.buddyya.point.domain.PointType;
 import com.team.buddyya.student.domain.Student;
+import com.team.buddyya.student.repository.BlockRepository;
 import com.team.buddyya.student.service.FindStudentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -45,6 +46,7 @@ public class BasicMatchService implements MatchService {
     private final NotificationService notificationService;
     private final FindPointService findPointService;
     private final UpdatePointService updatePointService;
+    private final BlockRepository blockRepository;
 
     @Override
     public MatchResponse requestMatch(Long studentId, MatchCreateRequest request) {
@@ -53,11 +55,13 @@ public class BasicMatchService implements MatchService {
         UniversityType universityType = UniversityType.fromValue(request.universityType());
         GenderType genderType = GenderType.fromValue(request.genderType());
         Set<Long> existingBuddies = matchedHistoryRepository.findBuddyIdsByStudentId(studentId);
+        Set<Long> blockedStudentIds = blockRepository.findBlockedStudentIdByBlockerId(studentId);
         Optional<MatchRequest> optionalMatchRequest = findValidMatchRequest(
                 student,
                 universityType,
                 genderType,
-                existingBuddies
+                existingBuddies,
+                blockedStudentIds
         );
         if (optionalMatchRequest.isPresent()) {
             return processMatchSuccess(student, universityType, genderType, optionalMatchRequest.get(), point);
@@ -105,19 +109,23 @@ public class BasicMatchService implements MatchService {
     }
 
     private Optional<MatchRequest> findValidMatchRequest(
-            Student requestedStudent, UniversityType universityType, GenderType genderType, Set<Long> existingBuddies) {
+            Student requestedStudent, UniversityType universityType, GenderType genderType, Set<Long> existingBuddies, Set<Long> blockedStudentIds) {
         return matchRequestRepository.findAllPendingMatches(requestedStudent.getIsKorean()).stream()
-                .filter(matchRequest -> isValidMatchRequest(requestedStudent, matchRequest, universityType, genderType, existingBuddies))
+                .filter(matchRequest -> isValidMatchRequest(requestedStudent, matchRequest, universityType, genderType, existingBuddies, blockedStudentIds))
                 .findFirst();
     }
 
     private boolean isValidMatchRequest(
             Student requestedStudent, MatchRequest matchRequest,
-            UniversityType requestedUniversityType, GenderType requestedGenderType, Set<Long> existingBuddies) {
+            UniversityType requestedUniversityType, GenderType requestedGenderType,
+            Set<Long> existingBuddies, Set<Long> blockedStudentIds) {
         Gender requestedGender = requestedStudent.getGender();
         Long requestedUniversityId = requestedStudent.getUniversity().getId();
         Student matchStudent = matchRequest.getStudent();
         if (existingBuddies.contains(matchStudent.getId())) {
+            return false;
+        }
+        if (blockedStudentIds.contains(matchStudent.getId())){
             return false;
         }
         boolean isAlreadyExistChatroom = chatroomRepository.findByUserAndBuddy(requestedStudent.getId(), matchStudent.getId()).isPresent();
