@@ -1,0 +1,2 @@
+ALTER TABLE student
+    MODIFY COLUMN phone_number VARCHAR(128) NOT NULL;
