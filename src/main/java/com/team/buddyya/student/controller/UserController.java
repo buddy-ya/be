@@ -44,6 +44,12 @@ public class UserController {
         return ResponseEntity.ok(studentService.getUserInfo(userDetails.getStudentInfo(), userId));
     }
 
+    @GetMapping("/phoneNumber")
+    public ResponseEntity<String> getPhoneNumber(@AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        return ResponseEntity.ok(studentService.getPhoneNumber(userDetails.getStudentInfo()));
+    }
+
     @PatchMapping
     public ResponseEntity<UserResponse> updateUser(
             @AuthenticationPrincipal CustomUserDetails userDetails,
