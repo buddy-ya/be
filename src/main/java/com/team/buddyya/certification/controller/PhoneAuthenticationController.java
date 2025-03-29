@@ -1,5 +1,6 @@
 package com.team.buddyya.certification.controller;
 
+import com.team.buddyya.certification.domain.RegisteredPhone;
 import com.team.buddyya.certification.dto.request.AdminAccountRequest;
 import com.team.buddyya.certification.dto.request.SendCodeRequest;
 import com.team.buddyya.certification.dto.request.TestAccountRequest;

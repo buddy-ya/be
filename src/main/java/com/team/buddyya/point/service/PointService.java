@@ -1,6 +1,10 @@
 package com.team.buddyya.point.service;
 
 import com.team.buddyya.auth.domain.StudentInfo;
+import com.team.buddyya.certification.domain.RegisteredPhone;
+import com.team.buddyya.certification.exception.PhoneAuthenticationException;
+import com.team.buddyya.certification.exception.PhoneAuthenticationExceptionType;
+import com.team.buddyya.certification.repository.RegisteredPhoneRepository;
 import com.team.buddyya.point.domain.Point;
 import com.team.buddyya.point.domain.PointStatus;
 import com.team.buddyya.point.domain.PointType;
@@ -26,20 +30,36 @@ public class PointService {
     private final PointStatusRepository pointStatusRepository;
     private final FindStudentService findStudentService;
     private final FindPointService findPointService;
+    private final RegisteredPhoneRepository registeredPhoneRepository;
 
     public Point createPoint(Student student) {
+        RegisteredPhone registeredPhone = registeredPhoneRepository.findByPhoneNumber(student.getPhoneNumber())
+                .orElseThrow(() -> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.PHONE_NOT_FOUND));
+        boolean isDeleted = registeredPhone.getIsDeleted();
+        PointType pointType = isDeleted ? PointType.NO_POINT_CHANGE : PointType.SIGNUP;
+        Point point = createAndSavePoint(student, pointType);
+        createAndSavePointStatus(point, pointType);
+        if (isDeleted) {
+            registeredPhone.updateIsDeleted(false);
+        }
+        return point;
+    }
+
+    private Point createAndSavePoint(Student student, PointType pointType) {
         Point point = Point.builder()
                 .student(student)
-                .currentPoint(PointType.SIGNUP.getPointChange())
+                .currentPoint(pointType.getPointChange())
                 .build();
-        pointRepository.save(point);
-        PointStatus signUpPointStatus = PointStatus.builder()
+        return pointRepository.save(point);
+    }
+
+    private void createAndSavePointStatus(Point point, PointType pointType) {
+        PointStatus pointStatus = PointStatus.builder()
                 .point(point)
-                .pointType(PointType.SIGNUP)
-                .changedPoint(PointType.SIGNUP.getPointChange())
+                .pointType(pointType)
+                .changedPoint(pointType.getPointChange())
                 .build();
-        pointStatusRepository.save(signUpPointStatus);
-        return point;
+        pointStatusRepository.save(pointStatus);
     }
 
     public PointListResponse getPoints(StudentInfo studentInfo){
