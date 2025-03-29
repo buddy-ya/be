@@ -2,6 +2,9 @@ package com.team.buddyya.student.service;
 
 import com.team.buddyya.auth.domain.StudentInfo;
 import com.team.buddyya.auth.repository.AuthTokenRepository;
+import com.team.buddyya.certification.domain.RegisteredPhone;
+import com.team.buddyya.certification.exception.PhoneAuthenticationException;
+import com.team.buddyya.certification.exception.PhoneAuthenticationExceptionType;
 import com.team.buddyya.certification.repository.RegisteredPhoneRepository;
 import com.team.buddyya.certification.repository.StudentEmailRepository;
 import com.team.buddyya.certification.repository.StudentIdCardRepository;
@@ -138,8 +141,10 @@ public class StudentService {
             studentIdCardRepository.delete(student.getStudentIdCard());
         }
         profileImageService.setDefaultProfileImage(student);
-        registeredPhoneRepository.deleteByPhoneNumber(student.getPhoneNumber());
         studentEmailRepository.deleteByEmail(student.getEmail());
+        RegisteredPhone registeredPhone = registeredPhoneRepository.findByPhoneNumber(student.getPhoneNumber())
+                .orElseThrow(() -> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.PHONE_NOT_FOUND));
+        registeredPhone.updateIsDeleted(true);
         student.markAsDeleted();
     }
 
