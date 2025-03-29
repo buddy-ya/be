@@ -37,32 +37,31 @@ public class PointService {
                 .orElseThrow(() -> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.PHONE_NOT_FOUND));
         boolean isDeleted = registeredPhone.getIsDeleted();
         PointType pointType = isDeleted ? PointType.NO_POINT_CHANGE : PointType.SIGNUP;
-        Point point = createAndSavePoint(student, pointType);
-        createAndSavePointStatus(point, pointType);
+        Point point = createAndSavePoint(student, pointType, isDeleted);
         if (isDeleted) {
             registeredPhone.updateIsDeleted(false);
         }
         return point;
     }
 
-    private Point createAndSavePoint(Student student, PointType pointType) {
+    private Point createAndSavePoint(Student student, PointType pointType, boolean isDeleted) {
         Point point = Point.builder()
                 .student(student)
                 .currentPoint(pointType.getPointChange())
                 .build();
-        return pointRepository.save(point);
+        pointRepository.save(point);
+        if (!isDeleted) {
+            PointStatus pointStatus = PointStatus.builder()
+                    .point(point)
+                    .pointType(pointType)
+                    .changedPoint(pointType.getPointChange())
+                    .build();
+            pointStatusRepository.save(pointStatus);
+        }
+        return point;
     }
 
-    private void createAndSavePointStatus(Point point, PointType pointType) {
-        PointStatus pointStatus = PointStatus.builder()
-                .point(point)
-                .pointType(pointType)
-                .changedPoint(pointType.getPointChange())
-                .build();
-        pointStatusRepository.save(pointStatus);
-    }
-
-    public PointListResponse getPoints(StudentInfo studentInfo){
+    public PointListResponse getPoints(StudentInfo studentInfo) {
         Student student = findStudentService.findByStudentId(studentInfo.id());
         Point point = findPointService.findByStudent(student);
         List<PointStatus> pointStatuses = pointStatusRepository.findAllByPointOrderByCreatedDateDesc(point);
