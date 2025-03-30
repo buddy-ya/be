@@ -30,11 +30,12 @@ public record UserResponse(
         LocalDateTime banExpiration,
         String banReason,
         Integer point,
+        Integer totalUnreadCount,
         String accessToken,
         String refreshToken
 ) {
 
-    public static UserResponse fromUserInfo(Student student, boolean isStudentIdCardRequested, Point point) {
+    public static UserResponse fromUserInfo(Student student, boolean isStudentIdCardRequested, Point point, Integer totalUnreadCount) {
         return new UserResponse(
                 student.getId(),
                 student.getRole().name(),
@@ -55,6 +56,7 @@ public record UserResponse(
                 null,
                 null,
                 point.getCurrentPoint(),
+                totalUnreadCount,
                 null,
                 null
         );
@@ -76,6 +78,7 @@ public record UserResponse(
                 convertToStringList(student.getMajors()),
                 convertToStringList(student.getLanguages()),
                 convertToStringList(student.getInterests()),
+                null,
                 null,
                 null,
                 null,
@@ -107,6 +110,7 @@ public record UserResponse(
                 student.getBanEndTime(),
                 student.getBanReason(),
                 point.getCurrentPoint(),
+                null,
                 accessToken,
                 refreshToken
         );
@@ -133,6 +137,7 @@ public record UserResponse(
                 student.getBanEndTime(),
                 student.getBanReason(),
                 point.getCurrentPoint(),
+                null,
                 accessToken,
                 refreshToken
         );
@@ -156,6 +161,7 @@ public record UserResponse(
                 null,
                 status,
                 false,
+                null,
                 null,
                 null,
                 null,

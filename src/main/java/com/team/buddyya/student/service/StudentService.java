@@ -5,6 +5,7 @@ import com.team.buddyya.auth.repository.AuthTokenRepository;
 import com.team.buddyya.certification.repository.RegisteredPhoneRepository;
 import com.team.buddyya.certification.repository.StudentEmailRepository;
 import com.team.buddyya.certification.repository.StudentIdCardRepository;
+import com.team.buddyya.chatting.domain.ChatroomStudent;
 import com.team.buddyya.common.service.S3UploadService;
 import com.team.buddyya.notification.repository.ExpoTokenRepository;
 import com.team.buddyya.point.domain.Point;
@@ -17,7 +18,9 @@ import com.team.buddyya.student.dto.response.BlockResponse;
 import com.team.buddyya.student.dto.response.UserResponse;
 import com.team.buddyya.student.exception.StudentException;
 import com.team.buddyya.student.exception.StudentExceptionType;
-import com.team.buddyya.student.repository.*;
+import com.team.buddyya.student.repository.BlockRepository;
+import com.team.buddyya.student.repository.StudentRepository;
+import com.team.buddyya.student.repository.UniversityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -88,7 +91,8 @@ public class StudentService {
         Point point = findPointService.findByStudent(student);
         boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
                 .isPresent();
-        return UserResponse.fromUserInfo(student, isStudentIdCardRequested, point);
+        int totalUnreadCount = calculateTotalUnreadCount(student);
+        return UserResponse.fromUserInfo(student, isStudentIdCardRequested, point, totalUnreadCount);
     }
 
     public UserResponse updateUserProfileImage(StudentInfo studentInfo, boolean isDefault, UpdateProfileImageRequest request) {
@@ -96,13 +100,14 @@ public class StudentService {
         Point point = findPointService.findByStudent(student);
         boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
                 .isPresent();
+        int totalUnreadCount = calculateTotalUnreadCount(student);
         if (isDefault) {
             profileImageService.updateUserProfileImage(student, USER_PROFILE_DEFAULT_IMAGE.getUrl());
-            return UserResponse.fromUserInfo(student, isStudentIdCardRequested, point);
+            return UserResponse.fromUserInfo(student, isStudentIdCardRequested, point, totalUnreadCount);
         }
         String imageUrl = s3UploadService.uploadFile(PROFILE_IMAGE.getDirectoryName(), request.profileImage());
         profileImageService.updateUserProfileImage(student, imageUrl);
-        return UserResponse.fromUserInfo(student, isStudentIdCardRequested, point);
+        return UserResponse.fromUserInfo(student, isStudentIdCardRequested, point, totalUnreadCount);
     }
 
     public UserResponse getUserInfo(StudentInfo studentInfo, Long userId) {
@@ -113,7 +118,8 @@ public class StudentService {
         Point point = findPointService.findByStudent(student);
         boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
                 .isPresent();
-        return UserResponse.fromUserInfo(student, isStudentIdCardRequested, point);
+        int totalUnreadCount = calculateTotalUnreadCount(student);
+        return UserResponse.fromUserInfo(student, isStudentIdCardRequested, point, totalUnreadCount);
     }
 
     public void updateStudentCertification(Student student) {
@@ -169,5 +175,14 @@ public class StudentService {
             expoTokenRepository.delete(student.getExpoToken());
         }
         student.getAvatar().setLoggedOut(true);
+    }
+
+    private int calculateTotalUnreadCount(Student student) {
+        return (int) student.getChatroomStudents()
+                .stream()
+                .filter(chatroomStudent -> !chatroomStudent.getIsExited())
+                .map(ChatroomStudent::getUnreadCount)
+                .filter(count -> count > 0)
+                .count();
     }
 }
