@@ -10,6 +10,7 @@ import com.team.buddyya.certification.dto.response.SendCodeResponse;
 import com.team.buddyya.certification.dto.response.TestAccountResponse;
 import com.team.buddyya.certification.service.MessageSendService;
 import com.team.buddyya.certification.service.PhoneAuthenticationService;
+import com.team.buddyya.certification.service.SendCodeFacadeService;
 import com.team.buddyya.student.dto.response.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,13 +24,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class PhoneAuthenticationController {
 
+    private final SendCodeFacadeService sendCodeFacadeService;
     private final PhoneAuthenticationService phoneAuthenticationService;
-    private final MessageSendService messageSendService;
 
     @PostMapping("/send-code")
     public ResponseEntity<SendCodeResponse> sendOne(@RequestBody SendCodeRequest request) {
-        String generatedCode = messageSendService.sendMessage(request);
-        SendCodeResponse response = phoneAuthenticationService.saveCode(request.phoneNumber(), generatedCode);
+        SendCodeResponse response = sendCodeFacadeService.sendCodeAndSave(request);
         return ResponseEntity.ok(response);
     }
 
