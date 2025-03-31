@@ -21,7 +21,7 @@ public class RegisteredPhone extends CreatedTime {
     @Column(length = 11, nullable = false, unique = true)
     private String phoneNumber;
 
-    @Column(length = 6, nullable = false, unique = true)
+    @Column(length = 6, nullable = false)
     private String authenticationCode;
 
     @Column(name = "has_withdrawn", nullable = false)
