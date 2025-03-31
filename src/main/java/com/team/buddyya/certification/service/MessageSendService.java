@@ -49,12 +49,8 @@ public class MessageSendService {
     }
 
     public String sendMessage(SendCodeRequest request) {
-        if (request.phoneNumber() != null) {
-            PhoneInfo phoneInfo = findOrCreatePhoneInfo(request.udId());
-            if (phoneInfo.isMaxSendMessageCount()) {
-                throw new PhoneAuthenticationException(PhoneAuthenticationExceptionType.MAX_SMS_SEND_COUNT);
-            }
-            phoneInfo.increaseMessageSendCount();
+        if (request.udId() != null) {
+            validateMessageCount(request.udId());
         }
         String generatedCode = generateRandomNumber();
         if (testAccountRepository.findByPhoneNumber(request.phoneNumber()).isPresent()) {
@@ -66,6 +62,14 @@ public class MessageSendService {
             throw new PhoneAuthenticationException(PhoneAuthenticationExceptionType.SMS_SEND_FAILED);
         }
         return generatedCode;
+    }
+
+    private void validateMessageCount(String udId){
+        PhoneInfo phoneInfo = findOrCreatePhoneInfo(udId);
+        if (phoneInfo.isMaxSendMessageCount()) {
+            throw new PhoneAuthenticationException(PhoneAuthenticationExceptionType.MAX_SMS_SEND_COUNT);
+        }
+        phoneInfo.increaseMessageSendCount();
     }
 
     private PhoneInfo findOrCreatePhoneInfo(String udId) {

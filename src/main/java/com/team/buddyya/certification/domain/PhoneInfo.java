@@ -21,7 +21,7 @@ public class PhoneInfo {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @Column(name = "ud_id", unique = true)
+    @Column(name = "udid", unique = true)
     private String udId;
 
     @Column(name = "send_Message_count", nullable = false)
