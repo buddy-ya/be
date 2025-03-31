@@ -24,12 +24,20 @@ public class RegisteredPhone extends CreatedTime {
     @Column(length = 6, nullable = false, unique = true)
     private String authenticationCode;
 
-    public RegisteredPhone(String phoneNumber, String authenticationCode) {
+    @Column(name = "has_withdrawn", nullable = false)
+    private Boolean hasWithdrawn;
+
+    public RegisteredPhone(String phoneNumber, String authenticationCode, boolean hasWithdrawn) {
         this.phoneNumber = phoneNumber;
         this.authenticationCode = authenticationCode;
+        this.hasWithdrawn = hasWithdrawn;
     }
 
     public void updateAuthenticationCode(String authenticationCode) {
         this.authenticationCode = authenticationCode;
+    }
+
+    public void updateHasWithDrawn(boolean hasWithdrawn) {
+        this.hasWithdrawn = hasWithdrawn;
     }
 }

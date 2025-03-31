@@ -48,11 +48,7 @@ public class PhoneAuthenticationService {
     private String testPhoneNumberPrefix;
 
     public SendCodeResponse saveCode(String phoneNumber, String generatedCode) {
-        RegisteredPhone registeredPhone = registeredPhoneRepository.findByPhoneNumber(phoneNumber)
-                .orElseGet(() -> new RegisteredPhone(phoneNumber, generatedCode));
-        if (registeredPhone.getId() != null) {
-            registeredPhone.updateAuthenticationCode(generatedCode);
-        }
+        RegisteredPhone registeredPhone = getOrCreatePhone(phoneNumber, generatedCode);
         registeredPhoneRepository.save(registeredPhone);
         return new SendCodeResponse(phoneNumber);
     }
@@ -84,6 +80,15 @@ public class PhoneAuthenticationService {
             return UserResponse.fromCheckMembership(student, isStudentIdCardRequested, EXISTING_MEMBER, accessToken, refreshToken, point);
         }
         return UserResponse.fromCheckMembership(NEW_MEMBER);
+    }
+
+    private RegisteredPhone getOrCreatePhone(String phoneNumber, String generatedCode) {
+        return registeredPhoneRepository.findByPhoneNumber(phoneNumber)
+                .map(phone -> {
+                    phone.updateAuthenticationCode(generatedCode);
+                    return phone;
+                })
+                .orElse(new RegisteredPhone(phoneNumber, generatedCode, false));
     }
 
     public TestAccountResponse isTestAccount(String phoneNumber) {
