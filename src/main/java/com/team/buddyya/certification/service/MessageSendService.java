@@ -49,8 +49,7 @@ public class MessageSendService {
     }
 
     public String sendMessage(SendCodeRequest request) {
-        PhoneInfo phoneInfo = phoneInfoRepository.findPhoneInfoByUdId(request.udId())
-                .orElseThrow(() -> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.PHONE_INFO_NOT_FOUND));
+        PhoneInfo phoneInfo = findOrCreatePhoneInfo(request.udId());
         if (phoneInfo.isMaxSendMessageCount()) {
             throw new PhoneAuthenticationException(PhoneAuthenticationExceptionType.MAX_SMS_SEND_COUNT);
         }
@@ -65,6 +64,14 @@ public class MessageSendService {
         }
         phoneInfo.increaseMessageSendCount();
         return generatedCode;
+    }
+
+    private PhoneInfo findOrCreatePhoneInfo(String udId) {
+        return phoneInfoRepository.findPhoneInfoByUdId(udId)
+                .orElseGet(() -> phoneInfoRepository.save(
+                        PhoneInfo.builder()
+                                .udId(udId)
+                                .build()));
     }
 
     private String generateRandomNumber() {
