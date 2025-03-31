@@ -5,8 +5,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
-
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.*;
 
@@ -26,20 +24,20 @@ public class RegisteredPhone extends CreatedTime {
     @Column(length = 6, nullable = false, unique = true)
     private String authenticationCode;
 
-    @Column(name = "deleted", nullable = false)
-    private Boolean isDeleted;
+    @Column(name = "has_withdrawn", nullable = false)
+    private Boolean hasWithdrawn;
 
-    public RegisteredPhone(String phoneNumber, String authenticationCode, boolean isDeleted) {
+    public RegisteredPhone(String phoneNumber, String authenticationCode, boolean hasWithdrawn) {
         this.phoneNumber = phoneNumber;
         this.authenticationCode = authenticationCode;
-        this.isDeleted = isDeleted;
+        this.hasWithdrawn = hasWithdrawn;
     }
 
     public void updateAuthenticationCode(String authenticationCode) {
         this.authenticationCode = authenticationCode;
     }
 
-    public void updateIsDeleted(boolean isDeleted) {
-        this.isDeleted = isDeleted;
+    public void updateHasWithDrawn(boolean hasWithdrawn) {
+        this.hasWithdrawn = hasWithdrawn;
     }
 }

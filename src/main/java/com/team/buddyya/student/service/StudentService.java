@@ -11,7 +11,6 @@ import com.team.buddyya.certification.repository.StudentIdCardRepository;
 import com.team.buddyya.common.service.S3UploadService;
 import com.team.buddyya.notification.repository.ExpoTokenRepository;
 import com.team.buddyya.point.domain.Point;
-import com.team.buddyya.point.dto.PointResponse;
 import com.team.buddyya.point.repository.PointRepository;
 import com.team.buddyya.point.repository.PointStatusRepository;
 import com.team.buddyya.point.service.FindPointService;
@@ -153,7 +152,7 @@ public class StudentService {
         studentEmailRepository.deleteByEmail(student.getEmail());
         RegisteredPhone registeredPhone = registeredPhoneRepository.findByPhoneNumber(student.getPhoneNumber())
                 .orElseThrow(() -> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.PHONE_NOT_FOUND));
-        registeredPhone.updateIsDeleted(true);
+        registeredPhone.updateHasWithDrawn(true);
         student.markAsDeleted();
     }
 

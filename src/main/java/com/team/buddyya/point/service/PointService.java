@@ -35,22 +35,19 @@ public class PointService {
     public Point createPoint(Student student) {
         RegisteredPhone registeredPhone = registeredPhoneRepository.findByPhoneNumber(student.getPhoneNumber())
                 .orElseThrow(() -> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.PHONE_NOT_FOUND));
-        boolean isDeleted = registeredPhone.getIsDeleted();
-        PointType pointType = isDeleted ? PointType.NO_POINT_CHANGE : PointType.SIGNUP;
-        Point point = createAndSavePoint(student, pointType, isDeleted);
-        if (isDeleted) {
-            registeredPhone.updateIsDeleted(false);
-        }
+        boolean hasWithdrawn = registeredPhone.getHasWithdrawn();
+        PointType pointType = hasWithdrawn ? PointType.NO_POINT_CHANGE : PointType.SIGNUP;
+        Point point = createAndSavePoint(student, pointType, hasWithdrawn);
         return point;
     }
 
-    private Point createAndSavePoint(Student student, PointType pointType, boolean isDeleted) {
+    private Point createAndSavePoint(Student student, PointType pointType, boolean hasWithdrawn) {
         Point point = Point.builder()
                 .student(student)
                 .currentPoint(pointType.getPointChange())
                 .build();
         pointRepository.save(point);
-        if (!isDeleted) {
+        if (!hasWithdrawn) {
             PointStatus pointStatus = PointStatus.builder()
                     .point(point)
                     .pointType(pointType)
