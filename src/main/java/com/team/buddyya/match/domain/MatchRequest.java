@@ -22,7 +22,7 @@ public class MatchRequest extends BaseTime {
     @JoinColumn(name = "student_id", nullable = false)
     private Student student;
 
-    @Column(name = "chat_room_id")
+    @Column(name = "chatroom_id")
     private Long chatroomId;
 
     @Column(name = "university_id", nullable = false)
