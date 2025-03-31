@@ -6,6 +6,7 @@ import com.team.buddyya.certification.repository.RegisteredPhoneRepository;
 import com.team.buddyya.certification.repository.StudentEmailRepository;
 import com.team.buddyya.certification.repository.StudentIdCardRepository;
 import com.team.buddyya.common.service.S3UploadService;
+import com.team.buddyya.match.repository.MatchRequestRepository;
 import com.team.buddyya.notification.repository.ExpoTokenRepository;
 import com.team.buddyya.point.domain.Point;
 import com.team.buddyya.point.service.FindPointService;
@@ -44,6 +45,7 @@ public class StudentService {
     private final RegisteredPhoneRepository registeredPhoneRepository;
     private final StudentEmailRepository studentEmailRepository;
     private final FindPointService findPointService;
+    private final MatchRequestRepository matchRequestRepository;
 
     private static final String BLOCK_SUCCESS_MESSAGE = "차단이 성공적으로 완료되었습니다.";
 
@@ -139,6 +141,8 @@ public class StudentService {
         }
         profileImageService.setDefaultProfileImage(student);
         registeredPhoneRepository.deleteByPhoneNumber(student.getPhoneNumber());
+        matchRequestRepository.findByStudentId(student.getId())
+                .ifPresent(matchRequest -> matchRequestRepository.deleteByStudent(student));
         studentEmailRepository.deleteByEmail(student.getEmail());
         student.markAsDeleted();
     }
