@@ -3,12 +3,12 @@ package com.team.buddyya.student.controller;
 import com.team.buddyya.auth.domain.CustomUserDetails;
 import com.team.buddyya.feed.dto.response.feed.FeedListResponse;
 import com.team.buddyya.feed.service.FeedService;
+import com.team.buddyya.student.dto.request.ValidateInvitationCodeRequest;
 import com.team.buddyya.student.dto.request.MyPageUpdateRequest;
 import com.team.buddyya.student.dto.request.OnBoardingRequest;
 import com.team.buddyya.student.dto.request.UpdateProfileImageRequest;
-import com.team.buddyya.student.dto.response.BlockResponse;
-import com.team.buddyya.student.dto.response.UniversityResponse;
-import com.team.buddyya.student.dto.response.UserResponse;
+import com.team.buddyya.student.dto.response.*;
+import com.team.buddyya.student.service.InvitationService;
 import com.team.buddyya.student.service.OnBoardingService;
 import com.team.buddyya.student.service.StudentService;
 import com.team.buddyya.student.service.UniversityService;
@@ -31,6 +31,7 @@ public class UserController {
     private final StudentService studentService;
     private final FeedService feedService;
     private final UniversityService universityService;
+    private final InvitationService invitationService;
 
     @PostMapping
     public ResponseEntity<UserResponse> onboard(@RequestBody OnBoardingRequest request) {
@@ -94,5 +95,18 @@ public class UserController {
     @GetMapping("/universities")
     public ResponseEntity<List<UniversityResponse>> getActiveUniversity() {
         return ResponseEntity.ok(universityService.getActiveUniversities());
+    }
+
+    @GetMapping("/invitation-code")
+    public ResponseEntity<InvitationCodeResponse> getInvitationCode(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        InvitationCodeResponse response = invitationService.getInvitationCode(userDetails.getStudentInfo());
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/invitation-code")
+    public ResponseEntity<ValidateInvitationCodeResponse> getInvitationCode(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                                    @RequestBody ValidateInvitationCodeRequest request){
+        ValidateInvitationCodeResponse response = invitationService.validateInvitationCode(userDetails.getStudentInfo(), request.code());
+        return ResponseEntity.ok(response);
     }
 }
