@@ -26,6 +26,7 @@ public class OnBoardingService {
     private final ProfileImageService profileImageService;
     private final PointService pointService;
     private final AuthTokenRepository authTokenRepository;
+    private final InvitationService invitationService;
     private final JwtUtils jwtUtils;
 
     public UserResponse onboard(OnBoardingRequest request) {
@@ -37,6 +38,7 @@ public class OnBoardingService {
         studentMajorService.createStudentMajors(request.majors(), student);
         studentInterestService.createStudentInterests(request.interests(), student);
         studentLanguageService.createStudentLanguages(request.languages(), student);
+        invitationService.createInvitationCode(student);
         Point point = pointService.createPoint(student);
         return UserResponse.fromOnboard(student, false, accessToken, refreshToken, point);
     }
