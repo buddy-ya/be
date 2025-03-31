@@ -13,7 +13,11 @@ import com.team.buddyya.feed.repository.BookmarkRepository;
 import com.team.buddyya.feed.repository.FeedLikeRepository;
 import com.team.buddyya.feed.repository.FeedRepository;
 import com.team.buddyya.student.domain.Student;
+import com.team.buddyya.student.domain.University;
+import com.team.buddyya.student.exception.StudentException;
+import com.team.buddyya.student.exception.StudentExceptionType;
 import com.team.buddyya.student.repository.BlockRepository;
+import com.team.buddyya.student.repository.UniversityRepository;
 import com.team.buddyya.student.service.FindStudentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -43,6 +47,7 @@ public class FeedService {
     private final BookmarkRepository bookmarkRepository;
     private final FeedImageService feedImageService;
     private final BlockRepository blockRepository;
+    private final UniversityRepository universityRepository;
 
     @Transactional(readOnly = true)
     protected Feed findFeedByFeedId(Long feedId) {
@@ -132,13 +137,15 @@ public class FeedService {
 
     public void createFeed(StudentInfo studentInfo, FeedCreateRequest request) {
         Category category = categoryService.getCategory(request.category());
+        University university = universityRepository.findByUniversityName(request.university())
+                .orElseThrow(() -> new StudentException(StudentExceptionType.UNIVERSITY_NOT_FOUND));
         Student student = findStudentByStudentId(studentInfo.id());
         Feed feed = Feed.builder()
                 .title(request.title())
                 .content(request.content())
                 .student(student)
                 .category(category)
-                .university(student.getUniversity())
+                .university(university)
                 .build();
         feedRepository.save(feed);
         uploadImages(feed, request.images());
