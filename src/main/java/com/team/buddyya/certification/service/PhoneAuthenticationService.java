@@ -47,12 +47,6 @@ public class PhoneAuthenticationService {
     @Value("${test.phone.number.prefix}")
     private String testPhoneNumberPrefix;
 
-    public void savePhoneInfo(SavePhoneInfoRequest request){
-        phoneInfoRepository.save(PhoneInfo.builder()
-                .udId(request.udId())
-                .build());
-    }
-
     public SendCodeResponse saveCode(String phoneNumber, String generatedCode) {
         RegisteredPhone registeredPhone = registeredPhoneRepository.findByPhoneNumber(phoneNumber)
                 .orElseGet(() -> new RegisteredPhone(phoneNumber, generatedCode));

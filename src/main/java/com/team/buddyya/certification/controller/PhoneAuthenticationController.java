@@ -26,12 +26,6 @@ public class PhoneAuthenticationController {
     private final PhoneAuthenticationService phoneAuthenticationService;
     private final MessageSendService messageSendService;
 
-    @PostMapping("/save-phone-info")
-    public ResponseEntity<Void> savePhoneInfo(@RequestBody SavePhoneInfoRequest request){
-        phoneAuthenticationService.savePhoneInfo(request);
-        return ResponseEntity.ok().build();
-    }
-
     @PostMapping("/send-code")
     public ResponseEntity<SendCodeResponse> sendOne(@RequestBody SendCodeRequest request) {
         String generatedCode = messageSendService.sendMessage(request);
