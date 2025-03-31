@@ -92,7 +92,7 @@ public class BasicMatchService implements MatchService {
             return MatchStatusResponse.from(matchRequest.get());
         }
         if (status.equals(MatchRequestStatus.MATCH_SUCCESS)) {
-            Chatroom chatroom = chatroomRepository.findById(matchRequest.get().getChatRoomId())
+            Chatroom chatroom = chatroomRepository.findById(matchRequest.get().getChatroomId())
                     .orElseThrow(() -> new ChatException(ChatExceptionType.CHATROOM_NOT_FOUND));
             ChatroomStudent chatroomStudent = chatroomStudentRepository.findByChatroomAndStudentId(chatroom, studentId)
                     .orElseThrow(() -> new ChatException(ChatExceptionType.USER_NOT_PART_OF_CHATROOM));
@@ -162,17 +162,17 @@ public class BasicMatchService implements MatchService {
         Chatroom chatroom = chatService.createChatroom(student, matchedStudent);
         MatchRequest newMatchRequest = createMatchRequest(student, chatroom.getId(), universityType, genderType, MatchRequestStatus.MATCH_SUCCESS);
         matchRequest.updateMatchRequestStatusSuccess();
-        matchRequest.updateChatRoomId(chatroom.getId());
+        matchRequest.updateChatroomId(chatroom.getId());
         notificationService.sendMatchSuccessNotification(student, chatroom.getId());
         notificationService.sendMatchSuccessNotification(matchedStudent, chatroom.getId());
         return MatchResponse.from(chatroom, matchedStudent, newMatchRequest, point, false);
     }
 
-    private MatchRequest createMatchRequest(Student student, Long chatRoomId,
+    private MatchRequest createMatchRequest(Student student, Long chatroomId,
                                             UniversityType universityType, GenderType genderType, MatchRequestStatus status) {
         MatchRequest matchRequest = MatchRequest.builder()
                 .student(student)
-                .chatRoomId(chatRoomId)
+                .chatroomId(chatroomId)
                 .isKorean(student.getIsKorean())
                 .universityType(universityType)
                 .genderType(genderType)
