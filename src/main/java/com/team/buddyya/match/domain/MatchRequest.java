@@ -1,7 +1,6 @@
 package com.team.buddyya.match.domain;
 
 import com.team.buddyya.common.domain.BaseTime;
-import com.team.buddyya.student.domain.Gender;
 import com.team.buddyya.student.domain.Student;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -23,6 +22,9 @@ public class MatchRequest extends BaseTime {
     @JoinColumn(name = "student_id", nullable = false)
     private Student student;
 
+    @Column(name = "chatroom_id")
+    private Long chatroomId;
+
     @Column(name = "university_id", nullable = false)
     private Long universityId;
 
@@ -42,16 +44,21 @@ public class MatchRequest extends BaseTime {
     private Boolean isKorean;
 
     @Builder
-    public MatchRequest(Student student, Boolean isKorean, Long universityId, UniversityType universityType, GenderType genderType, MatchRequestStatus matchRequestStatus) {
+    public MatchRequest(Student student, Long chatroomId, Long universityId, UniversityType universityType, GenderType genderType, MatchRequestStatus matchRequestStatus, Boolean isKorean) {
         this.student = student;
-        this.isKorean = isKorean;
+        this.chatroomId = chatroomId;
         this.universityId = universityId;
         this.universityType = universityType;
-        this.matchRequestStatus = matchRequestStatus;
         this.genderType = genderType;
+        this.matchRequestStatus = matchRequestStatus;
+        this.isKorean = isKorean;
     }
 
     public void updateMatchRequestStatusSuccess() {
         this.matchRequestStatus = MatchRequestStatus.MATCH_SUCCESS;
+    }
+
+    public void updateChatroomId(Long chatroomId) {
+        this.chatroomId = chatroomId;
     }
 }
