@@ -4,6 +4,7 @@ import com.team.buddyya.auth.domain.AuthToken;
 import com.team.buddyya.certification.domain.StudentIdCard;
 import com.team.buddyya.chatting.domain.ChatroomStudent;
 import com.team.buddyya.common.domain.BaseTime;
+import com.team.buddyya.common.service.EncryptedConverter;
 import com.team.buddyya.notification.domain.ExpoToken;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -30,7 +31,8 @@ public class Student extends BaseTime {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @Column(length = 11, nullable = false, unique = true)
+    @Convert(converter = EncryptedConverter.class)
+    @Column(length = 128, nullable = false, unique = true)
     private String phoneNumber;
 
     @Column(length = 64, nullable = false)

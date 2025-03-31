@@ -4,7 +4,8 @@ import org.springframework.http.HttpStatus;
 
 public enum CommonExceptionType implements BaseExceptionType {
 
-    FILE_UPLOAD_ERROR(9000, HttpStatus.INTERNAL_SERVER_ERROR, "Error occurred during file upload.");
+    FILE_UPLOAD_ERROR(9000, HttpStatus.INTERNAL_SERVER_ERROR, "Error occurred during file upload."),
+    ENCRYPTION_ERROR(9001, HttpStatus.INTERNAL_SERVER_ERROR, "Encryption/Decryption error");
 
     private final int errorCode;
     private final HttpStatus httpStatus;
