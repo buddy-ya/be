@@ -1,6 +1,7 @@
 package com.team.buddyya.student.dto.response;
 
 import com.team.buddyya.point.domain.Point;
+import com.team.buddyya.student.domain.MatchingProfile;
 import com.team.buddyya.student.domain.Student;
 
 import java.time.LocalDateTime;
@@ -31,10 +32,13 @@ public record UserResponse(
         String banReason,
         Integer point,
         String accessToken,
-        String refreshToken
+        String refreshToken,
+        String introduction,
+        String buddyActivity,
+        Boolean isMatchingProfileCompleted
 ) {
 
-    public static UserResponse fromUserInfo(Student student, boolean isStudentIdCardRequested, Point point) {
+    public static UserResponse fromUserInfo(Student student, boolean isStudentIdCardRequested, Point point, MatchingProfile matchingProfile) {
         return new UserResponse(
                 student.getId(),
                 student.getRole().name(),
@@ -56,11 +60,14 @@ public record UserResponse(
                 null,
                 point.getCurrentPoint(),
                 null,
-                null
+                null,
+                matchingProfile.getIntroduction(),
+                matchingProfile.getBuddyActivity(),
+                matchingProfile.isCompleted()
         );
     }
 
-    public static UserResponse fromOtherUserInfo(Student student) {
+    public static UserResponse fromOtherUserInfo(Student student, MatchingProfile matchingProfile) {
         return new UserResponse(
                 student.getId(),
                 null,
@@ -82,7 +89,10 @@ public record UserResponse(
                 null,
                 null,
                 null,
-                null
+                null,
+                matchingProfile.getIntroduction(),
+                matchingProfile.getBuddyActivity(),
+                matchingProfile.isCompleted()
         );
     }
 
@@ -108,7 +118,10 @@ public record UserResponse(
                 student.getBanReason(),
                 point.getCurrentPoint(),
                 accessToken,
-                refreshToken
+                refreshToken,
+                null,
+                null,
+                null
         );
     }
 
@@ -134,7 +147,10 @@ public record UserResponse(
                 student.getBanReason(),
                 point.getCurrentPoint(),
                 accessToken,
-                refreshToken
+                refreshToken,
+                null,
+                null,
+                null
         );
     }
 
@@ -156,6 +172,9 @@ public record UserResponse(
                 null,
                 status,
                 false,
+                null,
+                null,
+                null,
                 null,
                 null,
                 null,

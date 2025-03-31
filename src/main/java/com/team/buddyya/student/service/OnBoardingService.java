@@ -6,9 +6,11 @@ import com.team.buddyya.auth.jwt.JwtUtils;
 import com.team.buddyya.auth.repository.AuthTokenRepository;
 import com.team.buddyya.point.domain.Point;
 import com.team.buddyya.point.service.PointService;
+import com.team.buddyya.student.domain.MatchingProfile;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.dto.request.OnBoardingRequest;
 import com.team.buddyya.student.dto.response.UserResponse;
+import com.team.buddyya.student.repository.MatchingProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +27,7 @@ public class OnBoardingService {
     private final StudentMajorService studentMajorService;
     private final ProfileImageService profileImageService;
     private final PointService pointService;
+    private final MatchingProfileRepository matchingProfileRepository;
     private final AuthTokenRepository authTokenRepository;
     private final JwtUtils jwtUtils;
 
@@ -37,6 +40,7 @@ public class OnBoardingService {
         studentMajorService.createStudentMajors(request.majors(), student);
         studentInterestService.createStudentInterests(request.interests(), student);
         studentLanguageService.createStudentLanguages(request.languages(), student);
+        matchingProfileRepository.save(new MatchingProfile(student));
         Point point = pointService.createPoint(student);
         return UserResponse.fromOnboard(student, false, accessToken, refreshToken, point);
     }
