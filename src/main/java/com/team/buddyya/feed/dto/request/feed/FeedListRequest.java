@@ -5,8 +5,4 @@ public record FeedListRequest(
         String category,
         String keyword
 ) {
-
-    public static FeedListRequest of(String category, String keyword) {
-        return new FeedListRequest(university, category, keyword);
-    }
 }

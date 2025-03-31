@@ -61,11 +61,18 @@ public class FeedService {
     }
 
     @Transactional(readOnly = true)
+    protected University findUniversityByUniversityName(String universityName) {
+        return universityRepository.findByUniversityName(universityName)
+                .orElseThrow(() -> new StudentException(StudentExceptionType.UNIVERSITY_NOT_FOUND));
+    }
+
+    @Transactional(readOnly = true)
     public FeedListResponse getFeeds(StudentInfo studentInfo, Pageable pageable, FeedListRequest request) {
         String keyword = request.keyword();
+        Student student = findStudentByStudentId(studentInfo.id());
         Page<Feed> feeds = (keyword == null || keyword.isBlank())
-                ? getFeedsByCategory(request, pageable)
-                : getFeedsByKeyword(keyword, pageable);
+                ? getFeedsByUniversityAndCategory(request, pageable)
+                : getFeedsByKeyword(student, keyword, pageable);
         Set<Long> blockedStudentIds = blockRepository.findBlockedStudentIdByBlockerId(studentInfo.id());
         List<FeedResponse> response = filterBlockedFeeds(feeds.getContent(), blockedStudentIds, studentInfo.id());
         return FeedListResponse.from(response, feeds);
@@ -81,14 +88,15 @@ public class FeedService {
     }
 
     @Transactional(readOnly = true)
-    Page<Feed> getFeedsByCategory(FeedListRequest request, Pageable pageable) {
+    Page<Feed> getFeedsByUniversityAndCategory(FeedListRequest request, Pageable pageable) {
+        University university = findUniversityByUniversityName(request.university());
         Category category = categoryService.getCategory(request.category());
         Pageable customPageable = PageRequest.of(
                 pageable.getPageNumber(),
                 pageable.getPageSize(),
                 getSortBy(category)
         );
-        return feedRepository.findAllByCategoryName(category.getName(), customPageable);
+        return feedRepository.findAllByUniversityAndCategory(university, category, customPageable);
     }
 
     @Transactional(readOnly = true)
@@ -117,8 +125,11 @@ public class FeedService {
     }
 
     @Transactional(readOnly = true)
-    Page<Feed> getFeedsByKeyword(String keyword, Pageable pageable) {
-        return feedRepository.findByTitleContainingOrContentContaining(keyword, keyword, pageable);
+    Page<Feed> getFeedsByKeyword(Student student, String keyword, Pageable pageable) {
+        University openUniversity = findUniversityByUniversityName("all");
+        List<University> universities = List.of(student.getUniversity(), openUniversity);
+        return feedRepository.findByTitleContainingOrContentContainingAndUniversityIn(
+                keyword, keyword, universities, pageable);
     }
 
     @Transactional(readOnly = true)
@@ -166,7 +177,8 @@ public class FeedService {
         feedRepository.delete(feed);
     }
 
-    private List<FeedResponse> filterBlockedFeeds(List<Feed> feeds, Set<Long> blockedStudentIds, Long currentStudentId) {
+    private List<FeedResponse> filterBlockedFeeds(List<Feed> feeds, Set<Long> blockedStudentIds,
+                                                  Long currentStudentId) {
         return feeds.stream()
                 .filter(feed -> !blockedStudentIds.contains(feed.getStudent().getId()))
                 .map(feed -> createFeedResponse(feed, currentStudentId))
