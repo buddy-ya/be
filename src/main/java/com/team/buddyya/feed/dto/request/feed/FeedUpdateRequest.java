@@ -7,7 +7,6 @@ import java.util.List;
 public record FeedUpdateRequest(
         String title,
         String content,
-        String university,
         String category,
         List<MultipartFile> images
 ) {
