@@ -16,7 +16,10 @@ public enum StudentExceptionType implements BaseExceptionType {
     INVALID_NAME_UPDATE_REQUEST(2001, HttpStatus.BAD_REQUEST, "Only one value is required for name update."),
     UNSUPPORTED_UPDATE_KEY(2002, HttpStatus.BAD_REQUEST, "Unsupported update key."),
     CANNOT_BLOCK_SELF(2010, HttpStatus.BAD_REQUEST, "You cannot block yourself."),
-    ALREADY_BLOCKED(2011, HttpStatus.CONFLICT, "User is already blocked.");
+    ALREADY_BLOCKED(2011, HttpStatus.CONFLICT, "User is already blocked."),
+    INVITATION_CODE_NOT_FOUND(2012, HttpStatus.NOT_FOUND, "Invitation code not found."),
+    INVALID_INVITATION_CODE(2013, HttpStatus.BAD_REQUEST, "This Invitation code is not valid."),
+    INVITATION_EVENT_ALREADY_PARTICIPATED(2014, HttpStatus.BAD_REQUEST, "You have already joined the invitation event.");
 
     private final int errorCode;
     private final HttpStatus httpStatus;
