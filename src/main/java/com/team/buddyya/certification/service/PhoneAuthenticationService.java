@@ -2,13 +2,16 @@ package com.team.buddyya.certification.service;
 
 import com.team.buddyya.auth.dto.request.TokenInfoRequest;
 import com.team.buddyya.auth.jwt.JwtUtils;
+import com.team.buddyya.certification.domain.PhoneInfo;
 import com.team.buddyya.certification.domain.RegisteredPhone;
 import com.team.buddyya.certification.dto.response.AdminAccountResponse;
+import com.team.buddyya.certification.dto.request.SavePhoneInfoRequest;
 import com.team.buddyya.certification.dto.response.SendCodeResponse;
 import com.team.buddyya.certification.dto.response.TestAccountResponse;
 import com.team.buddyya.certification.exception.PhoneAuthenticationException;
 import com.team.buddyya.certification.exception.PhoneAuthenticationExceptionType;
 import com.team.buddyya.certification.repository.AdminAccountRepository;
+import com.team.buddyya.certification.repository.PhoneInfoRepository;
 import com.team.buddyya.certification.repository.RegisteredPhoneRepository;
 import com.team.buddyya.certification.repository.StudentIdCardRepository;
 import com.team.buddyya.certification.repository.TestAccountRepository;
@@ -35,6 +38,7 @@ public class PhoneAuthenticationService {
     private final RegisteredPhoneRepository registeredPhoneRepository;
     private final StudentRepository studentRepository;
     private final StudentIdCardRepository studentIdCardRepository;
+    private final PhoneInfoRepository phoneInfoRepository;
     private final TestAccountRepository testAccountRepository;
     private final FindPointService findPointService;
     private final AdminAccountRepository adminAccountRepository;
@@ -54,7 +58,7 @@ public class PhoneAuthenticationService {
     }
 
     @Transactional(readOnly = true)
-    public void verifyCode(String phoneNumber, String inputCode) {
+    public void verifyCode(String phoneNumber, String inputCode, String udId) {
         RegisteredPhone registeredPhone = registeredPhoneRepository.findByPhoneNumber(phoneNumber)
                 .orElseThrow(() -> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.PHONE_NOT_FOUND));
         if (testAccountRepository.findByPhoneNumber(phoneNumber).isPresent()) {
@@ -63,6 +67,9 @@ public class PhoneAuthenticationService {
         if (!inputCode.equals(registeredPhone.getAuthenticationCode())) {
             throw new PhoneAuthenticationException(PhoneAuthenticationExceptionType.CODE_MISMATCH);
         }
+        PhoneInfo phoneInfo = phoneInfoRepository.findPhoneInfoByUdId(udId)
+                .orElseThrow(()-> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.PHONE_INFO_NOT_FOUND));
+        phoneInfo.resetMessageSendCount();
     }
 
     public UserResponse checkMembership(String phoneNumber) {
