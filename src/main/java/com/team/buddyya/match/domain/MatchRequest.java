@@ -59,7 +59,7 @@ public class MatchRequest extends BaseTime {
         this.matchRequestStatus = MatchRequestStatus.MATCH_SUCCESS;
     }
 
-    public void updateChatRoomId(long chatRoomId) {
+    public void updateChatRoomId(Long chatRoomId) {
         this.chatRoomId = chatRoomId;
     }
 }
