@@ -25,6 +25,7 @@ public record FeedResponse(
         boolean isLiked,
         boolean isBookmarked,
         boolean isProfileImageUpload,
+        boolean isStudentDeleted,
         LocalDateTime createdDate
 ) {
 
@@ -51,6 +52,7 @@ public record FeedResponse(
                 userAction.isLiked(),
                 userAction.isBookmarked(),
                 isProfileImageUpload,
+                feed.getStudent().getIsDeleted(),
                 feed.getCreatedDate()
         );
     }

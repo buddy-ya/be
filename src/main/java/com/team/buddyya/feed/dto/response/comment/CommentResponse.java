@@ -25,6 +25,7 @@ public record CommentResponse(
         boolean isCommentOwner,
         boolean isBlocked,
         boolean isProfileImageUpload,
+        boolean isStudentDeleted,
         List<CommentResponse> replies
 ) {
 
@@ -54,6 +55,7 @@ public record CommentResponse(
                 isCommentOwner,
                 isBlocked,
                 isProfileImageUpload,
+                comment.getStudent().getIsDeleted(),
                 replies
         );
     }
