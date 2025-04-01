@@ -38,7 +38,6 @@ public class OnBoardingService {
         studentMajorService.createStudentMajors(request.majors(), student);
         studentInterestService.createStudentInterests(request.interests(), student);
         studentLanguageService.createStudentLanguages(request.languages(), student);
-        invitationService.createInvitationCode(student);
         Point point = pointService.createPoint(student);
         return UserResponse.fromOnboard(student, false, accessToken, refreshToken, point);
     }

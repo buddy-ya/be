@@ -8,13 +8,12 @@ import com.team.buddyya.certification.repository.RegisteredPhoneRepository;
 import com.team.buddyya.point.domain.Point;
 import com.team.buddyya.point.domain.PointType;
 import com.team.buddyya.point.service.UpdatePointService;
-import com.team.buddyya.student.domain.InvitationCode;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.dto.response.InvitationCodeResponse;
 import com.team.buddyya.student.dto.response.ValidateInvitationCodeResponse;
 import com.team.buddyya.student.exception.StudentException;
 import com.team.buddyya.student.exception.StudentExceptionType;
-import com.team.buddyya.student.repository.InvitationCodeRepository;
+import com.team.buddyya.student.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,49 +29,38 @@ public class InvitationService {
     private static final int CODE_LENGTH = 6;
     private static final SecureRandom RANDOM = new SecureRandom();
 
-    private final InvitationCodeRepository invitationCodeRepository;
     private final RegisteredPhoneRepository registeredPhoneRepository;
     private final UpdatePointService updatePointService;
+    private final FindStudentService findStudentService;
+    private final StudentRepository studentRepository;
 
-    public void createInvitationCode(Student student) {
-        RegisteredPhone registeredPhone = findRegisteredPhone(student.getPhoneNumber());
-        String uniqueCode = generateUniqueCode();
-        InvitationCode invitationCode = InvitationCode.builder()
-                .code(uniqueCode)
-                .student(student)
-                .registeredPhone(registeredPhone)
-                .build();
-        invitationCodeRepository.save(invitationCode);
+    public String createInvitationCode() {
+        return generateUniqueCode();
     }
 
     @Transactional(readOnly = true)
     public InvitationCodeResponse getInvitationCode(StudentInfo studentInfo) {
-        InvitationCode invitationCode = invitationCodeRepository.findByStudentId(studentInfo.id())
-                .orElseThrow(() -> new StudentException(StudentExceptionType.INVITATION_CODE_NOT_FOUND));
-        return InvitationCodeResponse.from(invitationCode);
+        Student student = findStudentService.findByStudentId(studentInfo.id());
+        RegisteredPhone registeredPhone = findRegisteredPhone(student.getPhoneNumber());
+        return InvitationCodeResponse.from(registeredPhone);
     }
 
     public ValidateInvitationCodeResponse validateInvitationCode(StudentInfo studentInfo, String code) {
-        InvitationCode validatedInvitationCode = invitationCodeRepository.findByCode(code)
+        RegisteredPhone invitingStudentPhone = registeredPhoneRepository.findByInvitationCode(code)
                 .orElseThrow(() -> new StudentException(StudentExceptionType.INVALID_INVITATION_CODE));
-        InvitationCode requestedInvitationCode = invitationCodeRepository.findByStudentId(studentInfo.id())
-                .orElseThrow(() -> new StudentException(StudentExceptionType.INVITATION_CODE_NOT_FOUND));
-        Student requestedStudent = requestedInvitationCode.getStudent();
-        validateNotAlreadyParticipated(requestedStudent);
-        Student invitingStudent = validatedInvitationCode.getStudent();
+        Student invitingStudent = studentRepository.findByPhoneNumber(invitingStudentPhone.getPhoneNumber())
+                .orElseThrow(()-> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
+        Student requestedStudent = findStudentService.findByStudentId(studentInfo.id());
+        RegisteredPhone requestedPhone = findRegisteredPhone(requestedStudent.getPhoneNumber());
+        validateNotAlreadyParticipated(requestedPhone);
         Point point = updatePointService.updatePoint(requestedStudent, PointType.INVITATION_EVENT);
         updatePointService.updatePoint(invitingStudent, PointType.INVITATION_EVENT);
-        requestedInvitationCode.markAsParticipated();
+        requestedPhone.markAsInvitationEventParticipated();
         return ValidateInvitationCodeResponse.from(point, PointType.INVITATION_EVENT);
     }
 
-    private void validateNotAlreadyParticipated(Student student) {
-        RegisteredPhone registeredPhone = findRegisteredPhone(student.getPhoneNumber());
-        boolean participated = invitationCodeRepository
-                .findAllByRegisteredPhone(registeredPhone)
-                .stream()
-                .anyMatch(InvitationCode::getParticipated);
-        if (participated) {
+    private void validateNotAlreadyParticipated(RegisteredPhone requestedPhone) {
+        if (requestedPhone.getInvitationEventParticipated()) {
             throw new StudentException(StudentExceptionType.INVITATION_EVENT_ALREADY_PARTICIPATED);
         }
     }
@@ -86,7 +74,7 @@ public class InvitationService {
         String code;
         do {
             code = generateCode();
-        } while (invitationCodeRepository.findByCode(code).isPresent());
+        } while (registeredPhoneRepository.findByInvitationCode(code).isPresent());
         return code;
     }
 

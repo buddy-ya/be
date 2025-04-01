@@ -1,10 +1,10 @@
 package com.team.buddyya.student.dto.response;
 
-import com.team.buddyya.student.domain.InvitationCode;
+import com.team.buddyya.certification.domain.RegisteredPhone;
 
 public record InvitationCodeResponse(String code, Boolean participated) {
 
-    public static InvitationCodeResponse from(InvitationCode invitationCode) {
-        return new InvitationCodeResponse(invitationCode.getCode(), invitationCode.getParticipated());
+    public static InvitationCodeResponse from(RegisteredPhone registeredPhone) {
+        return new InvitationCodeResponse(registeredPhone.getInvitationCode(),registeredPhone.getInvitationEventParticipated());
     }
 }

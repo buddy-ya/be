@@ -20,6 +20,7 @@ import com.team.buddyya.point.service.FindPointService;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.dto.response.UserResponse;
 import com.team.buddyya.student.repository.StudentRepository;
+import com.team.buddyya.student.service.InvitationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -42,6 +43,7 @@ public class PhoneAuthenticationService {
     private final TestAccountRepository testAccountRepository;
     private final FindPointService findPointService;
     private final AdminAccountRepository adminAccountRepository;
+    private final InvitationService invitationService;
     private final JwtUtils jwtUtils;
 
     @Value("${test.phone.number.prefix}")
@@ -88,7 +90,7 @@ public class PhoneAuthenticationService {
                     phone.updateAuthenticationCode(generatedCode);
                     return phone;
                 })
-                .orElse(new RegisteredPhone(phoneNumber, generatedCode, false));
+                .orElse(new RegisteredPhone(phoneNumber, generatedCode, invitationService.createInvitationCode()));
     }
 
     public TestAccountResponse isTestAccount(String phoneNumber) {
