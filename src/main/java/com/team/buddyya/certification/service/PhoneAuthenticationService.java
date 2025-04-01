@@ -53,7 +53,6 @@ public class PhoneAuthenticationService {
         return new SendCodeResponse(phoneNumber);
     }
 
-    @Transactional(readOnly = true)
     public void verifyCode(String phoneNumber, String inputCode, String udId) {
         RegisteredPhone registeredPhone = registeredPhoneRepository.findByPhoneNumber(phoneNumber)
                 .orElseThrow(() -> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.PHONE_NOT_FOUND));
