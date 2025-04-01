@@ -40,7 +40,7 @@ public class OnBoardingService {
         studentMajorService.createStudentMajors(request.majors(), student);
         studentInterestService.createStudentInterests(request.interests(), student);
         studentLanguageService.createStudentLanguages(request.languages(), student);
-        matchingProfileRepository.save(new MatchingProfile(student));
+        createMatchingProfile(student);
         Point point = pointService.createPoint(student);
         return UserResponse.fromOnboard(student, false, accessToken, refreshToken, point);
     }
@@ -53,5 +53,9 @@ public class OnBoardingService {
                 .build();
         authTokenRepository.save(authToken);
         return refreshToken;
+    }
+
+    private void createMatchingProfile(Student student) {
+        matchingProfileRepository.save(new MatchingProfile(student));
     }
 }
