@@ -1,6 +1,6 @@
 package com.team.buddyya.certification.domain;
 
-import com.team.buddyya.common.domain.CreatedTime;
+import com.team.buddyya.common.domain.BaseTime;
 import com.team.buddyya.student.domain.Student;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -14,7 +14,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Table(name = "student_id_card")
 @NoArgsConstructor(access = PROTECTED)
 @Entity
-public class StudentIdCard extends CreatedTime {
+public class StudentIdCard extends BaseTime {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
