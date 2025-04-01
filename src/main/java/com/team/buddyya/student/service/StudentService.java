@@ -81,6 +81,7 @@ public class StudentService {
 
     public UserResponse updateUser(StudentInfo studentInfo, MyPageUpdateRequest request) {
         Student student = findStudentService.findByStudentId(studentInfo.id());
+        MatchingProfile matchingProfile = getMatchingProfile(student);
         switch (request.key()) {
             case "interests":
                 studentInterestService.updateStudentInterests(request.values(), student);
@@ -98,11 +99,11 @@ public class StudentService {
                 break;
 
             case "introduction":
-                updateMatchingProfileIntroduction(student, request.values());
+                updateMatchingProfileIntroduction(request.values(), matchingProfile);
                 break;
 
             case "activity":
-                updateMatchingProfileActivity(student, request.values());
+                updateMatchingProfileActivity(request.values(), matchingProfile);
                 break;
 
             default:
@@ -111,8 +112,6 @@ public class StudentService {
         Point point = findPointService.findByStudent(student);
         boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
                 .isPresent();
-        MatchingProfile matchingProfile = matchingProfileRepository.findByStudent(student)
-                .orElseThrow(() -> new StudentException(StudentExceptionType.MATCHING_PROFILE_NOT_FOUND));
         return UserResponse.fromUserInfo(student, isStudentIdCardRequested, point, matchingProfile);
     }
 
@@ -123,47 +122,39 @@ public class StudentService {
                 .isPresent();
         if (isDefault) {
             profileImageService.updateUserProfileImage(student, USER_PROFILE_DEFAULT_IMAGE.getUrl());
-            MatchingProfile matchingProfile = matchingProfileRepository.findByStudent(student)
-                    .orElseThrow(() -> new StudentException(StudentExceptionType.MATCHING_PROFILE_NOT_FOUND));
+            MatchingProfile matchingProfile = getMatchingProfile(student);
             return UserResponse.fromUserInfo(student, isStudentIdCardRequested, point, matchingProfile);
         }
         String imageUrl = s3UploadService.uploadFile(PROFILE_IMAGE.getDirectoryName(), request.profileImage());
         profileImageService.updateUserProfileImage(student, imageUrl);
-        MatchingProfile matchingProfile = matchingProfileRepository.findByStudent(student)
-                .orElseThrow(() -> new StudentException(StudentExceptionType.MATCHING_PROFILE_NOT_FOUND));
+        MatchingProfile matchingProfile = getMatchingProfile(student);
         return UserResponse.fromUserInfo(student, isStudentIdCardRequested, point, matchingProfile);
     }
 
-    private void updateMatchingProfileIntroduction(Student student, List<String> values) {
+    private void updateMatchingProfileIntroduction(List<String> values, MatchingProfile matchingProfile) {
         if (values.size() != 1) {
             throw new StudentException(StudentExceptionType.INVALID_INTRODUCTION_UPDATE_REQUEST);
         }
-        MatchingProfile matchingProfile = matchingProfileRepository.findByStudent(student)
-                .orElseThrow(() -> new StudentException(StudentExceptionType.MATCHING_PROFILE_NOT_FOUND));
         matchingProfile.updateIntroduction(values.get(0));
     }
 
-    private void updateMatchingProfileActivity(Student student, List<String> values) {
+    private void updateMatchingProfileActivity(List<String> values, MatchingProfile matchingProfile) {
         if (values.size() != 1) {
             throw new StudentException(StudentExceptionType.INVALID_ACTIVITY_UPDATE_REQUEST);
         }
-        MatchingProfile matchingProfile = matchingProfileRepository.findByStudent(student)
-                .orElseThrow(() -> new StudentException(StudentExceptionType.MATCHING_PROFILE_NOT_FOUND));
         matchingProfile.updateActivity(values.get(0));
     }
 
     public UserResponse getUserInfo(StudentInfo studentInfo, Long userId) {
         Student student = findStudentService.findByStudentId(userId);
         if (!studentInfo.id().equals(userId)) {
-            MatchingProfile matchingProfile = matchingProfileRepository.findByStudent(student)
-                    .orElseThrow(() -> new StudentException(StudentExceptionType.MATCHING_PROFILE_NOT_FOUND));
+            MatchingProfile matchingProfile = getMatchingProfile(student);
             return UserResponse.fromOtherUserInfo(student, matchingProfile);
         }
         Point point = findPointService.findByStudent(student);
         boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
                 .isPresent();
-        MatchingProfile matchingProfile = matchingProfileRepository.findByStudent(student)
-                .orElseThrow(() -> new StudentException(StudentExceptionType.MATCHING_PROFILE_NOT_FOUND));
+        MatchingProfile matchingProfile = getMatchingProfile(student);
         return UserResponse.fromUserInfo(student, isStudentIdCardRequested, point, matchingProfile);
     }
 
@@ -228,5 +219,10 @@ public class StudentService {
             expoTokenRepository.delete(student.getExpoToken());
         }
         student.getAvatar().setLoggedOut(true);
+    }
+
+    private MatchingProfile getMatchingProfile(Student student) {
+        return matchingProfileRepository.findByStudent(student)
+                .orElseThrow(() -> new StudentException(StudentExceptionType.MATCHING_PROFILE_NOT_FOUND));
     }
 }
