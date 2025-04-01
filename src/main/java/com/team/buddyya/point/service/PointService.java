@@ -1,6 +1,10 @@
 package com.team.buddyya.point.service;
 
 import com.team.buddyya.auth.domain.StudentInfo;
+import com.team.buddyya.certification.domain.RegisteredPhone;
+import com.team.buddyya.certification.exception.PhoneAuthenticationException;
+import com.team.buddyya.certification.exception.PhoneAuthenticationExceptionType;
+import com.team.buddyya.certification.repository.RegisteredPhoneRepository;
 import com.team.buddyya.point.domain.Point;
 import com.team.buddyya.point.domain.PointStatus;
 import com.team.buddyya.point.domain.PointType;
@@ -26,23 +30,35 @@ public class PointService {
     private final PointStatusRepository pointStatusRepository;
     private final FindStudentService findStudentService;
     private final FindPointService findPointService;
+    private final RegisteredPhoneRepository registeredPhoneRepository;
 
     public Point createPoint(Student student) {
-        Point point = Point.builder()
-                .student(student)
-                .currentPoint(PointType.SIGNUP.getPointChange())
-                .build();
-        pointRepository.save(point);
-        PointStatus signUpPointStatus = PointStatus.builder()
-                .point(point)
-                .pointType(PointType.SIGNUP)
-                .changedPoint(PointType.SIGNUP.getPointChange())
-                .build();
-        pointStatusRepository.save(signUpPointStatus);
+        RegisteredPhone registeredPhone = registeredPhoneRepository.findByPhoneNumber(student.getPhoneNumber())
+                .orElseThrow(() -> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.PHONE_NOT_FOUND));
+        boolean hasWithdrawn = registeredPhone.getHasWithdrawn();
+        PointType pointType = hasWithdrawn ? PointType.NO_POINT_CHANGE : PointType.SIGNUP;
+        Point point = createAndSavePoint(student, pointType, hasWithdrawn);
         return point;
     }
 
-    public PointListResponse getPoints(StudentInfo studentInfo){
+    private Point createAndSavePoint(Student student, PointType pointType, boolean hasWithdrawn) {
+        Point point = Point.builder()
+                .student(student)
+                .currentPoint(pointType.getPointChange())
+                .build();
+        pointRepository.save(point);
+        if (!hasWithdrawn) {
+            PointStatus pointStatus = PointStatus.builder()
+                    .point(point)
+                    .pointType(pointType)
+                    .changedPoint(pointType.getPointChange())
+                    .build();
+            pointStatusRepository.save(pointStatus);
+        }
+        return point;
+    }
+
+    public PointListResponse getPoints(StudentInfo studentInfo) {
         Student student = findStudentService.findByStudentId(studentInfo.id());
         Point point = findPointService.findByStudent(student);
         List<PointStatus> pointStatuses = pointStatusRepository.findAllByPointOrderByCreatedDateDesc(point);

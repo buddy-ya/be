@@ -7,8 +7,8 @@ import com.team.buddyya.certification.dto.request.VerifyCodeRequest;
 import com.team.buddyya.certification.dto.response.AdminAccountResponse;
 import com.team.buddyya.certification.dto.response.SendCodeResponse;
 import com.team.buddyya.certification.dto.response.TestAccountResponse;
-import com.team.buddyya.certification.service.MessageSendService;
 import com.team.buddyya.certification.service.PhoneAuthenticationService;
+import com.team.buddyya.certification.service.SendCodeFacadeService;
 import com.team.buddyya.student.dto.response.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,20 +22,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class PhoneAuthenticationController {
 
+    private final SendCodeFacadeService sendCodeFacadeService;
     private final PhoneAuthenticationService phoneAuthenticationService;
-    private final MessageSendService messageSendService;
 
     @PostMapping("/send-code")
-    public ResponseEntity<SendCodeResponse> sendOne(@RequestBody SendCodeRequest sendCodeRequest) {
-        String generatedCode = messageSendService.sendMessage(sendCodeRequest.phoneNumber());
-        SendCodeResponse response = phoneAuthenticationService.saveCode(sendCodeRequest.phoneNumber(), generatedCode);
+    public ResponseEntity<SendCodeResponse> sendOne(@RequestBody SendCodeRequest request) {
+        SendCodeResponse response = sendCodeFacadeService.sendCodeAndSave(request);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/verify-code")
-    public ResponseEntity<UserResponse> verifyCode(@RequestBody VerifyCodeRequest verifyCodeRequest) {
-        phoneAuthenticationService.verifyCode(verifyCodeRequest.phoneNumber(), verifyCodeRequest.code());
-        UserResponse response = phoneAuthenticationService.checkMembership(verifyCodeRequest.phoneNumber());
+    public ResponseEntity<UserResponse> verifyCode(@RequestBody VerifyCodeRequest request) {
+        phoneAuthenticationService.verifyCode(request.phoneNumber(), request.code(), request.udId());
+        UserResponse response = phoneAuthenticationService.checkMembership(request.phoneNumber());
         return ResponseEntity.ok(response);
     }
 

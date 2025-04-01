@@ -9,4 +9,6 @@ import java.util.List;
 public interface PointStatusRepository extends JpaRepository<PointStatus, Long> {
 
     List<PointStatus> findAllByPointOrderByCreatedDateDesc(Point point);
+
+    void deleteAllByPoint(Point point);
 }

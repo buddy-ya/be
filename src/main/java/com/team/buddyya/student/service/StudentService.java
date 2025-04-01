@@ -2,12 +2,18 @@ package com.team.buddyya.student.service;
 
 import com.team.buddyya.auth.domain.StudentInfo;
 import com.team.buddyya.auth.repository.AuthTokenRepository;
+import com.team.buddyya.certification.domain.RegisteredPhone;
+import com.team.buddyya.certification.exception.PhoneAuthenticationException;
+import com.team.buddyya.certification.exception.PhoneAuthenticationExceptionType;
 import com.team.buddyya.certification.repository.RegisteredPhoneRepository;
 import com.team.buddyya.certification.repository.StudentEmailRepository;
 import com.team.buddyya.certification.repository.StudentIdCardRepository;
 import com.team.buddyya.common.service.S3UploadService;
+import com.team.buddyya.match.repository.MatchRequestRepository;
 import com.team.buddyya.notification.repository.ExpoTokenRepository;
 import com.team.buddyya.point.domain.Point;
+import com.team.buddyya.point.repository.PointRepository;
+import com.team.buddyya.point.repository.PointStatusRepository;
 import com.team.buddyya.point.service.FindPointService;
 import com.team.buddyya.student.domain.*;
 import com.team.buddyya.student.dto.request.MyPageUpdateRequest;
@@ -44,6 +50,9 @@ public class StudentService {
     private final RegisteredPhoneRepository registeredPhoneRepository;
     private final StudentEmailRepository studentEmailRepository;
     private final FindPointService findPointService;
+    private final PointRepository pointRepository;
+    private final PointStatusRepository pointStatusRepository;
+    private final MatchRequestRepository matchRequestRepository;
 
     private static final String BLOCK_SUCCESS_MESSAGE = "차단이 성공적으로 완료되었습니다.";
 
@@ -137,9 +146,17 @@ public class StudentService {
         if (student.getStudentIdCard() != null) {
             studentIdCardRepository.delete(student.getStudentIdCard());
         }
+        pointRepository.findByStudent(student).ifPresent(point -> {
+            pointStatusRepository.deleteAllByPoint(point);
+            pointRepository.delete(point);
+        });
         profileImageService.setDefaultProfileImage(student);
-        registeredPhoneRepository.deleteByPhoneNumber(student.getPhoneNumber());
+        matchRequestRepository.findByStudentId(student.getId())
+                .ifPresent(matchRequest -> matchRequestRepository.deleteByStudent(student));
         studentEmailRepository.deleteByEmail(student.getEmail());
+        RegisteredPhone registeredPhone = registeredPhoneRepository.findByPhoneNumber(student.getPhoneNumber())
+                .orElseThrow(() -> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.PHONE_NOT_FOUND));
+        registeredPhone.updateHasWithDrawn(true);
         student.markAsDeleted();
     }
 
