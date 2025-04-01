@@ -34,10 +34,15 @@ public class Chatroom extends CreatedTime {
     @OneToMany(mappedBy = "chatroom", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Chat> chats;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ChatroomType type;
+
     @Builder
-    public Chatroom(LocalDateTime createdTime) {
+    public Chatroom(LocalDateTime createdTime, ChatroomType type) {
         this.chatroomStudents = new ArrayList<>();
         this.chats = new ArrayList<>();
+        this.type = type;
         lastMessage = null;
         lastMessageTime = createdTime;
     }
