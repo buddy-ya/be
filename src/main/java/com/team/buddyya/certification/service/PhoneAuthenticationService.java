@@ -63,9 +63,11 @@ public class PhoneAuthenticationService {
         if (!inputCode.equals(registeredPhone.getAuthenticationCode())) {
             throw new PhoneAuthenticationException(PhoneAuthenticationExceptionType.CODE_MISMATCH);
         }
-        PhoneInfo phoneInfo = phoneInfoRepository.findPhoneInfoByUdId(udId)
-                .orElseThrow(()-> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.PHONE_INFO_NOT_FOUND));
-        phoneInfo.resetMessageSendCount();
+        if (udId != null) {
+            PhoneInfo phoneInfo = phoneInfoRepository.findPhoneInfoByUdId(udId)
+                    .orElseThrow(() -> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.PHONE_INFO_NOT_FOUND));
+            phoneInfo.resetMessageSendCount();
+        }
     }
 
     public UserResponse checkMembership(String phoneNumber) {
