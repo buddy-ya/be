@@ -10,6 +10,7 @@ import java.util.List;
 public record FeedResponse(
         Long id,
         Long userId,
+        String universityTab,
         String category,
         String name,
         String country,
@@ -35,6 +36,7 @@ public record FeedResponse(
         return new FeedResponse(
                 feed.getId(),
                 feed.getStudent().getId(),
+                feed.getUniversity().getUniversityName(),
                 feed.getCategory().getName(),
                 feed.getStudent().getName(),
                 feed.getStudent().getCountry(),
