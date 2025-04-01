@@ -104,7 +104,7 @@ public class UserController {
     }
 
     @PostMapping("/invitation-code")
-    public ResponseEntity<ValidateInvitationCodeResponse> getInvitationCode(@AuthenticationPrincipal CustomUserDetails userDetails,
+    public ResponseEntity<ValidateInvitationCodeResponse> validateInvitationCode(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                                     @RequestBody ValidateInvitationCodeRequest request){
         ValidateInvitationCodeResponse response = invitationService.validateInvitationCode(userDetails.getStudentInfo(), request.code());
         return ResponseEntity.ok(response);
