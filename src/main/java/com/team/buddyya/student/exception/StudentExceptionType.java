@@ -18,8 +18,8 @@ public enum StudentExceptionType implements BaseExceptionType {
     INVALID_INTRODUCTION_UPDATE_REQUEST(2001, HttpStatus.BAD_REQUEST, "Only one value is required for introduction update."),
     INVALID_ACTIVITY_UPDATE_REQUEST(2001, HttpStatus.BAD_REQUEST, "Only one value is required for activity update."),
     UNSUPPORTED_UPDATE_KEY(2002, HttpStatus.BAD_REQUEST, "Unsupported update key."),
-    INVALID_INTRODUCTION_LENGTH(2003, HttpStatus.BAD_REQUEST, "Introduction must be at least 20 characters long."),
-    INVALID_ACTIVITIES_LENGTH(2004, HttpStatus.BAD_REQUEST, "Activities must be at least 20 characters long."),
+    INVALID_INTRODUCTION_LENGTH(2003, HttpStatus.BAD_REQUEST, "Introduction must be at least 10 characters long."),
+    INVALID_ACTIVITIES_LENGTH(2004, HttpStatus.BAD_REQUEST, "Activities must be at least 10 characters long."),
     CANNOT_BLOCK_SELF(2010, HttpStatus.BAD_REQUEST, "You cannot block yourself."),
     ALREADY_BLOCKED(2011, HttpStatus.CONFLICT, "User is already blocked.");
 

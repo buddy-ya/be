@@ -37,7 +37,7 @@ public class MatchingProfile {
     }
 
     public void updateIntroduction(String introduction) {
-        if (introduction != null && introduction.length() < 20) {
+        if (introduction != null && introduction.length() < 10) {
             throw new StudentException(StudentExceptionType.INVALID_INTRODUCTION_LENGTH);
         }
         this.introduction = introduction;
@@ -45,7 +45,7 @@ public class MatchingProfile {
     }
 
     public void updateActivity(String buddyActivity) {
-        if (buddyActivity != null && buddyActivity.length() < 20) {
+        if (buddyActivity != null && buddyActivity.length() < 10) {
             throw new StudentException(StudentExceptionType.INVALID_ACTIVITIES_LENGTH);
         }
         this.buddyActivity = buddyActivity;
@@ -53,8 +53,8 @@ public class MatchingProfile {
     }
 
     private void updateCompletedStatus() {
-        boolean hasValidIntroduction = (this.introduction != null) && (this.introduction.length() >= 20);
-        boolean hasValidActivities = (this.buddyActivity != null) && (this.buddyActivity.length() >= 20);
+        boolean hasValidIntroduction = (this.introduction != null) && (this.introduction.length() >= 10);
+        boolean hasValidActivities = (this.buddyActivity != null) && (this.buddyActivity.length() >= 10);
         this.isCompleted = hasValidIntroduction && hasValidActivities;
     }
 }
