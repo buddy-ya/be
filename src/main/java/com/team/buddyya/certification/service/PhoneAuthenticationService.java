@@ -63,11 +63,7 @@ public class PhoneAuthenticationService {
         if (!inputCode.equals(registeredPhone.getAuthenticationCode())) {
             throw new PhoneAuthenticationException(PhoneAuthenticationExceptionType.CODE_MISMATCH);
         }
-        if (udId != null) {
-            PhoneInfo phoneInfo = phoneInfoRepository.findPhoneInfoByUdId(udId)
-                    .orElseThrow(() -> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.PHONE_INFO_NOT_FOUND));
-            phoneInfo.resetMessageSendCount();
-        }
+        resetMessageCountIfExists(udId);
     }
 
     public UserResponse checkMembership(String phoneNumber) {
@@ -105,5 +101,14 @@ public class PhoneAuthenticationService {
             return new AdminAccountResponse(true);
         }
         return new AdminAccountResponse(false);
+    }
+
+    private void resetMessageCountIfExists(String udId) {
+        if (udId == null) {
+            return;
+        }
+        PhoneInfo phoneInfo = phoneInfoRepository.findPhoneInfoByUdId(udId)
+                .orElseThrow(() -> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.PHONE_INFO_NOT_FOUND));
+        phoneInfo.resetMessageSendCount();
     }
 }
