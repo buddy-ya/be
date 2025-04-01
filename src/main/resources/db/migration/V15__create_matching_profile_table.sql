@@ -6,3 +6,6 @@ CREATE TABLE matching_profile
     buddy_activity TEXT,
     completed      BOOLEAN NOT NULL DEFAULT FALSE
 );
+
+ALTER TABLE student_id_card
+    ADD COLUMN updated_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
