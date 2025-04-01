@@ -26,7 +26,7 @@ public class RegisteredPhone extends CreatedTime {
     private String authenticationCode;
 
     @Column(name = "invitation_code", nullable = false, unique = true)
-    private String InvitationCode;
+    private String invitationCode;
 
     @Column(name = "invitation_event_participated", nullable = false)
     private Boolean invitationEventParticipated;
@@ -38,7 +38,7 @@ public class RegisteredPhone extends CreatedTime {
     public RegisteredPhone(String phoneNumber, String authenticationCode, String invitationCode) {
         this.phoneNumber = phoneNumber;
         this.authenticationCode = authenticationCode;
-        InvitationCode = invitationCode;
+        this.invitationCode = invitationCode;
         this.invitationEventParticipated = false;
         this.hasWithdrawn = false;
     }
