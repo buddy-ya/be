@@ -14,14 +14,14 @@ import com.team.buddyya.match.dto.response.MatchResponse;
 import com.team.buddyya.match.dto.response.MatchStatusResponse;
 import com.team.buddyya.match.exception.MatchException;
 import com.team.buddyya.match.exception.MatchExceptionType;
-import com.team.buddyya.match.repository.MatchedHistoryRepository;
 import com.team.buddyya.match.repository.MatchRequestRepository;
+import com.team.buddyya.match.repository.MatchedHistoryRepository;
 import com.team.buddyya.notification.service.NotificationService;
+import com.team.buddyya.point.domain.Point;
+import com.team.buddyya.point.domain.PointType;
 import com.team.buddyya.point.service.FindPointService;
 import com.team.buddyya.point.service.UpdatePointService;
 import com.team.buddyya.student.domain.Gender;
-import com.team.buddyya.point.domain.Point;
-import com.team.buddyya.point.domain.PointType;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.repository.BlockRepository;
 import com.team.buddyya.student.service.FindStudentService;
@@ -31,6 +31,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.Set;
+
+import static com.team.buddyya.chatting.domain.ChatroomType.MATCHING;
 
 @Service
 @RequiredArgsConstructor
@@ -125,7 +127,7 @@ public class BasicMatchService implements MatchService {
         if (existingBuddies.contains(matchStudent.getId())) {
             return false;
         }
-        if (blockedStudentIds.contains(matchStudent.getId())){
+        if (blockedStudentIds.contains(matchStudent.getId())) {
             return false;
         }
         boolean isAlreadyExistChatroom = chatroomRepository.findByUserAndBuddy(requestedStudent.getId(), matchStudent.getId()).isPresent();
@@ -167,7 +169,7 @@ public class BasicMatchService implements MatchService {
                 .build();
         matchedHistoryRepository.save(requestedMatchedHistory);
         matchedHistoryRepository.save(existingMatchedHistory);
-        Chatroom chatroom = chatService.createChatroom(student, matchedStudent);
+        Chatroom chatroom = chatService.createChatroom(student, matchedStudent, MATCHING);
         MatchRequest newMatchRequest = createMatchRequest(student, chatroom.getId(), universityType, genderType, MatchRequestStatus.MATCH_SUCCESS);
         matchRequest.updateMatchRequestStatusSuccess();
         matchRequest.updateChatroomId(chatroom.getId());

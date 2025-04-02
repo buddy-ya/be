@@ -23,10 +23,15 @@ import com.team.buddyya.student.dto.response.BlockResponse;
 import com.team.buddyya.student.dto.response.UserResponse;
 import com.team.buddyya.student.exception.StudentException;
 import com.team.buddyya.student.exception.StudentExceptionType;
-import com.team.buddyya.student.repository.*;
+import com.team.buddyya.student.repository.BlockRepository;
+import com.team.buddyya.student.repository.MatchingProfileRepository;
+import com.team.buddyya.student.repository.StudentRepository;
+import com.team.buddyya.student.repository.UniversityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static com.team.buddyya.common.domain.S3DirectoryName.PROFILE_IMAGE;
 import static com.team.buddyya.student.domain.UserProfileDefaultImage.USER_PROFILE_DEFAULT_IMAGE;
@@ -53,6 +58,7 @@ public class StudentService {
     private final PointRepository pointRepository;
     private final PointStatusRepository pointStatusRepository;
     private final MatchRequestRepository matchRequestRepository;
+    private final MatchingProfileRepository matchingProfileRepository;
 
     private static final String BLOCK_SUCCESS_MESSAGE = "차단이 성공적으로 완료되었습니다.";
 
@@ -75,6 +81,7 @@ public class StudentService {
 
     public UserResponse updateUser(StudentInfo studentInfo, MyPageUpdateRequest request) {
         Student student = findStudentService.findByStudentId(studentInfo.id());
+        MatchingProfile matchingProfile = getMatchingProfile(student);
         switch (request.key()) {
             case "interests":
                 studentInterestService.updateStudentInterests(request.values(), student);
@@ -91,13 +98,21 @@ public class StudentService {
                 student.updateName(request.values().get(0));
                 break;
 
+            case "introduction":
+                updateMatchingProfileIntroduction(request.values(), matchingProfile);
+                break;
+
+            case "activity":
+                updateMatchingProfileActivity(request.values(), matchingProfile);
+                break;
+
             default:
                 throw new StudentException(StudentExceptionType.UNSUPPORTED_UPDATE_KEY);
         }
         Point point = findPointService.findByStudent(student);
         boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
                 .isPresent();
-        return UserResponse.fromUserInfo(student, isStudentIdCardRequested, point);
+        return UserResponse.fromUserInfo(student, isStudentIdCardRequested, point, matchingProfile);
     }
 
     public UserResponse updateUserProfileImage(StudentInfo studentInfo, boolean isDefault, UpdateProfileImageRequest request) {
@@ -107,22 +122,40 @@ public class StudentService {
                 .isPresent();
         if (isDefault) {
             profileImageService.updateUserProfileImage(student, USER_PROFILE_DEFAULT_IMAGE.getUrl());
-            return UserResponse.fromUserInfo(student, isStudentIdCardRequested, point);
+            MatchingProfile matchingProfile = getMatchingProfile(student);
+            return UserResponse.fromUserInfo(student, isStudentIdCardRequested, point, matchingProfile);
         }
         String imageUrl = s3UploadService.uploadFile(PROFILE_IMAGE.getDirectoryName(), request.profileImage());
         profileImageService.updateUserProfileImage(student, imageUrl);
-        return UserResponse.fromUserInfo(student, isStudentIdCardRequested, point);
+        MatchingProfile matchingProfile = getMatchingProfile(student);
+        return UserResponse.fromUserInfo(student, isStudentIdCardRequested, point, matchingProfile);
+    }
+
+    private void updateMatchingProfileIntroduction(List<String> values, MatchingProfile matchingProfile) {
+        if (values.size() != 1) {
+            throw new StudentException(StudentExceptionType.INVALID_INTRODUCTION_UPDATE_REQUEST);
+        }
+        matchingProfile.updateIntroduction(values.get(0));
+    }
+
+    private void updateMatchingProfileActivity(List<String> values, MatchingProfile matchingProfile) {
+        if (values.size() != 1) {
+            throw new StudentException(StudentExceptionType.INVALID_ACTIVITY_UPDATE_REQUEST);
+        }
+        matchingProfile.updateActivity(values.get(0));
     }
 
     public UserResponse getUserInfo(StudentInfo studentInfo, Long userId) {
         Student student = findStudentService.findByStudentId(userId);
         if (!studentInfo.id().equals(userId)) {
-            return UserResponse.fromOtherUserInfo(student);
+            MatchingProfile matchingProfile = getMatchingProfile(student);
+            return UserResponse.fromOtherUserInfo(student, matchingProfile);
         }
         Point point = findPointService.findByStudent(student);
         boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
                 .isPresent();
-        return UserResponse.fromUserInfo(student, isStudentIdCardRequested, point);
+        MatchingProfile matchingProfile = getMatchingProfile(student);
+        return UserResponse.fromUserInfo(student, isStudentIdCardRequested, point, matchingProfile);
     }
 
     public void updateStudentCertification(Student student) {
@@ -186,5 +219,10 @@ public class StudentService {
             expoTokenRepository.delete(student.getExpoToken());
         }
         student.getAvatar().setLoggedOut(true);
+    }
+
+    private MatchingProfile getMatchingProfile(Student student) {
+        return matchingProfileRepository.findByStudent(student)
+                .orElseThrow(() -> new StudentException(StudentExceptionType.MATCHING_PROFILE_NOT_FOUND));
     }
 }

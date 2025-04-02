@@ -2,10 +2,7 @@ package com.team.buddyya.chatting.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team.buddyya.auth.domain.StudentInfo;
-import com.team.buddyya.chatting.domain.Chat;
-import com.team.buddyya.chatting.domain.Chatroom;
-import com.team.buddyya.chatting.domain.ChatroomStudent;
-import com.team.buddyya.chatting.domain.MessageType;
+import com.team.buddyya.chatting.domain.*;
 import com.team.buddyya.chatting.dto.request.ChatImageRequest;
 import com.team.buddyya.chatting.dto.request.ChatMessage;
 import com.team.buddyya.chatting.dto.request.CreateChatroomRequest;
@@ -18,10 +15,10 @@ import com.team.buddyya.chatting.repository.ChatroomRepository;
 import com.team.buddyya.chatting.repository.ChatroomStudentRepository;
 import com.team.buddyya.common.service.S3UploadService;
 import com.team.buddyya.notification.service.NotificationService;
-import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.point.repository.PointRepository;
-import com.team.buddyya.student.service.FindStudentService;
 import com.team.buddyya.point.service.PointService;
+import com.team.buddyya.student.domain.Student;
+import com.team.buddyya.student.service.FindStudentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -64,7 +61,7 @@ public class ChatService {
     private final PointRepository pointRepository;
     private final PointService pointService;
 
-    public CreateChatroomResponse createOrGetChatRoom(CreateChatroomRequest request, StudentInfo studentInfo) {
+    public CreateChatroomResponse createOrGetChatRoom(CreateChatroomRequest request, StudentInfo studentInfo, ChatroomType chatroomType) {
         Student user = findStudentService.findByStudentId(studentInfo.id());
         Student buddy = findStudentService.findByStudentId(request.buddyId());
         Optional<Chatroom> existingRoom = chatRoomRepository.findByUserAndBuddy(user.getId(), buddy.getId());
@@ -72,15 +69,16 @@ public class ChatService {
             Chatroom room = existingRoom.get();
             return CreateChatroomResponse.from(room, buddy, false);
         }
-        Chatroom newChatroom = createChatroom(user, buddy);
+        Chatroom newChatroom = createChatroom(user, buddy, chatroomType);
         notificationService.sendChatAcceptNotification(buddy, user.getName(), newChatroom.getId());
         return CreateChatroomResponse.from(newChatroom, buddy, true);
     }
 
-    public Chatroom createChatroom(Student user, Student buddy) {
+    public Chatroom createChatroom(Student user, Student buddy, ChatroomType type) {
         Chatroom newChatroom = Chatroom
                 .builder()
                 .createdTime(LocalDateTime.now())
+                .type(type)
                 .build();
         chatRoomRepository.save(newChatroom);
         ChatroomStudent userChatroom = ChatroomStudent.builder()
