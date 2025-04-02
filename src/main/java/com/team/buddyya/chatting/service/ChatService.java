@@ -193,13 +193,13 @@ public class ChatService {
                 .orElseThrow(() -> new ChatException(ChatExceptionType.USER_NOT_PART_OF_CHATROOM));
         Student buddy = getBuddyFromChatroom(student, chatroom);
         if (buddy == null) {
-            return ChatroomDetailResponse.from(roomId, null, null, null, null, true);
+            return ChatroomDetailResponse.from(roomId, null, null, null, null, true, chatroom.getType().name());
         }
         boolean isBuddyExited = chatroom.getChatroomStudents().stream()
                 .filter(cs -> !cs.getStudent().getId().equals(student.getId()))
                 .anyMatch(ChatroomStudent::getIsExited);
         String buddyProfileImage = getChatroomProfileImage(buddy);
-        return ChatroomDetailResponse.from(roomId, buddy.getName(), buddy.getCountry(), buddyProfileImage, buddy.getId(), isBuddyExited);
+        return ChatroomDetailResponse.from(roomId, buddy.getName(), buddy.getCountry(), buddyProfileImage, buddy.getId(), isBuddyExited, chatroom.getType().name());
     }
 
     private ChatroomResponse createChatroomResponse(ChatroomStudent chatroomStudent) {

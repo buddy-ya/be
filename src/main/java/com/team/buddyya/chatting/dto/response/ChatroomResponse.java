@@ -14,10 +14,11 @@ public record ChatroomResponse(
         String lastMessage,
         LocalDateTime lastMessageDate,
         Long buddyId,
-        boolean isBuddyExited
+        boolean isBuddyExited,
+        String type
 ) {
 
     public static ChatroomResponse from(Chatroom chatroom, String name, String country, ChatroomStudent chatroomStudent, String buddyProfileImage, Long buddyId, boolean isBuddyLeave) {
-        return new ChatroomResponse(chatroom.getId(), name, country, chatroomStudent.getUnreadCount(), buddyProfileImage, chatroom.getLastMessage(), chatroom.getLastMessageTime(), buddyId, isBuddyLeave);
+        return new ChatroomResponse(chatroom.getId(), name, country, chatroomStudent.getUnreadCount(), buddyProfileImage, chatroom.getLastMessage(), chatroom.getLastMessageTime(), buddyId, isBuddyLeave, chatroom.getType().name());
     }
 }
