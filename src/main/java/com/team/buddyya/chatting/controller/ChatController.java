@@ -1,7 +1,7 @@
 package com.team.buddyya.chatting.controller;
 
 import com.team.buddyya.auth.domain.CustomUserDetails;
-import com.team.buddyya.chatting.dto.request.ChatImageRequest;
+import com.team.buddyya.chatting.domain.ChatroomType;
 import com.team.buddyya.chatting.dto.request.CreateChatroomRequest;
 import com.team.buddyya.chatting.dto.response.*;
 import com.team.buddyya.chatting.service.ChatService;
@@ -26,7 +26,7 @@ public class ChatController {
     @PostMapping
     public ResponseEntity<CreateChatroomResponse> createOrGetChatRoom(@RequestBody CreateChatroomRequest request,
                                                                       @AuthenticationPrincipal CustomUserDetails userDetails) {
-        CreateChatroomResponse response = chatService.createOrGetChatRoom(request, userDetails.getStudentInfo());
+        CreateChatroomResponse response = chatService.createOrGetChatRoom(request, userDetails.getStudentInfo(), ChatroomType.MATCHING);
         return ResponseEntity.ok(response);
     }
 

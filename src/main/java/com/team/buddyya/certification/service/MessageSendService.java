@@ -1,8 +1,11 @@
 package com.team.buddyya.certification.service;
 
+import com.team.buddyya.certification.domain.PhoneInfo;
+import com.team.buddyya.certification.dto.request.SendCodeRequest;
 import com.team.buddyya.certification.exception.PhoneAuthenticationException;
 import com.team.buddyya.certification.exception.PhoneAuthenticationExceptionType;
 import com.team.buddyya.certification.repository.TestAccountRepository;
+import com.team.buddyya.certification.repository.PhoneInfoRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import net.nurigo.sdk.NurigoApp;
@@ -38,23 +41,43 @@ public class MessageSendService {
     private String fromPhoneNumber;
 
     private DefaultMessageService messageService;
+    private final PhoneInfoRepository phoneInfoRepository;
 
     @PostConstruct
     private void initMessageService() {
         this.messageService = NurigoApp.INSTANCE.initialize(apiKey, apiSecret, SOLAPI_API_URL);
     }
 
-    public String sendMessage(String to) {
+    public String sendMessage(SendCodeRequest request) {
+        if (request.udId() != null) {
+            validateMessageCount(request.udId());
+        }
         String generatedCode = generateRandomNumber();
-        if (testAccountRepository.findByPhoneNumber(to).isPresent()) {
+        if (testAccountRepository.findByPhoneNumber(request.phoneNumber()).isPresent()) {
             return generatedCode;
         }
-        Message message = createMessage(to, generatedCode);
+        Message message = createMessage(request.phoneNumber(), generatedCode);
         SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
         if (!response.getStatusCode().equals(MESSAGE_SEND_SUCCESS_STATUS_CODE)) {
             throw new PhoneAuthenticationException(PhoneAuthenticationExceptionType.SMS_SEND_FAILED);
         }
         return generatedCode;
+    }
+
+    private void validateMessageCount(String udId){
+        PhoneInfo phoneInfo = findOrCreatePhoneInfo(udId);
+        if (phoneInfo.isMaxSendMessageCount()) {
+            throw new PhoneAuthenticationException(PhoneAuthenticationExceptionType.MAX_SMS_SEND_COUNT);
+        }
+        phoneInfo.increaseMessageSendCount();
+    }
+
+    private PhoneInfo findOrCreatePhoneInfo(String udId) {
+        return phoneInfoRepository.findPhoneInfoByUdId(udId)
+                .orElseGet(() -> phoneInfoRepository.save(
+                        PhoneInfo.builder()
+                                .udId(udId)
+                                .build()));
     }
 
     private String generateRandomNumber() {

@@ -32,10 +32,13 @@ public record UserResponse(
         Integer point,
         Integer totalUnreadCount,
         String accessToken,
-        String refreshToken
+        String refreshToken,
+        String introduction,
+        String buddyActivity,
+        Boolean isMatchingProfileCompleted
 ) {
 
-    public static UserResponse fromUserInfo(Student student, boolean isStudentIdCardRequested, Point point, Integer totalUnreadCount) {
+    public static UserResponse fromUserInfo(Student student, boolean isStudentIdCardRequested, Point point, Integer totalUnreadCount, MatchingProfile matchingProfile) {
         return new UserResponse(
                 student.getId(),
                 student.getRole().name(),
@@ -58,7 +61,10 @@ public record UserResponse(
                 point.getCurrentPoint(),
                 totalUnreadCount,
                 null,
-                null
+                null,
+                matchingProfile.getIntroduction(),
+                matchingProfile.getBuddyActivity(),
+                matchingProfile.isCompleted()
         );
     }
 
@@ -85,7 +91,10 @@ public record UserResponse(
                 null,
                 null,
                 null,
-                null
+                null,
+                matchingProfile.getIntroduction(),
+                matchingProfile.getBuddyActivity(),
+                matchingProfile.isCompleted()
         );
     }
 
@@ -112,7 +121,10 @@ public record UserResponse(
                 point.getCurrentPoint(),
                 null,
                 accessToken,
-                refreshToken
+                refreshToken,
+                null,
+                null,
+                null
         );
     }
 
@@ -139,7 +151,10 @@ public record UserResponse(
                 point.getCurrentPoint(),
                 null,
                 accessToken,
-                refreshToken
+                refreshToken,
+                null,
+                null,
+                null
         );
     }
 
@@ -161,6 +176,9 @@ public record UserResponse(
                 null,
                 status,
                 false,
+                null,
+                null,
+                null,
                 null,
                 null,
                 null,

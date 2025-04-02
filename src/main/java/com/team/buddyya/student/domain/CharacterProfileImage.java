@@ -13,7 +13,10 @@ public enum CharacterProfileImage {
     CHARACTER_PROFILE_IMAGE_3("image3", "https://buddyya.s3.ap-northeast-2.amazonaws.com/default-profile-image/image3.png"),
     CHARACTER_PROFILE_IMAGE_4("image4", "https://buddyya.s3.ap-northeast-2.amazonaws.com/default-profile-image/image4.png"),
     CHARACTER_PROFILE_IMAGE_5("image5", "https://buddyya.s3.ap-northeast-2.amazonaws.com/default-profile-image/image5.png"),
-    CHARACTER_PROFILE_IMAGE_6("image6", "https://buddyya.s3.ap-northeast-2.amazonaws.com/default-profile-image/image6.png");
+    CHARACTER_PROFILE_IMAGE_6("image6", "https://buddyya.s3.ap-northeast-2.amazonaws.com/default-profile-image/image6.png"),
+    CHARACTER_PROFILE_IMAGE_7("image7", "https://buddyya.s3.ap-northeast-2.amazonaws.com/default-profile-image/image7.png"),
+    CHARACTER_PROFILE_IMAGE_8("image8", "https://buddyya.s3.ap-northeast-2.amazonaws.com/default-profile-image/image8.png"),
+    CHARACTER_PROFILE_IMAGE_9("image9", "https://buddyya.s3.ap-northeast-2.amazonaws.com/default-profile-image/image9.png");
 
     private final String key;
     private final String url;

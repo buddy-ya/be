@@ -29,7 +29,7 @@ public class Avatar extends BaseTime {
     @Column(name = "loggedOut", nullable = false)
     private Boolean isLoggedOut;
 
-    @OneToOne(fetch = LAZY)
+    @OneToOne
     @JoinColumn(name = "student_id", nullable = false, unique = true)
     private Student student;
 

@@ -11,5 +11,5 @@ public interface RegisteredPhoneRepository extends JpaRepository<RegisteredPhone
 
     Optional<RegisteredPhone> findByPhoneNumber(String phoneNumber);
 
-    void deleteByPhoneNumber(String phoneNumber);
+    Optional<RegisteredPhone> findByInvitationCode(String invitationCode);
 }

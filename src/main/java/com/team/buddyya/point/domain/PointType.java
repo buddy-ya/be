@@ -11,6 +11,7 @@ public enum PointType {
 
     SIGNUP("signup", +100, PointChangeType.EARN),
     UNIVERSITY_AUTH("university_auth", 1, PointChangeType.EARN),
+    INVITATION_EVENT("invitation_event", 10, PointChangeType.EARN),
     CHAT_REQUEST("chat_request", -1, PointChangeType.DEDUCT),
     MATCH_REQUEST("match_request", -1, PointChangeType.DEDUCT),
     CANCEL_MATCH_REQUEST("cancel_match_request", +1, PointChangeType.EARN),
