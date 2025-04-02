@@ -31,6 +31,7 @@ public record UserResponse(
         LocalDateTime banExpiration,
         String banReason,
         Integer point,
+        Integer totalUnreadCount,
         String accessToken,
         String refreshToken,
         String introduction,
@@ -38,7 +39,7 @@ public record UserResponse(
         Boolean isMatchingProfileCompleted
 ) {
 
-    public static UserResponse fromUserInfo(Student student, boolean isStudentIdCardRequested, Point point, MatchingProfile matchingProfile) {
+    public static UserResponse fromUserInfo(Student student, boolean isStudentIdCardRequested, Point point, Integer totalUnreadCount, MatchingProfile matchingProfile) {
         return new UserResponse(
                 student.getId(),
                 student.getRole().name(),
@@ -59,6 +60,7 @@ public record UserResponse(
                 null,
                 null,
                 point.getCurrentPoint(),
+                totalUnreadCount,
                 null,
                 null,
                 matchingProfile.getIntroduction(),
@@ -83,6 +85,7 @@ public record UserResponse(
                 convertToStringList(student.getMajors()),
                 convertToStringList(student.getLanguages()),
                 convertToStringList(student.getInterests()),
+                null,
                 null,
                 null,
                 null,
@@ -117,6 +120,7 @@ public record UserResponse(
                 student.getBanEndTime(),
                 student.getBanReason(),
                 point.getCurrentPoint(),
+                null,
                 accessToken,
                 refreshToken,
                 null,
@@ -146,6 +150,7 @@ public record UserResponse(
                 student.getBanEndTime(),
                 student.getBanReason(),
                 point.getCurrentPoint(),
+                null,
                 accessToken,
                 refreshToken,
                 null,
@@ -172,6 +177,7 @@ public record UserResponse(
                 null,
                 status,
                 false,
+                null,
                 null,
                 null,
                 null,

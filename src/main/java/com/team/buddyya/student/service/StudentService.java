@@ -8,6 +8,7 @@ import com.team.buddyya.certification.exception.PhoneAuthenticationExceptionType
 import com.team.buddyya.certification.repository.RegisteredPhoneRepository;
 import com.team.buddyya.certification.repository.StudentEmailRepository;
 import com.team.buddyya.certification.repository.StudentIdCardRepository;
+import com.team.buddyya.chatting.domain.ChatroomStudent;
 import com.team.buddyya.common.service.S3UploadService;
 import com.team.buddyya.match.repository.MatchRequestRepository;
 import com.team.buddyya.notification.repository.ExpoTokenRepository;
@@ -112,7 +113,8 @@ public class StudentService {
         Point point = findPointService.findByStudent(student);
         boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
                 .isPresent();
-        return UserResponse.fromUserInfo(student, isStudentIdCardRequested, point, matchingProfile);
+        int totalUnreadCount = calculateTotalUnreadCount(student);
+        return UserResponse.fromUserInfo(student, isStudentIdCardRequested, point, totalUnreadCount, matchingProfile);
     }
 
     public UserResponse updateUserProfileImage(StudentInfo studentInfo, boolean isDefault, UpdateProfileImageRequest request) {
@@ -120,15 +122,15 @@ public class StudentService {
         Point point = findPointService.findByStudent(student);
         boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
                 .isPresent();
+        int totalUnreadCount = calculateTotalUnreadCount(student);
+        MatchingProfile matchingProfile = getMatchingProfile(student);
         if (isDefault) {
             profileImageService.updateUserProfileImage(student, USER_PROFILE_DEFAULT_IMAGE.getUrl());
-            MatchingProfile matchingProfile = getMatchingProfile(student);
-            return UserResponse.fromUserInfo(student, isStudentIdCardRequested, point, matchingProfile);
+            return UserResponse.fromUserInfo(student, isStudentIdCardRequested, point, totalUnreadCount, matchingProfile);
         }
         String imageUrl = s3UploadService.uploadFile(PROFILE_IMAGE.getDirectoryName(), request.profileImage());
         profileImageService.updateUserProfileImage(student, imageUrl);
-        MatchingProfile matchingProfile = getMatchingProfile(student);
-        return UserResponse.fromUserInfo(student, isStudentIdCardRequested, point, matchingProfile);
+        return UserResponse.fromUserInfo(student, isStudentIdCardRequested, point, totalUnreadCount, matchingProfile);
     }
 
     private void updateMatchingProfileIntroduction(List<String> values, MatchingProfile matchingProfile) {
@@ -147,15 +149,15 @@ public class StudentService {
 
     public UserResponse getUserInfo(StudentInfo studentInfo, Long userId) {
         Student student = findStudentService.findByStudentId(userId);
+        MatchingProfile matchingProfile = getMatchingProfile(student);
         if (!studentInfo.id().equals(userId)) {
-            MatchingProfile matchingProfile = getMatchingProfile(student);
             return UserResponse.fromOtherUserInfo(student, matchingProfile);
         }
         Point point = findPointService.findByStudent(student);
         boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
                 .isPresent();
-        MatchingProfile matchingProfile = getMatchingProfile(student);
-        return UserResponse.fromUserInfo(student, isStudentIdCardRequested, point, matchingProfile);
+        int totalUnreadCount = calculateTotalUnreadCount(student);
+        return UserResponse.fromUserInfo(student, isStudentIdCardRequested, point, totalUnreadCount, matchingProfile);
     }
 
     public void updateStudentCertification(Student student) {
@@ -219,6 +221,15 @@ public class StudentService {
             expoTokenRepository.delete(student.getExpoToken());
         }
         student.getAvatar().setLoggedOut(true);
+    }
+
+    private int calculateTotalUnreadCount(Student student) {
+        return (int) student.getChatroomStudents()
+                .stream()
+                .filter(chatroomStudent -> !chatroomStudent.getIsExited())
+                .map(ChatroomStudent::getUnreadCount)
+                .filter(count -> count > 0)
+                .count();
     }
 
     private MatchingProfile getMatchingProfile(Student student) {
