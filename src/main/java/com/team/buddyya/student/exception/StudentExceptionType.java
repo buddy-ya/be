@@ -24,7 +24,8 @@ public enum StudentExceptionType implements BaseExceptionType {
     ALREADY_BLOCKED(2011, HttpStatus.CONFLICT, "User is already blocked."),
     INVITATION_CODE_NOT_FOUND(2012, HttpStatus.NOT_FOUND, "Invitation code not found."),
     INVALID_INVITATION_CODE(2013, HttpStatus.BAD_REQUEST, "This Invitation code is not valid."),
-    INVITATION_EVENT_ALREADY_PARTICIPATED(2014, HttpStatus.BAD_REQUEST, "You have already joined the invitation event.");
+    INVITATION_EVENT_ALREADY_PARTICIPATED(2014, HttpStatus.BAD_REQUEST, "You have already joined the invitation event."),
+    SELF_INVITATION_CODE(2015, HttpStatus.BAD_REQUEST, "You cannot use your own invitation code.");
 
     private final int errorCode;
     private final HttpStatus httpStatus;

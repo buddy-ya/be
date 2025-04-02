@@ -46,10 +46,7 @@ public class InvitationService {
     }
 
     public ValidateInvitationCodeResponse validateInvitationCode(StudentInfo studentInfo, String code) {
-        RegisteredPhone invitingStudentPhone = registeredPhoneRepository.findByInvitationCode(code)
-                .orElseThrow(() -> new StudentException(StudentExceptionType.INVALID_INVITATION_CODE));
-        Student invitingStudent = studentRepository.findByPhoneNumber(invitingStudentPhone.getPhoneNumber())
-                .orElseThrow(()-> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
+        Student invitingStudent = validateAndFindInvitingStudent(studentInfo.id(), code);
         Student requestedStudent = findStudentService.findByStudentId(studentInfo.id());
         RegisteredPhone requestedPhone = findRegisteredPhone(requestedStudent.getPhoneNumber());
         validateNotAlreadyParticipated(requestedPhone);
@@ -57,6 +54,17 @@ public class InvitationService {
         updatePointService.updatePoint(invitingStudent, PointType.INVITATION_EVENT);
         requestedPhone.markAsInvitationEventParticipated();
         return ValidateInvitationCodeResponse.from(point, PointType.INVITATION_EVENT);
+    }
+
+    private Student validateAndFindInvitingStudent(Long requestedStudentId, String code) {
+        RegisteredPhone invitingStudentPhone = registeredPhoneRepository.findByInvitationCode(code)
+                .orElseThrow(() -> new StudentException(StudentExceptionType.INVALID_INVITATION_CODE));
+        Student invitingStudent = studentRepository.findByPhoneNumber(invitingStudentPhone.getPhoneNumber())
+                .orElseThrow(() -> new StudentException(StudentExceptionType.STUDENT_NOT_FOUND));
+        if (requestedStudentId.equals(invitingStudent.getId())) {
+            throw new StudentException(StudentExceptionType.SELF_INVITATION_CODE);
+        }
+        return invitingStudent;
     }
 
     private void validateNotAlreadyParticipated(RegisteredPhone requestedPhone) {
