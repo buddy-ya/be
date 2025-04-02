@@ -25,7 +25,7 @@ public class RegisteredPhone extends CreatedTime {
     @Column(name="authentication_code", length = 6, nullable = false)
     private String authenticationCode;
 
-    @Column(name = "invitation_code", nullable = false, unique = true)
+    @Column(name = "invitation_code", length = 6, nullable = false, unique = true)
     private String invitationCode;
 
     @Column(name = "invitation_event_participated", nullable = false)
