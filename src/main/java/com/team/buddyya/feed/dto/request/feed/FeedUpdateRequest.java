@@ -10,5 +10,4 @@ public record FeedUpdateRequest(
         String category,
         List<MultipartFile> images
 ) {
-
 }
