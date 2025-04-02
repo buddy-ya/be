@@ -39,6 +39,7 @@ public class StudentIdCard extends BaseTime {
 
     public void updateImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+        this.rejectionReason = null;
     }
 
     public void updateRejectionReason(String rejectionReason) {
