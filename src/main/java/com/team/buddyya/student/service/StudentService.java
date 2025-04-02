@@ -25,6 +25,7 @@ import com.team.buddyya.student.dto.response.UserResponse;
 import com.team.buddyya.student.exception.StudentException;
 import com.team.buddyya.student.exception.StudentExceptionType;
 import com.team.buddyya.student.repository.BlockRepository;
+import com.team.buddyya.student.repository.MatchingProfileRepository;
 import com.team.buddyya.student.repository.StudentRepository;
 import com.team.buddyya.student.repository.UniversityRepository;
 import lombok.RequiredArgsConstructor;

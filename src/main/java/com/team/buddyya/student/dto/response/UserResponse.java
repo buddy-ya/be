@@ -1,6 +1,7 @@
 package com.team.buddyya.student.dto.response;
 
 import com.team.buddyya.point.domain.Point;
+import com.team.buddyya.student.domain.MatchingProfile;
 import com.team.buddyya.student.domain.Student;
 
 import java.time.LocalDateTime;
@@ -68,7 +69,7 @@ public record UserResponse(
         );
     }
 
-    public static UserResponse fromOtherUserInfo(Student student) {
+    public static UserResponse fromOtherUserInfo(Student student, MatchingProfile matchingProfile) {
         return new UserResponse(
                 student.getId(),
                 null,
