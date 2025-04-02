@@ -11,7 +11,7 @@ public enum StudentExceptionType implements BaseExceptionType {
     LANGUAGE_NOT_FOUND(2000, HttpStatus.NOT_FOUND, "Language not found."),
     INTEREST_NOT_FOUND(2000, HttpStatus.NOT_FOUND, "Interest not found."),
     PROFILE_IMAGE_NOT_FOUND(2000, HttpStatus.NOT_FOUND, "Profile image not found."),
-    MATCHING_PROFILE_NOT_FOUND(2000, HttpStatus.NOT_FOUND, "Matching Profile image not found."),
+    MATCHING_PROFILE_NOT_FOUND(2000, HttpStatus.NOT_FOUND, "Matching Profile not found."),
     INVALID_GENDER_VALUE(2000, HttpStatus.BAD_REQUEST, "Invalid gender value."),
     INVALID_DEFAULT_IMAGE_KEY(2000, HttpStatus.BAD_REQUEST, "Invalid profile image key."),
     INVALID_NAME_UPDATE_REQUEST(2001, HttpStatus.BAD_REQUEST, "Only one value is required for name update."),
