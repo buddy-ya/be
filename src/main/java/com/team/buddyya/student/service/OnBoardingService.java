@@ -26,6 +26,7 @@ public class OnBoardingService {
     private final ProfileImageService profileImageService;
     private final PointService pointService;
     private final AuthTokenRepository authTokenRepository;
+    private final InvitationService invitationService;
     private final JwtUtils jwtUtils;
 
     public UserResponse onboard(OnBoardingRequest request) {
