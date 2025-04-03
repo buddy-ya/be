@@ -74,6 +74,12 @@ public class NotificationService {
     private static final String CHAT_ACCEPT_BODY_KR = "대화를 시작해보세요!";
     private static final String CHAT_ACCEPT_BODY_EN = "Start the conversation now!";
 
+    private static final String INVITATION_REWARD_TITLE_KR = "포인트가 지급되었어요!";
+    private static final String INVITATION_REWARD_TITLE_EN = "You have received points!";
+
+    private static final String INVITATION_REWARD_BODY_KR = "추천 이벤트 참여로 포인트가 적립되었어요.";
+    private static final String INVITATION_REWARD_BODY_EN = "You received points from a referral event.";
+
     @Value("${EXPO.API.URL}")
     private String expoApiUrl;
 
@@ -291,6 +297,27 @@ public class NotificationService {
 
     private String getChatAcceptBody(boolean isKorean) {
         return isKorean ? CHAT_ACCEPT_BODY_KR : CHAT_ACCEPT_BODY_EN;
+    }
+
+    public void sendInvitationRewardNotification(Student student) {
+        try {
+            String token = getTokenByUserId(student.getId());
+            boolean isKorean = student.getIsKorean();
+            String title = isKorean ? INVITATION_REWARD_TITLE_KR : INVITATION_REWARD_TITLE_EN;
+            String body = isKorean ? INVITATION_REWARD_BODY_KR : INVITATION_REWARD_BODY_EN;
+            Map<String, Object> data = Map.of(
+                    "type", "POINT"
+            );
+            sendToExpo(RequestNotification.builder()
+                    .to(token)
+                    .title(title)
+                    .body(body)
+                    .data(data)
+                    .build()
+            );
+        } catch (NotificationException e) {
+            log.warn("추천인 포인트 지급 알림 전송 실패: {}", e.exceptionType().errorMessage());
+        }
     }
 
     private void sendToExpo(RequestNotification notification) {

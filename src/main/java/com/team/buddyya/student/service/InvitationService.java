@@ -5,6 +5,7 @@ import com.team.buddyya.certification.domain.RegisteredPhone;
 import com.team.buddyya.certification.exception.PhoneAuthenticationException;
 import com.team.buddyya.certification.exception.PhoneAuthenticationExceptionType;
 import com.team.buddyya.certification.repository.RegisteredPhoneRepository;
+import com.team.buddyya.notification.service.NotificationService;
 import com.team.buddyya.point.domain.Point;
 import com.team.buddyya.point.domain.PointType;
 import com.team.buddyya.point.service.UpdatePointService;
@@ -33,6 +34,7 @@ public class InvitationService {
     private final UpdatePointService updatePointService;
     private final FindStudentService findStudentService;
     private final StudentRepository studentRepository;
+    private final NotificationService notificationService;
 
     public String createInvitationCode() {
         return generateUniqueCode();
@@ -52,6 +54,7 @@ public class InvitationService {
         validateNotAlreadyParticipated(requestedPhone);
         Point point = updatePointService.updatePoint(requestedStudent, PointType.INVITATION_EVENT);
         updatePointService.updatePoint(invitingStudent, PointType.INVITATION_EVENT);
+        notificationService.sendInvitationRewardNotification(invitingStudent);
         requestedPhone.markAsInvitationEventParticipated();
         return ValidateInvitationCodeResponse.from(point, PointType.INVITATION_EVENT);
     }
