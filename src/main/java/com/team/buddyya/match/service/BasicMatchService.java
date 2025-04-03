@@ -22,8 +22,10 @@ import com.team.buddyya.point.domain.PointType;
 import com.team.buddyya.point.service.FindPointService;
 import com.team.buddyya.point.service.UpdatePointService;
 import com.team.buddyya.student.domain.Gender;
+import com.team.buddyya.student.domain.MatchingProfile;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.repository.BlockRepository;
+import com.team.buddyya.student.repository.MatchingProfileRepository;
 import com.team.buddyya.student.service.FindStudentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -49,10 +51,12 @@ public class BasicMatchService implements MatchService {
     private final FindPointService findPointService;
     private final UpdatePointService updatePointService;
     private final BlockRepository blockRepository;
+    private final MatchingProfileRepository matchingProfileRepository;
 
     @Override
     public MatchResponse requestMatch(Long studentId, MatchCreateRequest request) {
         Student student = findStudentService.findByStudentId(studentId);
+        validateMatchProfileCompleted(student);
         Point point = updatePointService.updatePoint(student, PointType.MATCH_REQUEST);
         UniversityType universityType = UniversityType.fromValue(request.universityType());
         GenderType genderType = GenderType.fromValue(request.genderType());
@@ -70,6 +74,12 @@ public class BasicMatchService implements MatchService {
         }
         MatchRequest newMatchRequest = createMatchRequest(student, null, universityType, genderType, MatchRequestStatus.MATCH_PENDING);
         return MatchResponse.from(newMatchRequest, point);
+    }
+
+    private void validateMatchProfileCompleted(Student student) {
+        MatchingProfile profile = matchingProfileRepository.findByStudent(student)
+                .orElseThrow(() -> new MatchException(MatchExceptionType.MATCH_PROFILE_NOT_FOUND));
+        profile.validateCompletion();
     }
 
     @Override

@@ -1,5 +1,7 @@
 package com.team.buddyya.student.domain;
 
+import com.team.buddyya.match.exception.MatchException;
+import com.team.buddyya.match.exception.MatchExceptionType;
 import com.team.buddyya.student.exception.StudentException;
 import com.team.buddyya.student.exception.StudentExceptionType;
 import jakarta.persistence.*;
@@ -56,5 +58,13 @@ public class MatchingProfile {
         boolean hasValidIntroduction = (this.introduction != null) && (this.introduction.length() >= 10);
         boolean hasValidActivities = (this.buddyActivity != null) && (this.buddyActivity.length() >= 10);
         this.isCompleted = hasValidIntroduction && hasValidActivities;
+    }
+
+    public void validateCompletion() {
+        boolean isIntroValid = (this.introduction != null) && (this.introduction.length() >= 10);
+        boolean isActivityValid = (this.buddyActivity != null) && (this.buddyActivity.length() >= 10);
+        if (!(isIntroValid && isActivityValid && this.isCompleted)) {
+            throw new MatchException(MatchExceptionType.MATCH_PROFILE_NOT_COMPLETED);
+        }
     }
 }
