@@ -306,7 +306,7 @@ public class NotificationService {
             String title = isKorean ? INVITATION_REWARD_TITLE_KR : INVITATION_REWARD_TITLE_EN;
             String body = isKorean ? INVITATION_REWARD_BODY_KR : INVITATION_REWARD_BODY_EN;
             Map<String, Object> data = Map.of(
-                    "type", "POINT_REWARD"
+                    "type", "POINT"
             );
             sendToExpo(RequestNotification.builder()
                     .to(token)
