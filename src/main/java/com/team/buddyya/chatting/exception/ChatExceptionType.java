@@ -9,7 +9,8 @@ public enum ChatExceptionType implements BaseExceptionType {
     USER_NOT_PART_OF_CHATROOM(5002, HttpStatus.FORBIDDEN, "User is not part of the chatroom."),
     SELF_CHAT_REQUEST_NOT_ALLOWED(5003, HttpStatus.BAD_REQUEST, "Cannot send a chat request to yourself."),
     CHAT_REQUEST_ALREADY_EXISTS(5004, HttpStatus.BAD_REQUEST, "Chat request already sent."),
-    CHATROOM_ALREADY_EXISTS(5005, HttpStatus.BAD_REQUEST, "Chatroom already exists.");
+    CHATROOM_ALREADY_EXISTS(5005, HttpStatus.BAD_REQUEST, "Chatroom already exists."),
+    CHAT_REQUEST_NOT_FOUND(5006, HttpStatus.BAD_REQUEST, "ChatRequest not found.");
 
     private final int errorCode;
     private final HttpStatus httpStatus;
