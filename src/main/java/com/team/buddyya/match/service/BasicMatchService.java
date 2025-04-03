@@ -61,21 +61,23 @@ public class BasicMatchService implements MatchService {
         validateMatchProfileCompleted(student);
         validateMatchRequestTime(student);
         Point point = updatePointService.updatePoint(student, PointType.MATCH_REQUEST);
+        NationalityType nationalityType = NationalityType.fromValue(request.nationalityType());
         UniversityType universityType = UniversityType.fromValue(request.universityType());
         GenderType genderType = GenderType.fromValue(request.genderType());
         Set<Long> existingBuddies = matchedHistoryRepository.findBuddyIdsByStudentId(studentId);
         Set<Long> blockedStudentIds = blockRepository.findBlockedStudentIdByBlockerId(studentId);
         Optional<MatchRequest> optionalMatchRequest = findValidMatchRequest(
                 student,
+                nationalityType,
                 universityType,
                 genderType,
                 existingBuddies,
                 blockedStudentIds
         );
         if (optionalMatchRequest.isPresent()) {
-            return processMatchSuccess(student, universityType, genderType, optionalMatchRequest.get(), point);
+            return processMatchSuccess(student, nationalityType, universityType, genderType, optionalMatchRequest.get(), point);
         }
-        MatchRequest newMatchRequest = createMatchRequest(student, null, universityType, genderType, MatchRequestStatus.MATCH_PENDING);
+        MatchRequest newMatchRequest = createMatchRequest(student, null, nationalityType, universityType, genderType, MatchRequestStatus.MATCH_PENDING);
         return MatchResponse.from(newMatchRequest, point);
     }
 
@@ -121,17 +123,18 @@ public class BasicMatchService implements MatchService {
     }
 
     private Optional<MatchRequest> findValidMatchRequest(
-            Student requestedStudent, UniversityType universityType, GenderType genderType, Set<Long> existingBuddies, Set<Long> blockedStudentIds) {
-        return matchRequestRepository.findAllPendingMatches(requestedStudent.getIsKorean()).stream()
-                .filter(matchRequest -> isValidMatchRequest(requestedStudent, matchRequest, universityType, genderType, existingBuddies, blockedStudentIds))
+            Student requestedStudent, NationalityType nationalityType, UniversityType universityType, GenderType genderType, Set<Long> existingBuddies, Set<Long> blockedStudentIds) {
+        return matchRequestRepository.findAllPendingMatches().stream()
+                .filter(matchRequest -> isValidMatchRequest(requestedStudent, matchRequest, nationalityType, universityType, genderType, existingBuddies, blockedStudentIds))
                 .findFirst();
     }
 
     private boolean isValidMatchRequest(
-            Student requestedStudent, MatchRequest matchRequest,
+            Student requestedStudent, MatchRequest matchRequest, NationalityType requestedNationalityType,
             UniversityType requestedUniversityType, GenderType requestedGenderType,
             Set<Long> existingBuddies, Set<Long> blockedStudentIds) {
         Gender requestedGender = requestedStudent.getGender();
+        boolean requestedNationality = requestedStudent.getIsKorean();
         Long requestedUniversityId = requestedStudent.getUniversity().getId();
         Student matchStudent = matchRequest.getStudent();
         if (existingBuddies.contains(matchStudent.getId())) {
@@ -144,30 +147,53 @@ public class BasicMatchService implements MatchService {
         if (isAlreadyExistChatroom) {
             return false;
         }
-        return isUniversityMatch(matchRequest.getUniversityType(), requestedUniversityType, matchRequest.getUniversityId(), requestedUniversityId)
+        return isNationalityMatch(matchRequest.getNationalityType(), requestedNationalityType, matchStudent.getIsKorean(), requestedNationality)
+                && isUniversityMatch(matchRequest.getUniversityType(), requestedUniversityType, matchRequest.getUniversityId(), requestedUniversityId)
                 && isGenderMatch(matchRequest.getGenderType(), requestedGenderType, matchStudent.getGender(), requestedGender);
     }
 
-    private boolean isUniversityMatch(UniversityType matchRequestUniversityType, UniversityType requestedUniversityType,
-                                      Long matchRequestUniversityId, Long requestedUniversityId) {
-        if (matchRequestUniversityType == UniversityType.SAME_UNIVERSITY && requestedUniversityType == UniversityType.SAME_UNIVERSITY) {
-            return matchRequestUniversityId.equals(requestedUniversityId);
+    private boolean isNationalityMatch(NationalityType requesterPreference,
+                                       NationalityType matchRequestPreference,
+                                       boolean isMatchRequestKorean,
+                                       boolean isRequesterKorean) {
+        if (isRequesterKorean) {
+            return !isMatchRequestKorean && matchRequestPreference == NationalityType.KOREAN;
         }
-        if (matchRequestUniversityType == UniversityType.DIFFERENT_UNIVERSITY && requestedUniversityType == UniversityType.DIFFERENT_UNIVERSITY) {
-            return !matchRequestUniversityId.equals(requestedUniversityId);
+        if (requesterPreference == NationalityType.KOREAN) {
+            return isMatchRequestKorean;
+        }
+        if (requesterPreference == NationalityType.GLOBAL) {
+            return !isMatchRequestKorean && matchRequestPreference == NationalityType.GLOBAL;
         }
         return false;
     }
 
-    private boolean isGenderMatch(GenderType matchRequestGenderType, GenderType requestedGenderType,
-                                  Gender matchRequestGender, Gender requestedGender) {
-        if (matchRequestGenderType == GenderType.ALL && requestedGenderType == GenderType.ALL) {
-            return true;
+    private boolean isUniversityMatch(UniversityType requesterPreference,
+                                      UniversityType matchRequestPreference,
+                                      Long requesterUniversityId,
+                                      Long matchRequestUniversityId) {
+        if (requesterPreference == UniversityType.SAME_UNIVERSITY &&
+                matchRequestPreference == UniversityType.SAME_UNIVERSITY) {
+            return requesterUniversityId.equals(matchRequestUniversityId);
         }
-        return matchRequestGender == requestedGender;
+        if (requesterPreference == UniversityType.DIFFERENT_UNIVERSITY &&
+                matchRequestPreference == UniversityType.DIFFERENT_UNIVERSITY) {
+            return !requesterUniversityId.equals(matchRequestUniversityId);
+        }
+        return false;
     }
 
-    private MatchResponse processMatchSuccess(Student student, UniversityType universityType, GenderType genderType, MatchRequest matchRequest, Point point) {
+    private boolean isGenderMatch(GenderType requesterPreference,
+                                  GenderType matchRequestPreference,
+                                  Gender requesterGender,
+                                  Gender matchRequestGender) {
+        if (requesterPreference == GenderType.ALL && matchRequestPreference == GenderType.ALL) {
+            return true;
+        }
+        return requesterGender == matchRequestGender;
+    }
+
+    private MatchResponse processMatchSuccess(Student student, NationalityType nationalityType, UniversityType universityType, GenderType genderType, MatchRequest matchRequest, Point point) {
         Student matchedStudent = matchRequest.getStudent();
         MatchedHistory requestedMatchedHistory = MatchedHistory.builder()
                 .student(student)
@@ -180,7 +206,7 @@ public class BasicMatchService implements MatchService {
         matchedHistoryRepository.save(requestedMatchedHistory);
         matchedHistoryRepository.save(existingMatchedHistory);
         Chatroom chatroom = chatService.createChatroom(student, matchedStudent, MATCHING);
-        MatchRequest newMatchRequest = createMatchRequest(student, chatroom.getId(), universityType, genderType, MatchRequestStatus.MATCH_SUCCESS);
+        MatchRequest newMatchRequest = createMatchRequest(student, chatroom.getId(), nationalityType, universityType, genderType, MatchRequestStatus.MATCH_SUCCESS);
         matchRequest.updateMatchRequestStatusSuccess();
         matchRequest.updateChatroomId(chatroom.getId());
         notificationService.sendMatchSuccessNotification(student, chatroom.getId());
@@ -191,11 +217,13 @@ public class BasicMatchService implements MatchService {
     }
 
     private MatchRequest createMatchRequest(Student student, Long chatroomId,
-                                            UniversityType universityType, GenderType genderType, MatchRequestStatus status) {
+                                            NationalityType nationalityType, UniversityType universityType, GenderType genderType,
+                                            MatchRequestStatus status) {
         MatchRequest matchRequest = MatchRequest.builder()
                 .student(student)
                 .chatroomId(chatroomId)
                 .isKorean(student.getIsKorean())
+                .nationalityType(nationalityType)
                 .universityType(universityType)
                 .genderType(genderType)
                 .matchRequestStatus(status)

@@ -29,6 +29,10 @@ public class MatchRequest extends BaseTime {
     private Long universityId;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "nationality_type", nullable = false)
+    private NationalityType nationalityType;
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "university_type", nullable = false)
     private UniversityType universityType;
 
@@ -44,9 +48,10 @@ public class MatchRequest extends BaseTime {
     private Boolean isKorean;
 
     @Builder
-    public MatchRequest(Student student, Long chatroomId, Long universityId, UniversityType universityType, GenderType genderType, MatchRequestStatus matchRequestStatus, Boolean isKorean) {
+    public MatchRequest(Student student, Long chatroomId, Long universityId, NationalityType nationalityType, UniversityType universityType, GenderType genderType, MatchRequestStatus matchRequestStatus, Boolean isKorean) {
         this.student = student;
         this.chatroomId = chatroomId;
+        this.nationalityType = nationalityType;
         this.universityId = universityId;
         this.universityType = universityType;
         this.genderType = genderType;

@@ -14,11 +14,10 @@ public interface MatchRequestRepository extends JpaRepository<MatchRequest, Long
 
     @Query("""
         SELECT m FROM MatchRequest m 
-        WHERE m.isKorean <> :isKorean 
-        AND m.matchRequestStatus = 'MATCH_PENDING'
+        WHERE m.matchRequestStatus = 'MATCH_PENDING'
         ORDER BY m.createdDate ASC
     """)
-    List<MatchRequest> findAllPendingMatches(boolean isKorean);
+    List<MatchRequest> findAllPendingMatches();
 
     void deleteByStudent(Student student);
 

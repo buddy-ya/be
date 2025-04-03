@@ -1,4 +1,4 @@
 package com.team.buddyya.match.dto.request;
 
-public record MatchCreateRequest(String universityType, String genderType) {
+public record MatchCreateRequest(String nationalityType, String universityType, String genderType) {
 }
