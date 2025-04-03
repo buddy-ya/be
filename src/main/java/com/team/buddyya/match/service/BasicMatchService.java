@@ -31,6 +31,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
 
@@ -57,6 +59,7 @@ public class BasicMatchService implements MatchService {
     public MatchResponse requestMatch(Long studentId, MatchCreateRequest request) {
         Student student = findStudentService.findByStudentId(studentId);
         validateMatchProfileCompleted(student);
+        validateMatchRequestTime(student);
         Point point = updatePointService.updatePoint(student, PointType.MATCH_REQUEST);
         UniversityType universityType = UniversityType.fromValue(request.universityType());
         GenderType genderType = GenderType.fromValue(request.genderType());
@@ -74,12 +77,6 @@ public class BasicMatchService implements MatchService {
         }
         MatchRequest newMatchRequest = createMatchRequest(student, null, universityType, genderType, MatchRequestStatus.MATCH_PENDING);
         return MatchResponse.from(newMatchRequest, point);
-    }
-
-    private void validateMatchProfileCompleted(Student student) {
-        MatchingProfile profile = matchingProfileRepository.findByStudent(student)
-                .orElseThrow(() -> new MatchException(MatchExceptionType.MATCH_PROFILE_NOT_FOUND));
-        profile.validateCompletion();
     }
 
     @Override
@@ -113,7 +110,8 @@ public class BasicMatchService implements MatchService {
             ChatroomStudent chatroomStudent = chatroomStudentRepository.findByChatroomAndStudentId(chatroom, studentId)
                     .orElseThrow(() -> new ChatException(ChatExceptionType.USER_NOT_PART_OF_CHATROOM));
             boolean isExited = chatroomStudent.getIsExited().equals(true);
-            MatchedHistory recentMatchedHistory = matchedHistoryRepository.findMostRecentMatchedHistoryByStudentId(studentId);
+            MatchedHistory recentMatchedHistory = matchedHistoryRepository.findMostRecentMatchedHistoryByStudentId(studentId)
+                    .orElseThrow(()-> new MatchException(MatchExceptionType.MATCH_HISTORY_NOT_FOUND));
             Student matchedStudent = findStudentService.findByStudentId(recentMatchedHistory.getBuddyId());
             MatchingProfile matchingProfile = matchingProfileRepository.findByStudent(matchedStudent)
                     .orElseThrow(() -> new MatchException(MatchExceptionType.MATCH_PROFILE_NOT_FOUND));
@@ -204,5 +202,24 @@ public class BasicMatchService implements MatchService {
                 .universityId(student.getUniversity().getId())
                 .build();
         return matchRequestRepository.save(matchRequest);
+    }
+
+    private void validateMatchProfileCompleted(Student student) {
+        MatchingProfile profile = matchingProfileRepository.findByStudent(student)
+                .orElseThrow(() -> new MatchException(MatchExceptionType.MATCH_PROFILE_NOT_FOUND));
+        profile.validateCompletion();
+    }
+
+    private void validateMatchRequestTime(Student student) {
+        Optional<MatchedHistory> recentMatchedHistory =
+                matchedHistoryRepository.findMostRecentMatchedHistoryByStudentId(student.getId());
+        if (recentMatchedHistory.isPresent()) {
+            LocalDateTime matchedAt = recentMatchedHistory.get().getCreatedDate();
+            LocalDate today = LocalDate.now();
+            LocalDate matchedDate = matchedAt.toLocalDate();
+            if (matchedDate.isEqual(today)) {
+                throw new MatchException(MatchExceptionType.MATCH_REQUEST_TIME_INVALID);
+            }
+        }
     }
 }
