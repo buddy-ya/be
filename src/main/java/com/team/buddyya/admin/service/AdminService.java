@@ -11,12 +11,18 @@ import com.team.buddyya.certification.exception.CertificateException;
 import com.team.buddyya.certification.repository.StudentIdCardRepository;
 import com.team.buddyya.chatting.domain.Chat;
 import com.team.buddyya.chatting.domain.Chatroom;
+import com.team.buddyya.chatting.domain.ChatroomType;
 import com.team.buddyya.chatting.exception.ChatException;
 import com.team.buddyya.chatting.exception.ChatExceptionType;
 import com.team.buddyya.chatting.repository.ChatRepository;
 import com.team.buddyya.chatting.repository.ChatroomRepository;
 import com.team.buddyya.common.service.S3UploadService;
 import com.team.buddyya.notification.service.NotificationService;
+import com.team.buddyya.point.domain.Point;
+import com.team.buddyya.point.domain.PointStatus;
+import com.team.buddyya.point.domain.PointType;
+import com.team.buddyya.point.repository.PointStatusRepository;
+import com.team.buddyya.point.service.FindPointService;
 import com.team.buddyya.report.domain.Report;
 import com.team.buddyya.report.domain.ReportImage;
 import com.team.buddyya.report.domain.ReportType;
@@ -52,11 +58,13 @@ public class AdminService {
     private final FindStudentService findStudentService;
     private final S3UploadService s3UploadService;
     private final NotificationService notificationService;
+    private final FindPointService findPointService;
     private final StudentIdCardRepository studentIdCardRepository;
     private final ReportRepository reportRepository;
     private final ReportImageRepository reportImageRepository;
     private final ChatroomRepository chatroomRepository;
     private final ChatRepository chatRepository;
+    private final PointStatusRepository pointStatusRepository;
 
     @Transactional(readOnly = true)
     public List<StudentIdCardResponse> getStudentIdCards() {
@@ -130,5 +138,26 @@ public class AdminService {
         return chats.stream()
                 .map(AdminChatMessageResponse::from)
                 .toList();
+    }
+
+    public void refundPointsToUser(Long roomId, Long reportUserId) {
+        Chatroom chatroom = chatroomRepository.findById(roomId)
+                .orElseThrow(() -> new ChatException(ChatExceptionType.CHATROOM_NOT_FOUND));
+        if (chatroom.getType().equals(ChatroomType.MATCHING)) {
+            Student reportUser = findStudentService.findByStudentId(reportUserId);
+            refundPoint(reportUser, PointType.CHATROOM_NO_RESPONSE_REFUND);
+        }
+    }
+
+    private void refundPoint(Student student, PointType pointType) {
+        Point point = findPointService.findByStudent(student);
+        int pointChange = pointType.getPointChange();
+        point.updatePoint(pointChange);
+        PointStatus pointStatus = PointStatus.builder()
+                .point(point)
+                .pointType(pointType)
+                .changedPoint(pointChange)
+                .build();
+        pointStatusRepository.save(pointStatus);
     }
 }
