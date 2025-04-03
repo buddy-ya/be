@@ -64,4 +64,12 @@ public class AdminController {
         List<AdminChatMessageResponse> response = adminService.getAllChatMessages(roomId);
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/refund/{roomId}/{reportUserId}")
+    public ResponseEntity<Void> refundPointsToUser(
+            @PathVariable("roomId") Long roomId,
+            @PathVariable("reportUserId") Long reportUserId) {
+        adminService.refundPointsToUser(roomId, reportUserId);
+        return ResponseEntity.ok().build();
+    }
 }
