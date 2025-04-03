@@ -83,6 +83,7 @@ public class ChatRequestService {
 
     public void deleteChatRequest(CustomUserDetails userDetails, Long chatRequestId) {
         Student sender = findStudentService.findByStudentId(userDetails.getStudentInfo().id());
+        updatePointService.updatePoint(sender, PointType.REJECTED_CHAT_REQUEST);
         chatRequestRepository.deleteById(chatRequestId);
     }
 
@@ -90,7 +91,9 @@ public class ChatRequestService {
     public void deleteExpiredChatRequests() {
         LocalDateTime expirationTime = LocalDateTime.now().minusDays(EXPIRED_CHAT_REQUEST_DAY);
         List<ChatRequest> expiredChatRequests = chatRequestRepository.findAllByCreatedDateBefore(expirationTime);
-        // TO DO: 포인트 환급 등 진행
+        expiredChatRequests.stream()
+                .map(ChatRequest::getSender)
+                .forEach(sender -> updatePointService.updatePoint(sender, PointType.REJECTED_CHAT_REQUEST));
         chatRequestRepository.deleteByCreatedDateBefore(expirationTime);
     }
 
