@@ -18,11 +18,10 @@ import com.team.buddyya.chatting.repository.ChatRepository;
 import com.team.buddyya.chatting.repository.ChatroomRepository;
 import com.team.buddyya.common.service.S3UploadService;
 import com.team.buddyya.notification.service.NotificationService;
-import com.team.buddyya.point.domain.Point;
-import com.team.buddyya.point.domain.PointStatus;
 import com.team.buddyya.point.domain.PointType;
 import com.team.buddyya.point.repository.PointStatusRepository;
 import com.team.buddyya.point.service.FindPointService;
+import com.team.buddyya.point.service.UpdatePointService;
 import com.team.buddyya.report.domain.Report;
 import com.team.buddyya.report.domain.ReportImage;
 import com.team.buddyya.report.domain.ReportType;
@@ -59,6 +58,7 @@ public class AdminService {
     private final S3UploadService s3UploadService;
     private final NotificationService notificationService;
     private final FindPointService findPointService;
+    private final UpdatePointService updatePointService;
     private final StudentIdCardRepository studentIdCardRepository;
     private final ReportRepository reportRepository;
     private final ReportImageRepository reportImageRepository;
@@ -145,19 +145,7 @@ public class AdminService {
                 .orElseThrow(() -> new ChatException(ChatExceptionType.CHATROOM_NOT_FOUND));
         if (chatroom.getType().equals(ChatroomType.MATCHING)) {
             Student reportUser = findStudentService.findByStudentId(reportUserId);
-            refundPoint(reportUser, PointType.CHATROOM_NO_RESPONSE_REFUND);
+            updatePointService.updatePoint(reportUser, PointType.CHATROOM_NO_RESPONSE_REFUND);
         }
-    }
-
-    private void refundPoint(Student student, PointType pointType) {
-        Point point = findPointService.findByStudent(student);
-        int pointChange = pointType.getPointChange();
-        point.updatePoint(pointChange);
-        PointStatus pointStatus = PointStatus.builder()
-                .point(point)
-                .pointType(pointType)
-                .changedPoint(pointChange)
-                .build();
-        pointStatusRepository.save(pointStatus);
     }
 }
