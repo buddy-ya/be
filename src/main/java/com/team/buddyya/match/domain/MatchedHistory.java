@@ -1,5 +1,6 @@
 package com.team.buddyya.match.domain;
 
+import com.team.buddyya.common.domain.CreatedTime;
 import com.team.buddyya.student.domain.Student;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -11,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "matched_history")
-public class MatchedHistory {
+public class MatchedHistory extends CreatedTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
