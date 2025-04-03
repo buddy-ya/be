@@ -115,7 +115,9 @@ public class BasicMatchService implements MatchService {
             boolean isExited = chatroomStudent.getIsExited().equals(true);
             MatchedHistory recentMatchedHistory = matchedHistoryRepository.findMostRecentMatchedHistoryByStudentId(studentId);
             Student matchedStudent = findStudentService.findByStudentId(recentMatchedHistory.getBuddyId());
-            return MatchStatusResponse.from(chatroom, matchedStudent, matchRequest.get(), isExited);
+            MatchingProfile matchingProfile = matchingProfileRepository.findByStudent(matchedStudent)
+                    .orElseThrow(() -> new MatchException(MatchExceptionType.MATCH_PROFILE_NOT_FOUND));
+            return MatchStatusResponse.from(chatroom, matchedStudent, matchRequest.get(), isExited, matchingProfile);
         }
         throw new MatchException(MatchExceptionType.UNEXPECTED_MATCH_STATUS);
     }
@@ -185,7 +187,9 @@ public class BasicMatchService implements MatchService {
         matchRequest.updateChatroomId(chatroom.getId());
         notificationService.sendMatchSuccessNotification(student, chatroom.getId());
         notificationService.sendMatchSuccessNotification(matchedStudent, chatroom.getId());
-        return MatchResponse.from(chatroom, matchedStudent, newMatchRequest, point, false);
+        MatchingProfile matchingProfile = matchingProfileRepository.findByStudent(matchedStudent)
+                .orElseThrow(() -> new MatchException(MatchExceptionType.MATCH_PROFILE_NOT_FOUND));
+        return MatchResponse.from(chatroom, matchedStudent, newMatchRequest, point, false, matchingProfile);
     }
 
     private MatchRequest createMatchRequest(Student student, Long chatroomId,
