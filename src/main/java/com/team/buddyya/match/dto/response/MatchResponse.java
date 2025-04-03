@@ -4,13 +4,13 @@ import com.team.buddyya.chatting.domain.Chatroom;
 import com.team.buddyya.match.domain.MatchRequest;
 import com.team.buddyya.point.domain.Point;
 import com.team.buddyya.point.domain.PointType;
+import com.team.buddyya.student.domain.MatchingProfile;
 import com.team.buddyya.student.domain.Student;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.team.buddyya.student.domain.UserProfileDefaultImage.getChatroomProfileImage;
-import static com.team.buddyya.student.domain.UserProfileDefaultImage.isDefaultUserProfileImage;
 
 public record MatchResponse(
         Long id,
@@ -27,10 +27,12 @@ public record MatchResponse(
         String matchStatus,
         Integer point,
         Integer pointChange,
+        String introduction,
+        String buddyActivity,
         boolean isExited
 ) {
 
-    public static MatchResponse from(Chatroom chatroom, Student buddy, MatchRequest matchRequest, Point point, boolean isExited) {
+    public static MatchResponse from(Chatroom chatroom, Student buddy, MatchRequest matchRequest, Point point, boolean isExited, MatchingProfile matchingProfile) {
         return new MatchResponse(
                 matchRequest.getId(),
                 chatroom.getId(),
@@ -46,6 +48,8 @@ public record MatchResponse(
                 matchRequest.getMatchRequestStatus().getDisplayName(),
                 point.getCurrentPoint(),
                 PointType.MATCH_REQUEST.getPointChange(),
+                matchingProfile.getIntroduction(),
+                matchingProfile.getBuddyActivity(),
                 isExited
         );
     }
@@ -66,6 +70,8 @@ public record MatchResponse(
                 matchRequest.getMatchRequestStatus().getDisplayName(),
                 point.getCurrentPoint(),
                 PointType.MATCH_REQUEST.getPointChange(),
+                null,
+                null,
                 false
         );
     }
