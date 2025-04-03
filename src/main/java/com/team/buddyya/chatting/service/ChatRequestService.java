@@ -17,6 +17,7 @@ import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.service.FindStudentService;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import com.team.buddyya.point.service.PointService;
 import lombok.RequiredArgsConstructor;
@@ -82,8 +83,9 @@ public class ChatRequestService {
     }
 
     public void deleteChatRequest(CustomUserDetails userDetails, Long chatRequestId) {
-        Student sender = findStudentService.findByStudentId(userDetails.getStudentInfo().id());
-        updatePointService.updatePoint(sender, PointType.REJECTED_CHAT_REQUEST);
+        ChatRequest chatRequest = chatRequestRepository.findById(chatRequestId)
+                .orElseThrow(()-> new ChatException(ChatExceptionType.CHAT_REQUEST_NOT_FOUND));
+        updatePointService.updatePoint(chatRequest.getSender(), PointType.REJECTED_CHAT_REQUEST);
         chatRequestRepository.deleteById(chatRequestId);
     }
 
