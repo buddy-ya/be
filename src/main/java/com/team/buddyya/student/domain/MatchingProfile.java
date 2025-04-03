@@ -61,9 +61,7 @@ public class MatchingProfile {
     }
 
     public void validateCompletion() {
-        boolean isIntroValid = (this.introduction != null) && (this.introduction.length() >= 10);
-        boolean isActivityValid = (this.buddyActivity != null) && (this.buddyActivity.length() >= 10);
-        if (!(isIntroValid && isActivityValid && this.isCompleted)) {
+        if (this.isCompleted == false) {
             throw new MatchException(MatchExceptionType.MATCH_PROFILE_NOT_COMPLETED);
         }
     }
