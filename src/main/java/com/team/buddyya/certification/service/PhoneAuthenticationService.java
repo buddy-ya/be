@@ -5,16 +5,11 @@ import com.team.buddyya.auth.jwt.JwtUtils;
 import com.team.buddyya.certification.domain.PhoneInfo;
 import com.team.buddyya.certification.domain.RegisteredPhone;
 import com.team.buddyya.certification.dto.response.AdminAccountResponse;
-import com.team.buddyya.certification.dto.request.SavePhoneInfoRequest;
 import com.team.buddyya.certification.dto.response.SendCodeResponse;
 import com.team.buddyya.certification.dto.response.TestAccountResponse;
 import com.team.buddyya.certification.exception.PhoneAuthenticationException;
 import com.team.buddyya.certification.exception.PhoneAuthenticationExceptionType;
-import com.team.buddyya.certification.repository.AdminAccountRepository;
-import com.team.buddyya.certification.repository.PhoneInfoRepository;
-import com.team.buddyya.certification.repository.RegisteredPhoneRepository;
-import com.team.buddyya.certification.repository.StudentIdCardRepository;
-import com.team.buddyya.certification.repository.TestAccountRepository;
+import com.team.buddyya.certification.repository.*;
 import com.team.buddyya.point.domain.Point;
 import com.team.buddyya.point.service.FindPointService;
 import com.team.buddyya.student.domain.Student;
@@ -22,7 +17,6 @@ import com.team.buddyya.student.dto.response.UserResponse;
 import com.team.buddyya.student.repository.StudentRepository;
 import com.team.buddyya.student.service.InvitationService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,9 +40,6 @@ public class PhoneAuthenticationService {
     private final InvitationService invitationService;
     private final JwtUtils jwtUtils;
 
-    @Value("${test.phone.number.prefix}")
-    private String testPhoneNumberPrefix;
-
     public SendCodeResponse saveCode(String phoneNumber, String generatedCode) {
         RegisteredPhone registeredPhone = getOrCreatePhone(phoneNumber, generatedCode);
         registeredPhoneRepository.save(registeredPhone);
@@ -59,6 +50,7 @@ public class PhoneAuthenticationService {
         RegisteredPhone registeredPhone = registeredPhoneRepository.findByPhoneNumber(phoneNumber)
                 .orElseThrow(() -> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.PHONE_NOT_FOUND));
         if (testAccountRepository.findByPhoneNumber(phoneNumber).isPresent()) {
+            resetMessageCountIfExists(udId);
             return;
         }
         if (!inputCode.equals(registeredPhone.getAuthenticationCode())) {
