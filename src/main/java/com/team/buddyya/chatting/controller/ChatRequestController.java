@@ -39,24 +39,24 @@ public class ChatRequestController {
     }
 
     @PostMapping("/{receiverId}")
-    public ResponseEntity<CreateChatRequestResponse> createChatRequest(@AuthenticationPrincipal CustomUserDetails userDetails
+    public ResponseEntity<Void> createChatRequest(@AuthenticationPrincipal CustomUserDetails userDetails
             , @PathVariable("receiverId") Long receiverId) {
-        CreateChatRequestResponse response = chatRequestService.createChatRequest(userDetails, receiverId);
-        return ResponseEntity.ok(response);
+        chatRequestService.createChatRequest(userDetails, receiverId);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping
     public ResponseEntity<CreateChatroomResponse> createOrGetChatRoom(@RequestBody CreateChatroomRequest request,
                                                                       @AuthenticationPrincipal CustomUserDetails userDetails) {
         CreateChatroomResponse response = chatService.createOrGetChatRoom(request, userDetails.getStudentInfo(), CHAT_REQUEST);
-        chatRequestService.deleteChatRequest(userDetails, request.chatRequestId());
+        chatRequestService.deleteChatRequest(request.chatRequestId());
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{chatRequestId}")
     public ResponseEntity<Void> deleteChatRequest(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                   @PathVariable("chatRequestId") Long chatRequestId) {
-        chatRequestService.deleteChatRequest(userDetails, chatRequestId);
+        chatRequestService.deleteChatRequest(chatRequestId);
         return ResponseEntity.noContent().build();
     }
 }

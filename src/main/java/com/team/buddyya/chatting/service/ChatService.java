@@ -58,8 +58,6 @@ public class ChatService {
     private final Map<Long, Set<WebSocketSession>> sessionsPerRoom = new ConcurrentHashMap<>();
     private final Map<WebSocketSession, Long> lastPongTimestamps = new ConcurrentHashMap<>();
     private final NotificationService notificationService;
-    private final PointRepository pointRepository;
-    private final PointService pointService;
 
     public CreateChatroomResponse createOrGetChatRoom(CreateChatroomRequest request, StudentInfo studentInfo, ChatroomType chatroomType) {
         Student user = findStudentService.findByStudentId(studentInfo.id());
