@@ -25,7 +25,7 @@ import java.util.Random;
 public class MessageSendService {
 
     private static final String SOLAPI_API_URL = "https://api.solapi.com";
-    private static final String MESSAGE_TEXT_FORMAT = "[버디야] 본인 확인 인증번호[%s]를 화면에 입력해주세요";
+    private static final String MESSAGE_TEXT_FORMAT = "[Buddyya] Enter the code [%s] on the screen to confirm it's you!";
     private static final String MESSAGE_SEND_SUCCESS_STATUS_CODE = "2000";
     private static final int AUTH_CODE_MAX_RANGE = 1_000_000;
 
