@@ -36,7 +36,6 @@ public class ChatRequestService {
     private final ChatroomRepository chatroomRepository;
     private final FindStudentService findStudentService;
     private final NotificationService notificationService;
-    private final UpdatePointService updatePointService;
 
     @Transactional(readOnly = true)
     public List<ChatRequestResponse> getChatRequests(CustomUserDetails userDetails) {
@@ -67,7 +66,7 @@ public class ChatRequestService {
         return chatroomRepository.findByUserAndBuddy(sender.getId(), receiver.getId()).isPresent();
     }
 
-    public CreateChatRequestResponse createChatRequest(CustomUserDetails userDetails, Long receiverId) {
+    public void createChatRequest(CustomUserDetails userDetails, Long receiverId) {
         Student sender = findStudentService.findByStudentId(userDetails.getStudentInfo().id());
         Student receiver = findStudentService.findByStudentId(receiverId);
         validateChatRequest(sender, receiver);
@@ -78,24 +77,15 @@ public class ChatRequestService {
                 .build();
         notificationService.sendChatRequestNotification(sender,receiver);
         chatRequestRepository.save(chatRequest);
-        Point point = updatePointService.updatePoint(sender, PointType.CHAT_REQUEST);
-        return CreateChatRequestResponse.from(point);
     }
 
-    public void deleteChatRequest(CustomUserDetails userDetails, Long chatRequestId) {
-        ChatRequest chatRequest = chatRequestRepository.findById(chatRequestId)
-                .orElseThrow(()-> new ChatException(ChatExceptionType.CHAT_REQUEST_NOT_FOUND));
-        updatePointService.updatePoint(chatRequest.getSender(), PointType.REJECTED_CHAT_REQUEST);
+    public void deleteChatRequest(Long chatRequestId) {
         chatRequestRepository.deleteById(chatRequestId);
     }
 
     @Scheduled(fixedRate = 60 * 1000)
     public void deleteExpiredChatRequests() {
         LocalDateTime expirationTime = LocalDateTime.now().minusDays(EXPIRED_CHAT_REQUEST_DAY);
-        List<ChatRequest> expiredChatRequests = chatRequestRepository.findAllByCreatedDateBefore(expirationTime);
-        expiredChatRequests.stream()
-                .map(ChatRequest::getSender)
-                .forEach(sender -> updatePointService.updatePoint(sender, PointType.REJECTED_CHAT_REQUEST));
         chatRequestRepository.deleteByCreatedDateBefore(expirationTime);
     }
 
