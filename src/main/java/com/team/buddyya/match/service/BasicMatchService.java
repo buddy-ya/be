@@ -113,7 +113,7 @@ public class BasicMatchService implements MatchService {
                     .orElseThrow(() -> new ChatException(ChatExceptionType.USER_NOT_PART_OF_CHATROOM));
             boolean isExited = chatroomStudent.getIsExited().equals(true);
             MatchedHistory recentMatchedHistory = matchedHistoryRepository.findMostRecentMatchedHistoryByStudentId(studentId)
-                    .orElseThrow(()-> new MatchException(MatchExceptionType.MATCH_HISTORY_NOT_FOUND));
+                    .orElseThrow(() -> new MatchException(MatchExceptionType.MATCH_HISTORY_NOT_FOUND));
             Student matchedStudent = findStudentService.findByStudentId(recentMatchedHistory.getBuddyId());
             MatchingProfile matchingProfile = matchingProfileRepository.findByStudent(matchedStudent)
                     .orElseThrow(() -> new MatchException(MatchExceptionType.MATCH_PROFILE_NOT_FOUND));
@@ -152,8 +152,8 @@ public class BasicMatchService implements MatchService {
                 && isGenderMatch(matchRequest.getGenderType(), requestedGenderType, matchStudent.getGender(), requestedGender);
     }
 
-    private boolean isNationalityMatch(NationalityType requesterPreference,
-                                       NationalityType matchRequestPreference,
+    private boolean isNationalityMatch(NationalityType matchRequestPreference,
+                                       NationalityType requesterPreference,
                                        boolean isMatchRequestKorean,
                                        boolean isRequesterKorean) {
         if (isRequesterKorean) {
@@ -168,8 +168,8 @@ public class BasicMatchService implements MatchService {
         return false;
     }
 
-    private boolean isUniversityMatch(UniversityType requesterPreference,
-                                      UniversityType matchRequestPreference,
+    private boolean isUniversityMatch(UniversityType matchRequestPreference,
+                                      UniversityType requesterPreference,
                                       Long requesterUniversityId,
                                       Long matchRequestUniversityId) {
         if (requesterPreference == UniversityType.SAME_UNIVERSITY &&
@@ -183,8 +183,8 @@ public class BasicMatchService implements MatchService {
         return false;
     }
 
-    private boolean isGenderMatch(GenderType requesterPreference,
-                                  GenderType matchRequestPreference,
+    private boolean isGenderMatch(GenderType matchRequestPreference,
+                                  GenderType requesterPreference,
                                   Gender requesterGender,
                                   Gender matchRequestGender) {
         if (requesterPreference == GenderType.ALL && matchRequestPreference == GenderType.ALL) {
