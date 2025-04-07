@@ -3,7 +3,6 @@ package com.team.buddyya.chatting.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team.buddyya.chatting.dto.request.ChatMessage;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -15,7 +14,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 
 @Component
-@Slf4j
 @RequiredArgsConstructor
 public class ChatHandler extends TextWebSocketHandler {
 
@@ -31,10 +29,8 @@ public class ChatHandler extends TextWebSocketHandler {
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) {
         try {
             String payload = (String) message.getPayload();
-            log.info("수신된 페이로드: {}", payload);
             if ("PONG".equalsIgnoreCase(payload.trim())) {
                 service.updateLastPongTimestamp(session);
-                log.info("세션 {}으로부터 PONG 수신.", session.getId());
                 return;
             }
             ChatMessage chatMessage = mapper.readValue(payload, ChatMessage.class);
@@ -62,23 +58,19 @@ public class ChatHandler extends TextWebSocketHandler {
 
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) {
-        log.error("세션 {}의 전송 오류: {}", session.getId(), exception.getMessage());
         closeSession(session, ERROR_TRANSPORT);
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-        log.info("세션 {}이(가) 상태 {}로 종료되었습니다.", session.getId(), status);
         service.removeSession(session);
     }
 
     private void handleClientError(WebSocketSession session, String errorMessage) {
-        log.warn("클라이언트 오류: {}", errorMessage);
         sendErrorMessage(session, errorMessage, CloseStatus.BAD_DATA);
     }
 
     private void handleServerError(WebSocketSession session, String errorMessage) {
-        log.error("서버 오류: {}", errorMessage);
         sendErrorMessage(session, errorMessage, CloseStatus.SERVER_ERROR);
     }
 
@@ -86,7 +78,6 @@ public class ChatHandler extends TextWebSocketHandler {
         try {
             session.sendMessage(new TextMessage("{\"error\": \"" + errorMessage + "\"}"));
         } catch (IOException e) {
-            log.error("세션 {}에 오류 메시지 전송 실패: {}", session.getId(), e.getMessage());
         } finally {
             closeSession(session, errorMessage);
         }
@@ -96,7 +87,6 @@ public class ChatHandler extends TextWebSocketHandler {
         try {
             session.close(CloseStatus.SERVER_ERROR);
         } catch (IOException e) {
-            log.error("세션 {} 종료 실패: {}", session.getId(), e.getMessage());
         }
     }
 }

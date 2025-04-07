@@ -10,7 +10,6 @@ import com.team.buddyya.auth.jwt.JwtUtils;
 import com.team.buddyya.auth.repository.AuthTokenRepository;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +19,6 @@ import java.time.temporal.ChronoUnit;
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Slf4j
 public class AuthService {
 
     private static final int REFRESH_TOKEN_THRESHOLD_DAYS = 30;

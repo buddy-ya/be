@@ -15,12 +15,9 @@ import com.team.buddyya.chatting.repository.ChatroomRepository;
 import com.team.buddyya.chatting.repository.ChatroomStudentRepository;
 import com.team.buddyya.common.service.S3UploadService;
 import com.team.buddyya.notification.service.NotificationService;
-import com.team.buddyya.point.repository.PointRepository;
-import com.team.buddyya.point.service.PointService;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.service.FindStudentService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -37,7 +34,6 @@ import java.util.stream.Collectors;
 import static com.team.buddyya.common.domain.S3DirectoryName.CHAT_IMAGE;
 import static com.team.buddyya.student.domain.UserProfileDefaultImage.getChatroomProfileImage;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -161,7 +157,6 @@ public class ChatService {
             lastPongTimestamps.remove(session);
             if (sessions.isEmpty()) {
                 sessionsPerRoom.remove(roomId);
-                log.info("Room ID {}에서 모든 세션이 종료되어 방 제거 완료.", roomId);
             }
         }
     }
@@ -257,19 +252,16 @@ public class ChatService {
 
     public void addSessionToRoom(Long roomId, WebSocketSession session) {
         sessionsPerRoom.computeIfAbsent(roomId, k -> new HashSet<>()).add(session);
-        log.info("Room ID {}에 새로운 세션 추가. 현재 세션 수: {}", roomId, sessionsPerRoom.get(roomId).size());
     }
 
     //    @Scheduled(fixedRate = 30000)
     public void sendPingMessages() {
-        log.info("모든 WebSocket 세션에 Ping 메시지를 전송합니다.");
         long currentTime = System.currentTimeMillis();
         sessionsPerRoom.forEach((roomId, sessions) -> {
             Set<WebSocketSession> invalidSessions;
             try {
                 invalidSessions = handlePingAndValidateSessions(roomId, sessions, currentTime);
             } catch (IOException e) {
-                log.error("PING 메시지 처리 중 에러 발생: {}", e.getMessage());
                 return;
             }
             cleanupInvalidSessions(roomId, sessions, invalidSessions);
@@ -286,7 +278,6 @@ public class ChatService {
             session.sendMessage(new TextMessage("PING"));
             if (isSessionTimedOut(session, currentTime)) {
                 invalidSessions.add(session);
-                log.warn("Room ID {}의 세션 {}이 만료로 제거됩니다.", roomId, session.getId());
             }
         }
         return invalidSessions;
@@ -303,9 +294,7 @@ public class ChatService {
             sessions.removeAll(invalidSessions);
             if (sessions.isEmpty()) {
                 sessionsPerRoom.remove(roomId);
-                log.info("Room ID {}에서 모든 세션이 종료되어 방 제거 완료.", roomId);
             }
-            log.info("Room ID {}에서 {}개의 비정상 세션 제거 완료.", roomId, invalidSessions.size());
         }
     }
 
@@ -313,13 +302,11 @@ public class ChatService {
         try {
             session.close();
         } catch (IOException e) {
-            log.error("세션 {} 닫기 실패. 에러: {}", session.getId(), e.getMessage());
         }
         lastPongTimestamps.remove(session);
     }
 
     public void updateLastPongTimestamp(WebSocketSession session) {
         session.getAttributes().put("timeout", System.currentTimeMillis() + PONG_TIMEOUT);
-        log.info("세션 {}으로부터 PONG 수신. 만료 시간 갱신 완료.", session.getId());
     }
 }

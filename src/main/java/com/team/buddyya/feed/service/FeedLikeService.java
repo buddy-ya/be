@@ -17,8 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class
-FeedLikeService {
+public class FeedLikeService {
 
     private final FeedLikeRepository feedLikeRepository;
     private final FindStudentService findStudentService;

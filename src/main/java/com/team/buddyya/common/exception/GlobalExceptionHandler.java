@@ -15,7 +15,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ExceptionResponse> handleBaseException(BaseException e) {
         final BaseExceptionType baseExceptionType = e.exceptionType();
         final ExceptionResponse exceptionResponse = new ExceptionResponse(baseExceptionType.errorCode(), baseExceptionType.errorMessage());
-        log.info("error = {}", exceptionResponse);
+        log.error("error = {}", exceptionResponse);
         return ResponseEntity.status(baseExceptionType.httpStatus()).body(exceptionResponse);
     }
 }
