@@ -80,6 +80,12 @@ public class NotificationService {
     private static final String INVITATION_REWARD_BODY_KR = "추천 이벤트 참여로 포인트가 적립되었어요.";
     private static final String INVITATION_REWARD_BODY_EN = "You received points from a referral event.";
 
+    private static final String REFUND_POINTS_TITLE_KR = "포인트가 환급되었어요!";
+    private static final String REFUND_POINTS_TITLE_EN = "Your points have been refunded!";
+
+    private static final String REFUND_POINTS_BODY_KR = "채팅 상대방의 미응답을 확인하여 포인트를 환급해드렸어요.";
+    private static final String REFUND_POINTS_BODY_EN = "We confirmed no response from your chat partner and refunded your points.";
+
     @Value("${EXPO.API.URL}")
     private String expoApiUrl;
 
@@ -317,6 +323,27 @@ public class NotificationService {
             );
         } catch (NotificationException e) {
             log.warn("추천인 포인트 지급 알림 전송 실패: {}", e.exceptionType().errorMessage());
+        }
+    }
+
+    public void sendRefundNotification(Student student) {
+        try {
+            String token = getTokenByUserId(student.getId());
+            boolean isKorean = student.getIsKorean();
+            String title = isKorean ? REFUND_POINTS_TITLE_KR : REFUND_POINTS_TITLE_EN;
+            String body = isKorean ? REFUND_POINTS_BODY_KR : REFUND_POINTS_BODY_EN;
+            Map<String, Object> data = Map.of(
+                    "type", "POINT"
+            );
+            sendToExpo(RequestNotification.builder()
+                    .to(token)
+                    .title(title)
+                    .body(body)
+                    .data(data)
+                    .build()
+            );
+        } catch (NotificationException e) {
+            log.warn("무응답 포인트 환급 알림 전송 실패: {}", e.exceptionType().errorMessage());
         }
     }
 
