@@ -12,12 +12,14 @@ import com.team.buddyya.student.dto.request.OnBoardingRequest;
 import com.team.buddyya.student.dto.response.UserResponse;
 import com.team.buddyya.student.repository.MatchingProfileRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class OnBoardingService {
 
     private final StudentService studentService;
@@ -43,6 +45,7 @@ public class OnBoardingService {
         studentLanguageService.createStudentLanguages(request.languages(), student);
         createMatchingProfile(student);
         Point point = pointService.createPoint(student);
+        log.info("🧑‍🎓 Student [{}] onboarded successfully", student.getName());
         return UserResponse.fromOnboard(student, false, accessToken, refreshToken, point);
     }
 

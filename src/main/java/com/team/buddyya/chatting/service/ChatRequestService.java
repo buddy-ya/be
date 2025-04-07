@@ -4,26 +4,20 @@ import com.team.buddyya.auth.domain.CustomUserDetails;
 import com.team.buddyya.chatting.domain.ChatRequest;
 import com.team.buddyya.chatting.dto.response.ChatRequestInfoResponse;
 import com.team.buddyya.chatting.dto.response.ChatRequestResponse;
-import com.team.buddyya.chatting.dto.response.CreateChatRequestResponse;
 import com.team.buddyya.chatting.exception.ChatException;
 import com.team.buddyya.chatting.exception.ChatExceptionType;
 import com.team.buddyya.chatting.repository.ChatRequestRepository;
 import com.team.buddyya.chatting.repository.ChatroomRepository;
 import com.team.buddyya.notification.service.NotificationService;
-import com.team.buddyya.point.domain.Point;
-import com.team.buddyya.point.domain.PointType;
-import com.team.buddyya.point.service.UpdatePointService;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.service.FindStudentService;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-
-import com.team.buddyya.point.service.PointService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @Transactional
@@ -75,7 +69,7 @@ public class ChatRequestService {
                 .sender(sender)
                 .receiver(receiver)
                 .build();
-        notificationService.sendChatRequestNotification(sender,receiver);
+        notificationService.sendChatRequestNotification(sender, receiver);
         chatRequestRepository.save(chatRequest);
     }
 

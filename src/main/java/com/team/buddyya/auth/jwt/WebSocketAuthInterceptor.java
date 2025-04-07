@@ -2,7 +2,6 @@ package com.team.buddyya.auth.jwt;
 
 import com.team.buddyya.chatting.repository.ChatroomStudentRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.ServerHttpRequest;
@@ -16,7 +15,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
 
-@Slf4j
 @Component
 @RequiredArgsConstructor
 public class WebSocketAuthInterceptor implements HandshakeInterceptor {
@@ -39,10 +37,8 @@ public class WebSocketAuthInterceptor implements HandshakeInterceptor {
             attributes.put("timeout", System.currentTimeMillis() + SESSION_TIMEOUT);
             return true;
         } catch (IllegalArgumentException e) {
-            log.warn("Handshake failed: {}", e.getMessage());
             setErrorResponse(response, HttpStatus.UNAUTHORIZED, ERROR_UNAUTHORIZED);
         } catch (Exception e) {
-            log.error("Internal server error during handshake: {}", e.getMessage(), e);
             setErrorResponse(response, HttpStatus.INTERNAL_SERVER_ERROR, ERROR_INTERNAL_SERVER);
         }
         return false;
@@ -63,7 +59,6 @@ public class WebSocketAuthInterceptor implements HandshakeInterceptor {
         try {
             response.getBody().write(("{\"error\":\"" + message + "\"}").getBytes(StandardCharsets.UTF_8));
         } catch (IOException e) {
-            log.error("Failed to write response body: {}", e.getMessage());
         }
     }
 
