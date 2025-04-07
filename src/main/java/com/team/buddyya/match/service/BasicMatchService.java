@@ -215,7 +215,7 @@ public class BasicMatchService implements MatchService {
         notificationService.sendMatchSuccessNotification(matchedStudent, chatroom.getId());
         MatchingProfile matchingProfile = matchingProfileRepository.findByStudent(matchedStudent)
                 .orElseThrow(() -> new MatchException(MatchExceptionType.MATCH_PROFILE_NOT_FOUND));
-        log.info("🤝 Successfully matched: [{}] ↔ [{}]", student.getName(), matchedStudent.getName());
+        log.info("🤝 Successfully matched: [{}] ↔ [{}]", student.getId(), matchedStudent.getId());
         return MatchResponse.from(chatroom, matchedStudent, newMatchRequest, point, false, matchingProfile);
     }
 
