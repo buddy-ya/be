@@ -12,6 +12,8 @@ import com.team.buddyya.feed.exception.FeedExceptionType;
 import com.team.buddyya.feed.repository.BookmarkRepository;
 import com.team.buddyya.feed.repository.FeedLikeRepository;
 import com.team.buddyya.feed.repository.FeedRepository;
+import com.team.buddyya.report.domain.ReportType;
+import com.team.buddyya.report.repository.ReportRepository;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.domain.University;
 import com.team.buddyya.student.exception.StudentException;
@@ -48,6 +50,7 @@ public class FeedService {
     private final FeedImageService feedImageService;
     private final BlockRepository blockRepository;
     private final UniversityRepository universityRepository;
+    private final ReportRepository reportRepository;
 
     @Transactional(readOnly = true)
     protected Feed findFeedByFeedId(Long feedId) {
@@ -173,7 +176,10 @@ public class FeedService {
     public void deleteFeed(StudentInfo studentInfo, Long feedId) {
         Feed feed = findFeedByFeedId(feedId);
         validateFeedOwner(studentInfo, feed);
-        feedImageService.deleteS3FeedImages(feed);
+        boolean isReportedFeed = reportRepository.existsByTypeAndReportedId(ReportType.FEED, feed.getId());
+        if (!isReportedFeed) {
+            feedImageService.deleteS3FeedImages(feed);
+        }
         feedRepository.delete(feed);
     }
 
