@@ -57,14 +57,12 @@ public class AdminService {
     private final FindStudentService findStudentService;
     private final S3UploadService s3UploadService;
     private final NotificationService notificationService;
-    private final FindPointService findPointService;
     private final UpdatePointService updatePointService;
     private final StudentIdCardRepository studentIdCardRepository;
     private final ReportRepository reportRepository;
     private final ReportImageRepository reportImageRepository;
     private final ChatroomRepository chatroomRepository;
     private final ChatRepository chatRepository;
-    private final PointStatusRepository pointStatusRepository;
 
     @Transactional(readOnly = true)
     public List<StudentIdCardResponse> getStudentIdCards() {
@@ -146,6 +144,7 @@ public class AdminService {
         if (chatroom.getType().equals(ChatroomType.MATCHING)) {
             Student reportUser = findStudentService.findByStudentId(reportUserId);
             updatePointService.updatePoint(reportUser, PointType.CHATROOM_NO_RESPONSE_REFUND);
+            notificationService.sendRefundNotification(reportUser);
         }
     }
 }
