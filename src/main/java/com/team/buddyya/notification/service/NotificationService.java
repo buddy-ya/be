@@ -140,24 +140,29 @@ public class NotificationService {
         return isKorean ? MATCH_SUCCESS_BODY_KR: MATCH_SUCCESS_BODY_EN;
     }
 
-    public void sendCommentReplyNotification(Feed feed, Comment parent, String commentContent){
-        try{
-            Student recipient = parent.getStudent();
-            String token = getTokenByUserId(recipient.getId());
-            Map<String, Object> data = Map.of(
-                    "feedId", feed.getId(),
-                    "type", "FEED"
-            );
-            boolean isKorean = recipient.getIsKorean();
-            String title = getCommentReplyNotificationTitle(isKorean);
-            sendToExpo(RequestNotification.builder()
-                    .to(token)
-                    .title(title)
-                    .body(commentContent)
-                    .data(data).build()
-            );
-        } catch (NotificationException e) {
-            log.warn("피드 대댓글 알림 전송 실패: {}", e.exceptionType().errorMessage());
+    public void sendCommentReplyNotification(Long writerId, Feed feed, Comment parent, String commentContent){
+        boolean isFeedOwner = feed.isFeedOwner(writerId);
+        boolean isWriterParent = parent.isParent(writerId);
+        boolean isParentFeedOwner = parent.isParent(feed.getStudent().getId());
+        if(!isFeedOwner && !isWriterParent && !isParentFeedOwner) {
+            try {
+                Student recipient = parent.getStudent();
+                String token = getTokenByUserId(recipient.getId());
+                Map<String, Object> data = Map.of(
+                        "feedId", feed.getId(),
+                        "type", "FEED"
+                );
+                boolean isKorean = recipient.getIsKorean();
+                String title = getCommentReplyNotificationTitle(isKorean);
+                sendToExpo(RequestNotification.builder()
+                        .to(token)
+                        .title(title)
+                        .body(commentContent)
+                        .data(data).build()
+                );
+            } catch (NotificationException e) {
+                log.warn("피드 대댓글 알림 전송 실패: {}", e.exceptionType().errorMessage());
+            }
         }
     }
 
@@ -165,24 +170,27 @@ public class NotificationService {
         return isKorean ? FEED_REPLY_TITLE_KR: FEED_REPLY_TITLE_EN;
     }
 
-    public void sendCommentNotification(Feed feed, String commentContent) {
-        try {
-            Student recipient = feed.getStudent();
-            String token = getTokenByUserId(recipient.getId());
-            Map<String, Object> data = Map.of(
-                    "feedId", feed.getId(),
-                    "type", "FEED"
-            );
-            boolean isKorean = recipient.getIsKorean();
-            String title = getCommentNotificationTitle(isKorean);
-            sendToExpo(RequestNotification.builder()
-                    .to(token)
-                    .title(title)
-                    .body(commentContent)
-                    .data(data).build()
-            );
-        } catch (NotificationException e) {
-            log.warn("피드 알림 전송 실패: {}", e.exceptionType().errorMessage());
+    public void sendCommentNotification(Long writerId, Feed feed, String commentContent) {
+        boolean isFeedOwner = feed.isFeedOwner(writerId);
+        if(!isFeedOwner) {
+            try {
+                Student recipient = feed.getStudent();
+                String token = getTokenByUserId(recipient.getId());
+                Map<String, Object> data = Map.of(
+                        "feedId", feed.getId(),
+                        "type", "FEED"
+                );
+                boolean isKorean = recipient.getIsKorean();
+                String title = getCommentNotificationTitle(isKorean);
+                sendToExpo(RequestNotification.builder()
+                        .to(token)
+                        .title(title)
+                        .body(commentContent)
+                        .data(data).build()
+                );
+            } catch (NotificationException e) {
+                log.warn("피드 알림 전송 실패: {}", e.exceptionType().errorMessage());
+            }
         }
     }
 
