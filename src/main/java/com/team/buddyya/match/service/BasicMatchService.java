@@ -26,6 +26,7 @@ import com.team.buddyya.student.domain.MatchingProfile;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.repository.BlockRepository;
 import com.team.buddyya.student.repository.MatchingProfileRepository;
+import com.team.buddyya.student.repository.StudentLanguageRepository;
 import com.team.buddyya.student.service.FindStudentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -44,6 +46,8 @@ import static com.team.buddyya.chatting.domain.ChatroomType.MATCHING;
 @Transactional
 @Slf4j
 public class BasicMatchService implements MatchService {
+
+    private static final Long CHINESE_LANGUAGE_ID = 3L;
 
     private final MatchRequestRepository matchRequestRepository;
     private final MatchedHistoryRepository matchedHistoryRepository;
@@ -56,12 +60,14 @@ public class BasicMatchService implements MatchService {
     private final UpdatePointService updatePointService;
     private final BlockRepository blockRepository;
     private final MatchingProfileRepository matchingProfileRepository;
+    private final StudentLanguageRepository studentLanguageRepository;
 
     @Override
     public MatchResponse requestMatch(Long studentId, MatchCreateRequest request) {
         Student student = findStudentService.findByStudentId(studentId);
         validateMatchProfileCompleted(student);
         validateMatchRequestTime(student);
+        boolean isChineseAvailable = checkChineseAvailability(student);
         Point point = updatePointService.updatePoint(student, PointType.MATCH_REQUEST);
         NationalityType nationalityType = NationalityType.fromValue(request.nationalityType());
         UniversityType universityType = UniversityType.fromValue(request.universityType());
@@ -70,6 +76,7 @@ public class BasicMatchService implements MatchService {
         Set<Long> blockedStudentIds = blockRepository.findBlockedStudentIdByBlockerId(studentId);
         Optional<MatchRequest> optionalMatchRequest = findValidMatchRequest(
                 student,
+                isChineseAvailable,
                 nationalityType,
                 universityType,
                 genderType,
@@ -79,7 +86,7 @@ public class BasicMatchService implements MatchService {
         if (optionalMatchRequest.isPresent()) {
             return processMatchSuccess(student, nationalityType, universityType, genderType, optionalMatchRequest.get(), point);
         }
-        MatchRequest newMatchRequest = createMatchRequest(student, null, nationalityType, universityType, genderType, MatchRequestStatus.MATCH_PENDING);
+        MatchRequest newMatchRequest = createMatchRequest(student, isChineseAvailable, null, nationalityType, universityType, genderType, MatchRequestStatus.MATCH_PENDING);
         return MatchResponse.from(newMatchRequest, point);
     }
 
@@ -125,9 +132,19 @@ public class BasicMatchService implements MatchService {
     }
 
     private Optional<MatchRequest> findValidMatchRequest(
-            Student requestedStudent, NationalityType nationalityType, UniversityType universityType, GenderType genderType, Set<Long> existingBuddies, Set<Long> blockedStudentIds) {
-        return matchRequestRepository.findAllPendingMatches().stream()
-                .filter(matchRequest -> isValidMatchRequest(requestedStudent, matchRequest, nationalityType, universityType, genderType, existingBuddies, blockedStudentIds))
+            Student requestedStudent, boolean isChineseAvailable, NationalityType nationalityType, UniversityType universityType, GenderType genderType, Set<Long> existingBuddies, Set<Long> blockedStudentIds) {
+        List<MatchRequest> candidates = isChineseAvailable
+                ? matchRequestRepository.findAllPendingMatchesPrioritizeChinese()
+                : matchRequestRepository.findAllPendingMatches();
+        return candidates.stream()
+                .filter(matchRequest -> isValidMatchRequest(
+                        requestedStudent,
+                        matchRequest,
+                        nationalityType,
+                        universityType,
+                        genderType,
+                        existingBuddies,
+                        blockedStudentIds))
                 .findFirst();
     }
 
@@ -208,7 +225,7 @@ public class BasicMatchService implements MatchService {
         matchedHistoryRepository.save(requestedMatchedHistory);
         matchedHistoryRepository.save(existingMatchedHistory);
         Chatroom chatroom = chatService.createChatroom(student, matchedStudent, MATCHING);
-        MatchRequest newMatchRequest = createMatchRequest(student, chatroom.getId(), nationalityType, universityType, genderType, MatchRequestStatus.MATCH_SUCCESS);
+        MatchRequest newMatchRequest = createMatchRequest(student, false, chatroom.getId(), nationalityType, universityType, genderType, MatchRequestStatus.MATCH_SUCCESS);
         matchRequest.updateMatchRequestStatusSuccess();
         matchRequest.updateChatroomId(chatroom.getId());
         notificationService.sendMatchSuccessNotification(student, chatroom.getId());
@@ -219,13 +236,13 @@ public class BasicMatchService implements MatchService {
         return MatchResponse.from(chatroom, matchedStudent, newMatchRequest, point, false, matchingProfile);
     }
 
-    private MatchRequest createMatchRequest(Student student, Long chatroomId,
+    private MatchRequest createMatchRequest(Student student, boolean isChineseAvailable, Long chatroomId,
                                             NationalityType nationalityType, UniversityType universityType, GenderType genderType,
                                             MatchRequestStatus status) {
         MatchRequest matchRequest = MatchRequest.builder()
                 .student(student)
                 .chatroomId(chatroomId)
-                .isKorean(student.getIsKorean())
+                .isChineseAvailable(isChineseAvailable)
                 .nationalityType(nationalityType)
                 .universityType(universityType)
                 .genderType(genderType)
@@ -252,5 +269,9 @@ public class BasicMatchService implements MatchService {
                 throw new MatchException(MatchExceptionType.MATCH_REQUEST_TIME_INVALID);
             }
         }
+    }
+
+    public boolean checkChineseAvailability(Student student){
+        return studentLanguageRepository.existsByStudentAndLanguage_Id(student, CHINESE_LANGUAGE_ID);
     }
 }

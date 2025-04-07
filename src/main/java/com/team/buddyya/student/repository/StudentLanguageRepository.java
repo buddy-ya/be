@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface StudentLanguageRepository extends JpaRepository<StudentLanguage, Long> {
 
     void deleteByStudent(Student student);
+
+    boolean existsByStudentAndLanguage_Id(Student student, Long languageId);
 }
