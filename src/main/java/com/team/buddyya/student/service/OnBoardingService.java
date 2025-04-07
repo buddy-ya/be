@@ -45,7 +45,7 @@ public class OnBoardingService {
         studentLanguageService.createStudentLanguages(request.languages(), student);
         createMatchingProfile(student);
         Point point = pointService.createPoint(student);
-        log.info("🧑‍🎓 Student [{}] onboarded successfully", student.getName());
+        log.info("🧑‍🎓 Student id = [{}], name = [{}] onboarded successfully", student.getId(), student.getName());
         return UserResponse.fromOnboard(student, false, accessToken, refreshToken, point);
     }
 

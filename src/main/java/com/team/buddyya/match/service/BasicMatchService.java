@@ -28,6 +28,7 @@ import com.team.buddyya.student.repository.BlockRepository;
 import com.team.buddyya.student.repository.MatchingProfileRepository;
 import com.team.buddyya.student.service.FindStudentService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +42,7 @@ import static com.team.buddyya.chatting.domain.ChatroomType.MATCHING;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class BasicMatchService implements MatchService {
 
     private final MatchRequestRepository matchRequestRepository;
@@ -213,6 +215,7 @@ public class BasicMatchService implements MatchService {
         notificationService.sendMatchSuccessNotification(matchedStudent, chatroom.getId());
         MatchingProfile matchingProfile = matchingProfileRepository.findByStudent(matchedStudent)
                 .orElseThrow(() -> new MatchException(MatchExceptionType.MATCH_PROFILE_NOT_FOUND));
+        log.info("🤝 Successfully matched: [{}] ↔ [{}]", student.getId(), matchedStudent.getId());
         return MatchResponse.from(chatroom, matchedStudent, newMatchRequest, point, false, matchingProfile);
     }
 
