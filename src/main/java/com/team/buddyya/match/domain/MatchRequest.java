@@ -44,11 +44,11 @@ public class MatchRequest extends BaseTime {
     @Column(name = "match_request_status", nullable = false)
     private MatchRequestStatus matchRequestStatus;
 
-    @Column(name = "korean", nullable = false)
-    private Boolean isKorean;
+    @Column(name = "chinese_available", nullable = false)
+    private Boolean isChineseAvailable;
 
     @Builder
-    public MatchRequest(Student student, Long chatroomId, Long universityId, NationalityType nationalityType, UniversityType universityType, GenderType genderType, MatchRequestStatus matchRequestStatus, Boolean isKorean) {
+    public MatchRequest(Student student, Long chatroomId, Long universityId, NationalityType nationalityType, UniversityType universityType, GenderType genderType, MatchRequestStatus matchRequestStatus, Boolean isChineseAvailable) {
         this.student = student;
         this.chatroomId = chatroomId;
         this.nationalityType = nationalityType;
@@ -56,7 +56,7 @@ public class MatchRequest extends BaseTime {
         this.universityType = universityType;
         this.genderType = genderType;
         this.matchRequestStatus = matchRequestStatus;
-        this.isKorean = isKorean;
+        this.isChineseAvailable = isChineseAvailable;
     }
 
     public void updateMatchRequestStatusSuccess() {

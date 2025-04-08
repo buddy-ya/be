@@ -13,6 +13,13 @@ import java.util.Optional;
 public interface MatchRequestRepository extends JpaRepository<MatchRequest, Long> {
 
     @Query("""
+    SELECT m FROM MatchRequest m
+    WHERE m.matchRequestStatus = 'MATCH_PENDING'
+    ORDER BY m.isChineseAvailable DESC, m.createdDate ASC
+    """)
+    List<MatchRequest> findAllPendingMatchesPrioritizeChinese();
+
+    @Query("""
         SELECT m FROM MatchRequest m 
         WHERE m.matchRequestStatus = 'MATCH_PENDING'
         ORDER BY m.createdDate ASC
