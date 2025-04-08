@@ -19,8 +19,6 @@ import com.team.buddyya.chatting.repository.ChatroomRepository;
 import com.team.buddyya.common.service.S3UploadService;
 import com.team.buddyya.notification.service.NotificationService;
 import com.team.buddyya.point.domain.PointType;
-import com.team.buddyya.point.repository.PointStatusRepository;
-import com.team.buddyya.point.service.FindPointService;
 import com.team.buddyya.point.service.UpdatePointService;
 import com.team.buddyya.report.domain.Report;
 import com.team.buddyya.report.domain.ReportImage;
@@ -66,7 +64,8 @@ public class AdminService {
 
     @Transactional(readOnly = true)
     public List<StudentIdCardResponse> getStudentIdCards() {
-        return studentIdCardRepository.findAllByOrderByCreatedDateAsc().stream()
+        return studentIdCardRepository.findUploadStudentIdCards()
+                .stream()
                 .map(StudentIdCardResponse::from)
                 .collect(Collectors.toList());
     }
