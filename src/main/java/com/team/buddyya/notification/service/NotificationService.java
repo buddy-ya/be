@@ -141,10 +141,9 @@ public class NotificationService {
     }
 
     public void sendCommentReplyNotification(Long writerId, Feed feed, Comment parent, String commentContent){
-        boolean isFeedOwner = feed.isFeedOwner(writerId);
         boolean isWriterParent = parent.isParent(writerId);
         boolean isParentFeedOwner = parent.isParent(feed.getStudent().getId());
-        if(!isFeedOwner && !isWriterParent && !isParentFeedOwner) {
+        if(!isWriterParent && !isParentFeedOwner) {
             try {
                 Student recipient = parent.getStudent();
                 String token = getTokenByUserId(recipient.getId());
