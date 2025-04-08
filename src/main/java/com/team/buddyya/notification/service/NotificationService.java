@@ -116,8 +116,7 @@ public class NotificationService {
             String token = getTokenByUserId(student.getId());
             Map<String, Object> data = Map.of(
                     "roomId", roomId,
-                    "type", "MATCH",
-                    "channelId", "default"
+                    "type", "MATCH"
             );
             boolean isKorean = student.getIsKorean();
             String title = getMatchSuccessNotificationTitle(isKorean);
@@ -126,6 +125,7 @@ public class NotificationService {
                     .to(token)
                     .title(title)
                     .body(body)
+                    .priority("high")
                     .data(data).build()
             );
         } catch (NotificationException e) {
@@ -150,8 +150,7 @@ public class NotificationService {
                 String token = getTokenByUserId(recipient.getId());
                 Map<String, Object> data = Map.of(
                         "feedId", feed.getId(),
-                        "type", "FEED",
-                        "channelId", "default"
+                        "type", "FEED"
                 );
                 boolean isKorean = recipient.getIsKorean();
                 String title = getCommentReplyNotificationTitle(isKorean);
@@ -159,6 +158,7 @@ public class NotificationService {
                         .to(token)
                         .title(title)
                         .body(commentContent)
+                        .priority("high")
                         .data(data).build()
                 );
             } catch (NotificationException e) {
@@ -179,8 +179,7 @@ public class NotificationService {
                 String token = getTokenByUserId(recipient.getId());
                 Map<String, Object> data = Map.of(
                         "feedId", feed.getId(),
-                        "type", "FEED",
-                        "channelId", "default"
+                        "type", "FEED"
                 );
                 boolean isKorean = recipient.getIsKorean();
                 String title = getCommentNotificationTitle(isKorean);
@@ -188,6 +187,7 @@ public class NotificationService {
                         .to(token)
                         .title(title)
                         .body(commentContent)
+                        .priority("high")
                         .data(data).build()
                 );
             } catch (NotificationException e) {
@@ -206,7 +206,6 @@ public class NotificationService {
             Map<String, Object> data = new HashMap<>();
             data.put("type", "AUTHORIZATION");
             data.put("isCertificated", isSuccess);
-            data.put("channelId", "default");
             boolean isKorean = student.getIsKorean();
             RequestNotification notification = createAuthorizationNotification(isKorean, isSuccess, token, data);
             sendToExpo(notification);
@@ -222,6 +221,7 @@ public class NotificationService {
                 .to(token)
                 .title(title)
                 .body(body)
+                .priority("high")
                 .data(data)
                 .build();
     }
@@ -263,14 +263,14 @@ public class NotificationService {
             String title = getChatRequestTitle(isKorean);
             String body = getChatRequestBody(isKorean, sender.getName());
             Map<String, Object> data = Map.of(
-                    "type", "CHAT_REQUEST",
-                    "channelId", "default"
+                    "type", "CHAT_REQUEST"
             );
             sendToExpo(RequestNotification.builder()
                     .to(token)
                     .title(title)
                     .body(body)
                     .data(data)
+                    .priority("high")
                     .build()
             );
         } catch (NotificationException e) {
@@ -293,8 +293,7 @@ public class NotificationService {
             String token = getTokenByUserId(student.getId());
             Map<String, Object> data = Map.of(
                     "roomId", roomId,
-                    "type", "CHAT_ACCEPT",
-                    "channelId", "default"
+                    "type", "CHAT_ACCEPT"
             );
             boolean isKorean = student.getIsKorean();
             String title = senderName + " " + getChatAcceptTitle(isKorean);
@@ -303,6 +302,7 @@ public class NotificationService {
                     .to(token)
                     .title(title)
                     .body(body)
+                    .priority("high")
                     .data(data).build()
             );
         } catch (NotificationException e) {
@@ -325,13 +325,13 @@ public class NotificationService {
             String title = isKorean ? INVITATION_REWARD_TITLE_KR : INVITATION_REWARD_TITLE_EN;
             String body = isKorean ? INVITATION_REWARD_BODY_KR : INVITATION_REWARD_BODY_EN;
             Map<String, Object> data = Map.of(
-                    "type", "POINT",
-                    "channelId", "default"
+                    "type", "POINT"
             );
             sendToExpo(RequestNotification.builder()
                     .to(token)
                     .title(title)
                     .body(body)
+                    .priority("high")
                     .data(data)
                     .build()
             );
@@ -347,13 +347,13 @@ public class NotificationService {
             String title = isKorean ? REFUND_POINTS_TITLE_KR : REFUND_POINTS_TITLE_EN;
             String body = isKorean ? REFUND_POINTS_BODY_KR : REFUND_POINTS_BODY_EN;
             Map<String, Object> data = Map.of(
-                    "type", "POINT",
-                    "channelId", "default"
+                    "type", "POINT"
             );
             sendToExpo(RequestNotification.builder()
                     .to(token)
                     .title(title)
                     .body(body)
+                    .priority("high")
                     .data(data)
                     .build()
             );
