@@ -15,13 +15,15 @@ public class RequestNotification {
     private String to;
     private String title;
     private String body;
+    private String priority;
     private Map<String, Object> data;
 
     @Builder
-    public RequestNotification(String to, String title, String body, Map<String, Object> data) {
+    public RequestNotification(String to, String title, String body, Map<String, Object> data, String priority) {
         this.to = to;
         this.title = title;
         this.body = body;
         this.data = data;
+        this.priority = priority;
     }
 }
