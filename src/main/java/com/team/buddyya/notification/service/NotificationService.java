@@ -126,6 +126,7 @@ public class NotificationService {
                     .title(title)
                     .body(body)
                     .priority("high")
+                    .channelId("default")
                     .data(data).build()
             );
         } catch (NotificationException e) {
@@ -159,6 +160,7 @@ public class NotificationService {
                         .title(title)
                         .body(commentContent)
                         .priority("high")
+                        .channelId("default")
                         .data(data).build()
                 );
             } catch (NotificationException e) {
@@ -188,6 +190,7 @@ public class NotificationService {
                         .title(title)
                         .body(commentContent)
                         .priority("high")
+                        .channelId("default")
                         .data(data).build()
                 );
             } catch (NotificationException e) {
@@ -222,6 +225,7 @@ public class NotificationService {
                 .title(title)
                 .body(body)
                 .priority("high")
+                .channelId("default")
                 .data(data)
                 .build();
     }
@@ -269,8 +273,9 @@ public class NotificationService {
                     .to(token)
                     .title(title)
                     .body(body)
-                    .data(data)
                     .priority("high")
+                    .channelId("default")
+                    .data(data)
                     .build()
             );
         } catch (NotificationException e) {
@@ -303,6 +308,7 @@ public class NotificationService {
                     .title(title)
                     .body(body)
                     .priority("high")
+                    .channelId("default")
                     .data(data).build()
             );
         } catch (NotificationException e) {
@@ -332,6 +338,7 @@ public class NotificationService {
                     .title(title)
                     .body(body)
                     .priority("high")
+                    .channelId("default")
                     .data(data)
                     .build()
             );
@@ -354,6 +361,7 @@ public class NotificationService {
                     .title(title)
                     .body(body)
                     .priority("high")
+                    .channelId("default")
                     .data(data)
                     .build()
             );
