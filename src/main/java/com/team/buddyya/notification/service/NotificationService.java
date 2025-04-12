@@ -86,6 +86,12 @@ public class NotificationService {
     private static final String REFUND_POINTS_BODY_KR = "채팅 상대방의 미응답을 확인하여 포인트를 환급해드렸어요.";
     private static final String REFUND_POINTS_BODY_EN = "We confirmed no response from your chat partner and refunded your points.";
 
+    private static final String ATTENDANCE_REWARD_TITLE_KR = "출석 완료!";
+    private static final String ATTENDANCE_REWARD_TITLE_EN = "Checked In!";
+
+    private static final String ATTENDANCE_REWARD_BODY_KR = "매일 출석하면 포인트가 쌓여요. 오늘도 +10포인트 적립!";
+    private static final String ATTENDANCE_REWARD_BODY_EN = "You’ve earned 10 points for checking in today. Come back daily for more!";
+
     @Value("${EXPO.API.URL}")
     private String expoApiUrl;
 
@@ -367,6 +373,29 @@ public class NotificationService {
             );
         } catch (NotificationException e) {
             log.warn("무응답 포인트 환급 알림 전송 실패: {}", e.exceptionType().errorMessage());
+        }
+    }
+
+    public void sendDailyAttendanceNotification(Student student) {
+        try {
+            String token = getTokenByUserId(student.getId());
+            boolean isKorean = student.getIsKorean();
+            String title = isKorean ? ATTENDANCE_REWARD_TITLE_KR : ATTENDANCE_REWARD_TITLE_EN;
+            String body = isKorean ? ATTENDANCE_REWARD_BODY_KR : ATTENDANCE_REWARD_BODY_EN;
+            Map<String, Object> data = Map.of(
+                    "type", "POINT"
+            );
+            sendToExpo(RequestNotification.builder()
+                    .to(token)
+                    .title(title)
+                    .body(body)
+                    .priority("high")
+                    .channelId("default")
+                    .data(data)
+                    .build()
+            );
+        } catch (NotificationException e) {
+            log.warn("출석 이벤트 알림 전송 실패: {}", e.exceptionType().errorMessage());
         }
     }
 
