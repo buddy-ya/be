@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.*;
 
@@ -34,6 +36,9 @@ public class RegisteredPhone extends CreatedTime {
     @Column(name = "has_withdrawn", nullable = false)
     private Boolean hasWithdrawn;
 
+    @Column(name = "last_attendance_date")
+    private LocalDate lastAttendanceDate;
+
     @Builder
     public RegisteredPhone(String phoneNumber, String authenticationCode, String invitationCode) {
         this.phoneNumber = phoneNumber;
@@ -41,6 +46,7 @@ public class RegisteredPhone extends CreatedTime {
         this.invitationCode = invitationCode;
         this.invitationEventParticipated = false;
         this.hasWithdrawn = false;
+        lastAttendanceDate = null;
     }
 
     public void updateAuthenticationCode(String authenticationCode) {
@@ -51,5 +57,14 @@ public class RegisteredPhone extends CreatedTime {
 
     public void updateHasWithDrawn(boolean hasWithdrawn) {
         this.hasWithdrawn = hasWithdrawn;
+    }
+
+    public boolean isTodayAlreadyChecked() {
+        LocalDate today = LocalDate.now();
+        return lastAttendanceDate != null && lastAttendanceDate.isEqual(today);
+    }
+
+    public void updateLastAttendanceDateToToday() {
+        this.lastAttendanceDate = LocalDate.now();
     }
 }
