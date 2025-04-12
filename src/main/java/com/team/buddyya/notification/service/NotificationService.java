@@ -89,7 +89,7 @@ public class NotificationService {
     private static final String ATTENDANCE_REWARD_TITLE_KR = "출석 완료!";
     private static final String ATTENDANCE_REWARD_TITLE_EN = "Checked In!";
 
-    private static final String ATTENDANCE_REWARD_BODY_KR = "매일 출석하면 포인트가 쌓여요. 오늘도 +10포인트 적립!";
+    private static final String ATTENDANCE_REWARD_BODY_KR = "매일 출석하면 포인트가 쌓여요. 오늘도 +15포인트 적립!";
     private static final String ATTENDANCE_REWARD_BODY_EN = "You’ve earned 10 points for checking in today. Come back daily for more!";
 
     @Value("${EXPO.API.URL}")
