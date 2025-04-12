@@ -10,6 +10,7 @@ import com.team.buddyya.feed.repository.BookmarkRepository;
 import com.team.buddyya.feed.repository.FeedRepository;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.service.FindStudentService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,14 +35,14 @@ public class BookmarkService {
                 .orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_BOOKMARKED));
     }
 
+    @Transactional
     public BookmarkResponse toggleBookmark(StudentInfo studentInfo, Long feedId) {
         Feed feed = feedRepository.findById(feedId)
                 .orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND));
         Student student = findStudentService.findByStudentId(studentInfo.id());
-        boolean isBookmarked = existsByStudentAndFeed(student, feed);
-        if (isBookmarked) {
-            Bookmark bookmark = findByStudentAndFeed(student, feed);
-            bookmarkRepository.delete(bookmark);
+        List<Bookmark> bookmarks = bookmarkRepository.findAllByStudentAndFeed(student, feed);
+        if (!bookmarks.isEmpty()) {
+            bookmarkRepository.deleteAll(bookmarks);
             return BookmarkResponse.from(false);
         }
         Bookmark bookmark = Bookmark.builder()
