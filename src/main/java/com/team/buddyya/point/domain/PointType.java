@@ -11,13 +11,14 @@ public enum PointType {
 
     SIGNUP("signup", 100, PointChangeType.EARN),
     UNIVERSITY_AUTH("university_auth", 1, PointChangeType.EARN),
-    INVITATION_EVENT("invitation_event", 50, PointChangeType.EARN),
+    INVITATION_EVENT("invitation_event", 100, PointChangeType.EARN),
     CHAT_REQUEST("chat_request", -15, PointChangeType.DEDUCT),
     MATCH_REQUEST("match_request", -35, PointChangeType.DEDUCT),
     CANCEL_MATCH_REQUEST("cancel_match_request", 35, PointChangeType.EARN),
     NO_POINT_CHANGE("no_point_change", 0, PointChangeType.NONE),
     REJECTED_CHAT_REQUEST("rejected_chat_request", 15, PointChangeType.EARN),
-    CHATROOM_NO_RESPONSE_REFUND("chatroom_no_response_refund", 35, PointChangeType.EARN);
+    CHATROOM_NO_RESPONSE_REFUND("chatroom_no_response_refund", 35, PointChangeType.EARN),
+    EVENT_REWARD("event_reward", 15, PointChangeType.EARN);
 
     private final String displayName;
     private final int pointChange;
