@@ -57,13 +57,9 @@ public class ChatRequestService {
 
     @Transactional(readOnly = true)
     public boolean isAlreadyExistChatroom(Student sender, Student receiver) {
-        boolean activeChatroomExists = chatroomRepository
+        return chatroomRepository
                 .findLatestActiveChatroomByUserPair(sender.getId(), receiver.getId())
                 .isPresent();
-        if (activeChatroomExists) {
-            return false;
-        }
-        return true;
     }
 
     @Transactional(readOnly = true)
