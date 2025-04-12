@@ -47,6 +47,9 @@ public class Feed extends BaseTime {
     @Column(name = "view_count", nullable = false)
     private int viewCount;
 
+    @Column(name = "is_profile_visible", nullable = false)
+    private boolean isProfileVisible;
+
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "student_id", nullable = false)
     private Student student;
@@ -72,21 +75,24 @@ public class Feed extends BaseTime {
     private List<Bookmark> bookmarks;
 
     @Builder
-    public Feed(String title, String content, Student student, Category category, University university) {
+    public Feed(String title, String content, Student student, Category category, University university,
+                boolean isProfileVisible) {
         this.title = title;
         this.content = content;
         this.student = student;
         this.category = category;
         this.university = university;
+        this.isProfileVisible = isProfileVisible;
         this.likeCount = 0;
         this.commentCount = 0;
         this.viewCount = 0;
     }
 
-    public void updateFeed(String title, String content, Category category) {
+    public void updateFeed(String title, String content, Category category, boolean isProfileVisible) {
         this.title = title;
         this.content = content;
         this.category = category;
+        this.isProfileVisible = isProfileVisible;
     }
 
     public void increaseLikeCount() {

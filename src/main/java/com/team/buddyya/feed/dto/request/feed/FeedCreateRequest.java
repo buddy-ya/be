@@ -8,6 +8,7 @@ public record FeedCreateRequest(
         String content,
         String university,
         String category,
+        boolean isProfileVisible,
         List<MultipartFile> images
 ) {
 }
