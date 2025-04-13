@@ -92,7 +92,7 @@ public class ChatRequestService {
             throw new ChatException(ChatExceptionType.CHAT_REQUEST_ALREADY_EXISTS);
         }
         if (isBlockedEachOther(sender, receiver.getId())) {
-            throw new ChatException(ChatExceptionType.CHATROOM_ALREADY_EXISTS);
+            throw new ChatException(ChatExceptionType.CHAT_REQUEST_BLOCKED);
         }
         if (isAlreadyExistChatroom(sender, receiver)) {
             throw new ChatException(ChatExceptionType.CHATROOM_ALREADY_EXISTS);
