@@ -11,6 +11,7 @@ import com.team.buddyya.feed.repository.FeedRepository;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.service.FindStudentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,7 +49,11 @@ public class FeedLikeService {
                 .feed(feed)
                 .student(student)
                 .build();
-        feedLikeRepository.save(feedLike);
-        return LikeResponse.from(true, feed.getLikeCount());
+        try {
+            feedLikeRepository.save(feedLike);
+            return LikeResponse.from(true, feed.getLikeCount());
+        } catch (DataIntegrityViolationException e) {
+            return LikeResponse.from(true, feed.getLikeCount());
+        }
     }
 }
