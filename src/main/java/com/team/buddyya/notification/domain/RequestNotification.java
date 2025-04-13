@@ -17,15 +17,17 @@ public class RequestNotification {
     private String body;
     private String priority;
     private String channelId;
+    private String sound;
     private Map<String, Object> data;
 
     @Builder
-    public RequestNotification(String to, String title, String body, Map<String, Object> data, String priority, String channelId) {
+    public RequestNotification(String to, String title, String body, Map<String, Object> data) {
         this.to = to;
         this.title = title;
         this.body = body;
         this.data = data;
-        this.priority = priority;
-        this.channelId = channelId;
+        this.priority = "high";
+        this.sound = "default";
+        this.channelId = ("default");
     }
 }
