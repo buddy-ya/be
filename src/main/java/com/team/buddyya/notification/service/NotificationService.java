@@ -1,8 +1,10 @@
 package com.team.buddyya.notification.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.team.buddyya.chatting.domain.Chatroom;
 import com.team.buddyya.feed.domain.Comment;
 import com.team.buddyya.feed.domain.Feed;
+import com.team.buddyya.match.domain.MatchRequest;
 import com.team.buddyya.notification.domain.ExpoToken;
 import com.team.buddyya.notification.domain.RequestNotification;
 import com.team.buddyya.notification.dto.response.SaveTokenResponse;
@@ -10,6 +12,8 @@ import com.team.buddyya.notification.exception.NotificationException;
 import com.team.buddyya.notification.exception.NotificationExceptionType;
 import com.team.buddyya.notification.repository.ExpoTokenRepository;
 import com.team.buddyya.point.domain.Point;
+import com.team.buddyya.point.domain.PointType;
+import com.team.buddyya.student.domain.MatchingProfile;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.service.FindStudentService;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +28,11 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import static com.team.buddyya.student.domain.UserProfileDefaultImage.getChatroomProfileImage;
 
 @Service
 @Transactional
@@ -118,12 +126,28 @@ public class NotificationService {
         expoTokenRepository.save(Token);
     }
 
-    public void sendMatchSuccessNotification(Student student, Long roomId){
+    public void sendMatchSuccessNotification(Student student, Student buddy, Chatroom chatroom, MatchRequest matchRequest, Point point, boolean isExited, MatchingProfile matchingProfile){
         try{
             String token = getTokenByUserId(student.getId());
-            Map<String, Object> data = Map.of(
-                    "roomId", roomId,
-                    "type", "MATCH"
+            Map<String, Object> data = Map.ofEntries(
+                    Map.entry("id", matchRequest.getId()),
+                    Map.entry("roomId", chatroom.getId()),
+                    Map.entry("buddyId", buddy.getId()),
+                    Map.entry("name", buddy.getName()),
+                    Map.entry("country", buddy.getCountry()),
+                    Map.entry("university", buddy.getUniversity().getUniversityName()),
+                    Map.entry("gender", buddy.getGender().getDisplayName()),
+                    Map.entry("profileImageUrl", getChatroomProfileImage(buddy)),
+                    Map.entry("majors", convertToStringList(buddy.getMajors())),
+                    Map.entry("languages", convertToStringList(buddy.getLanguages())),
+                    Map.entry("interests", convertToStringList(buddy.getInterests())),
+                    Map.entry("matchStatus", matchRequest.getMatchRequestStatus().getDisplayName()),
+                    Map.entry("point", point.getCurrentPoint()),
+                    Map.entry("pointChange", PointType.MATCH_REQUEST.getPointChange()),
+                    Map.entry("introduction", matchingProfile.getIntroduction()),
+                    Map.entry("buddyActivity", matchingProfile.getBuddyActivity()),
+                    Map.entry("isExited", isExited),
+                    Map.entry("type", "MATCH")
             );
             boolean isKorean = student.getIsKorean();
             String title = getMatchSuccessNotificationTitle(isKorean);
@@ -423,5 +447,11 @@ public class NotificationService {
         return expoTokenRepository.findByStudentId(userId)
                 .orElseThrow(() -> new NotificationException(NotificationExceptionType.TOKEN_NOT_FOUND))
                 .getToken();
+    }
+
+    private static List<String> convertToStringList(List<?> list) {
+        return list.stream()
+                .map(Object::toString)
+                .collect(Collectors.toList());
     }
 }
