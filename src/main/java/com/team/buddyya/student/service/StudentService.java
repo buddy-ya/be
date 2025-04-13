@@ -12,10 +12,13 @@ import com.team.buddyya.chatting.domain.ChatroomStudent;
 import com.team.buddyya.common.service.S3UploadService;
 import com.team.buddyya.match.repository.MatchRequestRepository;
 import com.team.buddyya.notification.repository.ExpoTokenRepository;
+import com.team.buddyya.notification.service.NotificationService;
 import com.team.buddyya.point.domain.Point;
+import com.team.buddyya.point.domain.PointType;
 import com.team.buddyya.point.repository.PointRepository;
 import com.team.buddyya.point.repository.PointStatusRepository;
 import com.team.buddyya.point.service.FindPointService;
+import com.team.buddyya.point.service.UpdatePointService;
 import com.team.buddyya.student.domain.*;
 import com.team.buddyya.student.dto.request.MyPageUpdateRequest;
 import com.team.buddyya.student.dto.request.OnBoardingRequest;
@@ -32,6 +35,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static com.team.buddyya.common.domain.S3DirectoryName.PROFILE_IMAGE;
@@ -60,6 +64,8 @@ public class StudentService {
     private final PointStatusRepository pointStatusRepository;
     private final MatchRequestRepository matchRequestRepository;
     private final MatchingProfileRepository matchingProfileRepository;
+    private final UpdatePointService updatePointService;
+    private final NotificationService notificationService;
 
     private static final String BLOCK_SUCCESS_MESSAGE = "차단이 성공적으로 완료되었습니다.";
 
@@ -153,6 +159,7 @@ public class StudentService {
         if (!studentInfo.id().equals(userId)) {
             return UserResponse.fromOtherUserInfo(student, matchingProfile);
         }
+        checkAttendanceAndReward(student);
         Point point = findPointService.findByStudent(student);
         boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
                 .isPresent();
@@ -235,5 +242,15 @@ public class StudentService {
     private MatchingProfile getMatchingProfile(Student student) {
         return matchingProfileRepository.findByStudent(student)
                 .orElseThrow(() -> new StudentException(StudentExceptionType.MATCHING_PROFILE_NOT_FOUND));
+    }
+
+    public void checkAttendanceAndReward(Student student) {
+        RegisteredPhone registeredPhone = registeredPhoneRepository.findByPhoneNumber(student.getPhoneNumber())
+                .orElseThrow(() -> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.PHONE_NOT_FOUND));
+        if (!registeredPhone.isTodayAlreadyChecked()) {
+            updatePointService.updatePoint(student, PointType.EVENT_REWARD);
+            registeredPhone.updateLastAttendanceDateToToday();
+            notificationService.sendDailyAttendanceNotification(student);
+        }
     }
 }

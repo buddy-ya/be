@@ -79,7 +79,12 @@ public class PhoneAuthenticationService {
                     phone.updateAuthenticationCode(generatedCode);
                     return phone;
                 })
-                .orElse(new RegisteredPhone(phoneNumber, generatedCode, invitationService.createInvitationCode()));
+                .orElse(RegisteredPhone.builder()
+                        .phoneNumber(phoneNumber)
+                        .authenticationCode(generatedCode)
+                        .invitationCode(invitationService.createInvitationCode())
+                        .build()
+                );
     }
 
     public TestAccountResponse isTestAccount(String phoneNumber) {
