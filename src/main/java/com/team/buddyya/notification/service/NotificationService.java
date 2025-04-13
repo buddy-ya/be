@@ -9,6 +9,7 @@ import com.team.buddyya.notification.dto.response.SaveTokenResponse;
 import com.team.buddyya.notification.exception.NotificationException;
 import com.team.buddyya.notification.exception.NotificationExceptionType;
 import com.team.buddyya.notification.repository.ExpoTokenRepository;
+import com.team.buddyya.point.domain.Point;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.service.FindStudentService;
 import lombok.RequiredArgsConstructor;
@@ -330,14 +331,15 @@ public class NotificationService {
         return isKorean ? CHAT_ACCEPT_BODY_KR : CHAT_ACCEPT_BODY_EN;
     }
 
-    public void sendInvitationRewardNotification(Student student) {
+    public void sendInvitationRewardNotification(Point point, Student student) {
         try {
             String token = getTokenByUserId(student.getId());
             boolean isKorean = student.getIsKorean();
             String title = isKorean ? INVITATION_REWARD_TITLE_KR : INVITATION_REWARD_TITLE_EN;
             String body = isKorean ? INVITATION_REWARD_BODY_KR : INVITATION_REWARD_BODY_EN;
             Map<String, Object> data = Map.of(
-                    "type", "POINT"
+                    "type", "POINT",
+                    "point", point.getCurrentPoint()
             );
             sendToExpo(RequestNotification.builder()
                     .to(token)
@@ -353,14 +355,15 @@ public class NotificationService {
         }
     }
 
-    public void sendRefundNotification(Student student) {
+    public void sendRefundNotification(Point point, Student student) {
         try {
             String token = getTokenByUserId(student.getId());
             boolean isKorean = student.getIsKorean();
             String title = isKorean ? REFUND_POINTS_TITLE_KR : REFUND_POINTS_TITLE_EN;
             String body = isKorean ? REFUND_POINTS_BODY_KR : REFUND_POINTS_BODY_EN;
             Map<String, Object> data = Map.of(
-                    "type", "POINT"
+                    "type", "POINT",
+                    "point", point.getCurrentPoint()
             );
             sendToExpo(RequestNotification.builder()
                     .to(token)
@@ -376,14 +379,15 @@ public class NotificationService {
         }
     }
 
-    public void sendDailyAttendanceNotification(Student student) {
+    public void sendDailyAttendanceNotification(Point point, Student student) {
         try {
             String token = getTokenByUserId(student.getId());
             boolean isKorean = student.getIsKorean();
             String title = isKorean ? ATTENDANCE_REWARD_TITLE_KR : ATTENDANCE_REWARD_TITLE_EN;
             String body = isKorean ? ATTENDANCE_REWARD_BODY_KR : ATTENDANCE_REWARD_BODY_EN;
             Map<String, Object> data = Map.of(
-                    "type", "POINT"
+                    "type", "POINT",
+                    "point", point.getCurrentPoint()
             );
             sendToExpo(RequestNotification.builder()
                     .to(token)

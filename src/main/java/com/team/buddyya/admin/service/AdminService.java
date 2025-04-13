@@ -18,6 +18,7 @@ import com.team.buddyya.chatting.repository.ChatRepository;
 import com.team.buddyya.chatting.repository.ChatroomRepository;
 import com.team.buddyya.common.service.S3UploadService;
 import com.team.buddyya.notification.service.NotificationService;
+import com.team.buddyya.point.domain.Point;
 import com.team.buddyya.point.domain.PointType;
 import com.team.buddyya.point.service.UpdatePointService;
 import com.team.buddyya.report.domain.Report;
@@ -142,8 +143,8 @@ public class AdminService {
                 .orElseThrow(() -> new ChatException(ChatExceptionType.CHATROOM_NOT_FOUND));
         if (chatroom.getType().equals(ChatroomType.MATCHING)) {
             Student reportUser = findStudentService.findByStudentId(reportUserId);
-            updatePointService.updatePoint(reportUser, PointType.CHATROOM_NO_RESPONSE_REFUND);
-            notificationService.sendRefundNotification(reportUser);
+            Point point = updatePointService.updatePoint(reportUser, PointType.CHATROOM_NO_RESPONSE_REFUND);
+            notificationService.sendRefundNotification(point, reportUser);
         }
     }
 }
