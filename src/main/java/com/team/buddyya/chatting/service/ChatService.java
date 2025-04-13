@@ -1,12 +1,25 @@
 package com.team.buddyya.chatting.service;
 
+import static com.team.buddyya.common.domain.S3DirectoryName.CHAT_IMAGE;
+import static com.team.buddyya.student.domain.UserProfileDefaultImage.getChatroomProfileImage;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team.buddyya.auth.domain.StudentInfo;
-import com.team.buddyya.chatting.domain.*;
+import com.team.buddyya.chatting.domain.Chat;
+import com.team.buddyya.chatting.domain.Chatroom;
+import com.team.buddyya.chatting.domain.ChatroomStudent;
+import com.team.buddyya.chatting.domain.ChatroomType;
+import com.team.buddyya.chatting.domain.MessageType;
 import com.team.buddyya.chatting.dto.request.ChatImageRequest;
 import com.team.buddyya.chatting.dto.request.ChatMessage;
 import com.team.buddyya.chatting.dto.request.CreateChatroomRequest;
-import com.team.buddyya.chatting.dto.response.*;
+import com.team.buddyya.chatting.dto.response.ChatMessageListResponse;
+import com.team.buddyya.chatting.dto.response.ChatMessageResponse;
+import com.team.buddyya.chatting.dto.response.ChatroomDetailResponse;
+import com.team.buddyya.chatting.dto.response.ChatroomListResponse;
+import com.team.buddyya.chatting.dto.response.ChatroomResponse;
+import com.team.buddyya.chatting.dto.response.CreateChatroomResponse;
+import com.team.buddyya.chatting.dto.response.LeaveChatroomResponse;
 import com.team.buddyya.chatting.exception.ChatException;
 import com.team.buddyya.chatting.exception.ChatExceptionType;
 import com.team.buddyya.chatting.repository.ChatRepository;
@@ -17,6 +30,16 @@ import com.team.buddyya.common.service.S3UploadService;
 import com.team.buddyya.notification.service.NotificationService;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.service.FindStudentService;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,15 +47,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-
-import static com.team.buddyya.common.domain.S3DirectoryName.CHAT_IMAGE;
-import static com.team.buddyya.student.domain.UserProfileDefaultImage.getChatroomProfileImage;
 
 @Service
 @RequiredArgsConstructor
@@ -55,14 +69,10 @@ public class ChatService {
     private final Map<WebSocketSession, Long> lastPongTimestamps = new ConcurrentHashMap<>();
     private final NotificationService notificationService;
 
-    public CreateChatroomResponse createOrGetChatRoom(CreateChatroomRequest request, StudentInfo studentInfo, ChatroomType chatroomType) {
+    public CreateChatroomResponse createOrGetChatRoom(CreateChatroomRequest request, StudentInfo studentInfo,
+                                                      ChatroomType chatroomType) {
         Student user = findStudentService.findByStudentId(studentInfo.id());
         Student buddy = findStudentService.findByStudentId(request.buddyId());
-        Optional<Chatroom> existingRoom = chatRoomRepository.findByUserAndBuddy(user.getId(), buddy.getId());
-        if (existingRoom.isPresent()) {
-            Chatroom room = existingRoom.get();
-            return CreateChatroomResponse.from(room, buddy, false);
-        }
         Chatroom newChatroom = createChatroom(user, buddy, chatroomType);
         notificationService.sendChatAcceptNotification(buddy, user.getName(), newChatroom.getId());
         return CreateChatroomResponse.from(newChatroom, buddy, true);
@@ -182,7 +192,8 @@ public class ChatService {
         Student student = findStudentService.findByStudentId(studentInfo.id());
         Chatroom chatroom = chatRoomRepository.findById(roomId)
                 .orElseThrow(() -> new ChatException(ChatExceptionType.CHATROOM_NOT_FOUND));
-        ChatroomStudent chatroomStudent = chatroomStudentRepository.findByChatroomAndStudentId(chatroom, student.getId())
+        ChatroomStudent chatroomStudent = chatroomStudentRepository.findByChatroomAndStudentId(chatroom,
+                        student.getId())
                 .orElseThrow(() -> new ChatException(ChatExceptionType.USER_NOT_PART_OF_CHATROOM));
         Student buddy = getBuddyFromChatroom(student, chatroom);
         if (buddy == null) {
@@ -192,7 +203,8 @@ public class ChatService {
                 .filter(cs -> !cs.getStudent().getId().equals(student.getId()))
                 .anyMatch(ChatroomStudent::getIsExited);
         String buddyProfileImage = getChatroomProfileImage(buddy);
-        return ChatroomDetailResponse.from(roomId, buddy.getName(), buddy.getCountry(), buddyProfileImage, buddy.getId(), isBuddyExited, chatroom.getType().name());
+        return ChatroomDetailResponse.from(roomId, buddy.getName(), buddy.getCountry(), buddyProfileImage,
+                buddy.getId(), isBuddyExited, chatroom.getType().name());
     }
 
     private ChatroomResponse createChatroomResponse(ChatroomStudent chatroomStudent) {
@@ -205,7 +217,8 @@ public class ChatService {
                 .filter(cs -> !cs.getStudent().getId().equals(chatroomStudent.getStudent().getId()))
                 .anyMatch(ChatroomStudent::getIsExited);
         String buddyProfileImage = getChatroomProfileImage(buddy);
-        return ChatroomResponse.from(chatroom, buddy.getName(), buddy.getCountry(), chatroomStudent, buddyProfileImage, buddy.getId(), isBuddyExited);
+        return ChatroomResponse.from(chatroom, buddy.getName(), buddy.getCountry(), chatroomStudent, buddyProfileImage,
+                buddy.getId(), isBuddyExited);
     }
 
     private Student getBuddyFromChatroom(Student student, Chatroom chatroom) {
@@ -219,7 +232,8 @@ public class ChatService {
     public ChatMessageListResponse getChatMessages(Long chatroomId, StudentInfo studentInfo, Pageable pageable) {
         Chatroom chatroom = chatRoomRepository.findById(chatroomId)
                 .orElseThrow(() -> new ChatException(ChatExceptionType.CHATROOM_NOT_FOUND));
-        ChatroomStudent chatroomStudent = chatroomStudentRepository.findByChatroomAndStudentId(chatroom, studentInfo.id())
+        ChatroomStudent chatroomStudent = chatroomStudentRepository.findByChatroomAndStudentId(chatroom,
+                        studentInfo.id())
                 .orElseThrow(() -> new ChatException(ChatExceptionType.USER_NOT_PART_OF_CHATROOM));
         chatroomStudent.resetUnreadCount();
         Page<Chat> chats = chatRepository.findByChatroom(chatroom, pageable);
@@ -230,7 +244,8 @@ public class ChatService {
     public LeaveChatroomResponse leaveChatroom(Long chatroomId, StudentInfo studentInfo) {
         Chatroom chatroom = chatRoomRepository.findById(chatroomId)
                 .orElseThrow(() -> new ChatException(ChatExceptionType.CHATROOM_NOT_FOUND));
-        ChatroomStudent chatroomStudent = chatroomStudentRepository.findByChatroomAndStudentId(chatroom, studentInfo.id())
+        ChatroomStudent chatroomStudent = chatroomStudentRepository.findByChatroomAndStudentId(chatroom,
+                        studentInfo.id())
                 .orElseThrow(() -> new ChatException(ChatExceptionType.USER_NOT_PART_OF_CHATROOM));
         chatroomStudent.updateIsExited();
         return LeaveChatroomResponse.from(CHATROOM_LEAVE_SUCCESS_MESSAGE);
@@ -268,7 +283,8 @@ public class ChatService {
         });
     }
 
-    private Set<WebSocketSession> handlePingAndValidateSessions(Long roomId, Set<WebSocketSession> sessions, long currentTime) throws IOException {
+    private Set<WebSocketSession> handlePingAndValidateSessions(Long roomId, Set<WebSocketSession> sessions,
+                                                                long currentTime) throws IOException {
         Set<WebSocketSession> invalidSessions = new HashSet<>();
         for (WebSocketSession session : sessions) {
             if (!session.isOpen()) {
@@ -288,7 +304,8 @@ public class ChatService {
         return timeout == null || currentTime > timeout;
     }
 
-    private void cleanupInvalidSessions(Long roomId, Set<WebSocketSession> sessions, Set<WebSocketSession> invalidSessions) {
+    private void cleanupInvalidSessions(Long roomId, Set<WebSocketSession> sessions,
+                                        Set<WebSocketSession> invalidSessions) {
         if (!invalidSessions.isEmpty()) {
             invalidSessions.forEach(session -> closeAndRemoveSession(session));
             sessions.removeAll(invalidSessions);
