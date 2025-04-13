@@ -159,7 +159,7 @@ public class StudentService {
         if (!studentInfo.id().equals(userId)) {
             return UserResponse.fromOtherUserInfo(student, matchingProfile);
         }
-        checkAttendanceAndReward(student);
+//        checkAttendanceAndReward(student);
         Point point = findPointService.findByStudent(student);
         boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student)
                 .isPresent();
