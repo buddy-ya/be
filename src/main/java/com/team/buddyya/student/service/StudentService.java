@@ -248,9 +248,9 @@ public class StudentService {
         RegisteredPhone registeredPhone = registeredPhoneRepository.findByPhoneNumber(student.getPhoneNumber())
                 .orElseThrow(() -> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.PHONE_NOT_FOUND));
         if (!registeredPhone.isTodayAlreadyChecked()) {
-            updatePointService.updatePoint(student, PointType.EVENT_REWARD);
+            Point point = updatePointService.updatePoint(student, PointType.EVENT_REWARD);
             registeredPhone.updateLastAttendanceDateToToday();
-            notificationService.sendDailyAttendanceNotification(student);
+            notificationService.sendDailyAttendanceNotification(point, student);
         }
     }
 }

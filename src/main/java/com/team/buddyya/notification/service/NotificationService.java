@@ -1,14 +1,19 @@
 package com.team.buddyya.notification.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.team.buddyya.chatting.domain.Chatroom;
 import com.team.buddyya.feed.domain.Comment;
 import com.team.buddyya.feed.domain.Feed;
+import com.team.buddyya.match.domain.MatchRequest;
 import com.team.buddyya.notification.domain.ExpoToken;
 import com.team.buddyya.notification.domain.RequestNotification;
 import com.team.buddyya.notification.dto.response.SaveTokenResponse;
 import com.team.buddyya.notification.exception.NotificationException;
 import com.team.buddyya.notification.exception.NotificationExceptionType;
 import com.team.buddyya.notification.repository.ExpoTokenRepository;
+import com.team.buddyya.point.domain.Point;
+import com.team.buddyya.point.domain.PointType;
+import com.team.buddyya.student.domain.MatchingProfile;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.service.FindStudentService;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +28,11 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import static com.team.buddyya.student.domain.UserProfileDefaultImage.getChatroomProfileImage;
 
 @Service
 @Transactional
@@ -122,6 +131,7 @@ public class NotificationService {
             String token = getTokenByUserId(student.getId());
             Map<String, Object> data = Map.of(
                     "roomId", roomId,
+                    "wasPending",false,
                     "type", "MATCH"
             );
             boolean isKorean = student.getIsKorean();
@@ -131,8 +141,44 @@ public class NotificationService {
                     .to(token)
                     .title(title)
                     .body(body)
-                    .priority("high")
-                    .channelId("default")
+                    .data(data).build()
+            );
+        } catch (NotificationException e) {
+            log.warn("매칭 성공 알림 전송 실패: {}", e.exceptionType().errorMessage());
+        }
+    }
+
+    public void sendPendingMatchSuccessNotification(Student student, Student buddy, Chatroom chatroom, MatchRequest matchRequest, Point point, boolean isExited, MatchingProfile matchingProfile){
+        try{
+            String token = getTokenByUserId(student.getId());
+            Map<String, Object> data = Map.ofEntries(
+                    Map.entry("id", matchRequest.getId()),
+                    Map.entry("chatRoomId", chatroom.getId()),
+                    Map.entry("buddyId", buddy.getId()),
+                    Map.entry("name", buddy.getName()),
+                    Map.entry("country", buddy.getCountry()),
+                    Map.entry("university", buddy.getUniversity().getUniversityName()),
+                    Map.entry("gender", buddy.getGender().getDisplayName()),
+                    Map.entry("profileImageUrl", getChatroomProfileImage(buddy)),
+                    Map.entry("majors", convertToStringList(buddy.getMajors())),
+                    Map.entry("languages", convertToStringList(buddy.getLanguages())),
+                    Map.entry("interests", convertToStringList(buddy.getInterests())),
+                    Map.entry("matchStatus", matchRequest.getMatchRequestStatus().getDisplayName()),
+                    Map.entry("point", point.getCurrentPoint()),
+                    Map.entry("pointChange", PointType.MATCH_REQUEST.getPointChange()),
+                    Map.entry("introduction", matchingProfile.getIntroduction()),
+                    Map.entry("buddyActivity", matchingProfile.getBuddyActivity()),
+                    Map.entry("isExited", isExited),
+                    Map.entry("wasPending",true),
+                    Map.entry("type", "MATCH")
+            );
+            boolean isKorean = student.getIsKorean();
+            String title = getMatchSuccessNotificationTitle(isKorean);
+            String body = getMatchSuccessNotificationBody(isKorean);
+            sendToExpo(RequestNotification.builder()
+                    .to(token)
+                    .title(title)
+                    .body(body)
                     .data(data).build()
             );
         } catch (NotificationException e) {
@@ -165,8 +211,6 @@ public class NotificationService {
                         .to(token)
                         .title(title)
                         .body(commentContent)
-                        .priority("high")
-                        .channelId("default")
                         .data(data).build()
                 );
             } catch (NotificationException e) {
@@ -195,8 +239,6 @@ public class NotificationService {
                         .to(token)
                         .title(title)
                         .body(commentContent)
-                        .priority("high")
-                        .channelId("default")
                         .data(data).build()
                 );
             } catch (NotificationException e) {
@@ -230,8 +272,6 @@ public class NotificationService {
                 .to(token)
                 .title(title)
                 .body(body)
-                .priority("high")
-                .channelId("default")
                 .data(data)
                 .build();
     }
@@ -279,8 +319,6 @@ public class NotificationService {
                     .to(token)
                     .title(title)
                     .body(body)
-                    .priority("high")
-                    .channelId("default")
                     .data(data)
                     .build()
             );
@@ -313,8 +351,6 @@ public class NotificationService {
                     .to(token)
                     .title(title)
                     .body(body)
-                    .priority("high")
-                    .channelId("default")
                     .data(data).build()
             );
         } catch (NotificationException e) {
@@ -330,21 +366,20 @@ public class NotificationService {
         return isKorean ? CHAT_ACCEPT_BODY_KR : CHAT_ACCEPT_BODY_EN;
     }
 
-    public void sendInvitationRewardNotification(Student student) {
+    public void sendInvitationRewardNotification(Point point, Student student) {
         try {
             String token = getTokenByUserId(student.getId());
             boolean isKorean = student.getIsKorean();
             String title = isKorean ? INVITATION_REWARD_TITLE_KR : INVITATION_REWARD_TITLE_EN;
             String body = isKorean ? INVITATION_REWARD_BODY_KR : INVITATION_REWARD_BODY_EN;
             Map<String, Object> data = Map.of(
-                    "type", "POINT"
+                    "type", "POINT",
+                    "point", point.getCurrentPoint()
             );
             sendToExpo(RequestNotification.builder()
                     .to(token)
                     .title(title)
                     .body(body)
-                    .priority("high")
-                    .channelId("default")
                     .data(data)
                     .build()
             );
@@ -353,21 +388,20 @@ public class NotificationService {
         }
     }
 
-    public void sendRefundNotification(Student student) {
+    public void sendRefundNotification(Point point, Student student) {
         try {
             String token = getTokenByUserId(student.getId());
             boolean isKorean = student.getIsKorean();
             String title = isKorean ? REFUND_POINTS_TITLE_KR : REFUND_POINTS_TITLE_EN;
             String body = isKorean ? REFUND_POINTS_BODY_KR : REFUND_POINTS_BODY_EN;
             Map<String, Object> data = Map.of(
-                    "type", "POINT"
+                    "type", "POINT",
+                    "point", point.getCurrentPoint()
             );
             sendToExpo(RequestNotification.builder()
                     .to(token)
                     .title(title)
                     .body(body)
-                    .priority("high")
-                    .channelId("default")
                     .data(data)
                     .build()
             );
@@ -376,21 +410,20 @@ public class NotificationService {
         }
     }
 
-    public void sendDailyAttendanceNotification(Student student) {
+    public void sendDailyAttendanceNotification(Point point, Student student) {
         try {
             String token = getTokenByUserId(student.getId());
             boolean isKorean = student.getIsKorean();
             String title = isKorean ? ATTENDANCE_REWARD_TITLE_KR : ATTENDANCE_REWARD_TITLE_EN;
             String body = isKorean ? ATTENDANCE_REWARD_BODY_KR : ATTENDANCE_REWARD_BODY_EN;
             Map<String, Object> data = Map.of(
-                    "type", "POINT"
+                    "type", "POINT",
+                    "point", point.getCurrentPoint()
             );
             sendToExpo(RequestNotification.builder()
                     .to(token)
                     .title(title)
                     .body(body)
-                    .priority("high")
-                    .channelId("default")
                     .data(data)
                     .build()
             );
@@ -419,5 +452,11 @@ public class NotificationService {
         return expoTokenRepository.findByStudentId(userId)
                 .orElseThrow(() -> new NotificationException(NotificationExceptionType.TOKEN_NOT_FOUND))
                 .getToken();
+    }
+
+    private static List<String> convertToStringList(List<?> list) {
+        return list.stream()
+                .map(Object::toString)
+                .collect(Collectors.toList());
     }
 }

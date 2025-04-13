@@ -228,10 +228,10 @@ public class BasicMatchService implements MatchService {
         MatchRequest newMatchRequest = createMatchRequest(student, false, chatroom.getId(), nationalityType, universityType, genderType, MatchRequestStatus.MATCH_SUCCESS);
         matchRequest.updateMatchRequestStatusSuccess();
         matchRequest.updateChatroomId(chatroom.getId());
-        notificationService.sendMatchSuccessNotification(student, chatroom.getId());
-        notificationService.sendMatchSuccessNotification(matchedStudent, chatroom.getId());
         MatchingProfile matchingProfile = matchingProfileRepository.findByStudent(matchedStudent)
                 .orElseThrow(() -> new MatchException(MatchExceptionType.MATCH_PROFILE_NOT_FOUND));
+        notificationService.sendMatchSuccessNotification(student, chatroom.getId());
+        notificationService.sendPendingMatchSuccessNotification(matchedStudent, student, chatroom, newMatchRequest, point, false, matchingProfile);
         log.info("🤝 Successfully matched: [{}] ↔ [{}]", student.getId(), matchedStudent.getId());
         return MatchResponse.from(chatroom, matchedStudent, newMatchRequest, point, false, matchingProfile);
     }

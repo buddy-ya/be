@@ -52,11 +52,11 @@ public class InvitationService {
         Student requestedStudent = findStudentService.findByStudentId(studentInfo.id());
         RegisteredPhone requestedPhone = findRegisteredPhone(requestedStudent.getPhoneNumber());
         validateNotAlreadyParticipated(requestedPhone);
-        Point point = updatePointService.updatePoint(requestedStudent, PointType.INVITATION_EVENT);
-        updatePointService.updatePoint(invitingStudent, PointType.INVITATION_EVENT);
-        notificationService.sendInvitationRewardNotification(invitingStudent);
+        Point requestedStudentPoint = updatePointService.updatePoint(requestedStudent, PointType.INVITATION_EVENT);
+        Point invitingStudentPoint = updatePointService.updatePoint(invitingStudent, PointType.INVITATION_EVENT);
+        notificationService.sendInvitationRewardNotification(invitingStudentPoint, invitingStudent);
         requestedPhone.markAsInvitationEventParticipated();
-        return ValidateInvitationCodeResponse.from(point, PointType.INVITATION_EVENT);
+        return ValidateInvitationCodeResponse.from(requestedStudentPoint, PointType.INVITATION_EVENT);
     }
 
     private Student validateAndFindInvitingStudent(Long requestedStudentId, String code) {
