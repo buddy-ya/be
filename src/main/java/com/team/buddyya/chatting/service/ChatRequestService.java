@@ -14,7 +14,6 @@ import com.team.buddyya.student.service.FindStudentService;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ChatRequestService {
 
-    private static final long EXPIRED_CHAT_REQUEST_DAY = 1;
+    private static final long EXPIRED_CHAT_REQUEST_DAY = 2;
 
     private final ChatRequestRepository chatRequestRepository;
     private final ChatroomRepository chatroomRepository;
@@ -31,8 +30,9 @@ public class ChatRequestService {
     private final NotificationService notificationService;
     private final BlockRepository blockRepository;
 
-    @Transactional(readOnly = true)
     public List<ChatRequestResponse> getChatRequests(CustomUserDetails userDetails) {
+        LocalDateTime expirationTime = LocalDateTime.now().minusDays(EXPIRED_CHAT_REQUEST_DAY);
+        chatRequestRepository.deleteByCreatedDateBefore(expirationTime);
         Student receiver = findStudentService.findByStudentId(userDetails.getStudentInfo().id());
         List<ChatRequest> chatRequests = chatRequestRepository.findAllByReceiver(receiver);
         return chatRequests.stream()
@@ -82,12 +82,6 @@ public class ChatRequestService {
 
     public void deleteChatRequest(Long chatRequestId) {
         chatRequestRepository.deleteById(chatRequestId);
-    }
-
-    @Scheduled(fixedRate = 60 * 1000)
-    public void deleteExpiredChatRequests() {
-        LocalDateTime expirationTime = LocalDateTime.now().minusDays(EXPIRED_CHAT_REQUEST_DAY);
-        chatRequestRepository.deleteByCreatedDateBefore(expirationTime);
     }
 
     private void validateChatRequest(Student sender, Student receiver) {
