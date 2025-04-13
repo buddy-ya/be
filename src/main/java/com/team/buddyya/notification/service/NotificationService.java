@@ -126,12 +126,34 @@ public class NotificationService {
         expoTokenRepository.save(Token);
     }
 
-    public void sendMatchSuccessNotification(Student student, Student buddy, Chatroom chatroom, MatchRequest matchRequest, Point point, boolean isExited, MatchingProfile matchingProfile){
+    public void sendMatchSuccessNotification(Student student, Long roomId){
+        try{
+            String token = getTokenByUserId(student.getId());
+            Map<String, Object> data = Map.of(
+                    "roomId", roomId,
+                    "wasPending",false,
+                    "type", "MATCH"
+            );
+            boolean isKorean = student.getIsKorean();
+            String title = getMatchSuccessNotificationTitle(isKorean);
+            String body = getMatchSuccessNotificationBody(isKorean);
+            sendToExpo(RequestNotification.builder()
+                    .to(token)
+                    .title(title)
+                    .body(body)
+                    .data(data).build()
+            );
+        } catch (NotificationException e) {
+            log.warn("매칭 성공 알림 전송 실패: {}", e.exceptionType().errorMessage());
+        }
+    }
+
+    public void sendPendingMatchSuccessNotification(Student student, Student buddy, Chatroom chatroom, MatchRequest matchRequest, Point point, boolean isExited, MatchingProfile matchingProfile){
         try{
             String token = getTokenByUserId(student.getId());
             Map<String, Object> data = Map.ofEntries(
                     Map.entry("id", matchRequest.getId()),
-                    Map.entry("roomId", chatroom.getId()),
+                    Map.entry("chatRoomId", chatroom.getId()),
                     Map.entry("buddyId", buddy.getId()),
                     Map.entry("name", buddy.getName()),
                     Map.entry("country", buddy.getCountry()),
@@ -147,6 +169,7 @@ public class NotificationService {
                     Map.entry("introduction", matchingProfile.getIntroduction()),
                     Map.entry("buddyActivity", matchingProfile.getBuddyActivity()),
                     Map.entry("isExited", isExited),
+                    Map.entry("wasPending",true),
                     Map.entry("type", "MATCH")
             );
             boolean isKorean = student.getIsKorean();
