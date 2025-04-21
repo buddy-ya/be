@@ -7,11 +7,13 @@ import com.team.buddyya.certification.exception.PhoneAuthenticationExceptionType
 import com.team.buddyya.certification.repository.RegisteredPhoneRepository;
 import com.team.buddyya.notification.service.NotificationService;
 import com.team.buddyya.point.domain.Point;
+import com.team.buddyya.point.domain.PointChangeType;
 import com.team.buddyya.point.domain.PointStatus;
 import com.team.buddyya.point.domain.PointType;
 import com.team.buddyya.point.dto.PointListResponse;
+import com.team.buddyya.point.dto.PointMissionResponse;
 import com.team.buddyya.point.dto.PointResponse;
-import com.team.buddyya.point.dto.PointRewardResponse;
+import com.team.buddyya.point.dto.PointMissionRewardResponse;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.point.repository.PointRepository;
 import com.team.buddyya.point.repository.PointStatusRepository;
@@ -72,17 +74,32 @@ public class PointService {
         return PointListResponse.from(point, pointResponses);
     }
 
-    public PointRewardResponse checkAttendanceAndReward(StudentInfo studentInfo) {
+    public PointMissionResponse getUserMissionInfo(StudentInfo studentInfo){
         Student student = findStudentService.findByStudentId(studentInfo.id());
         RegisteredPhone registeredPhone = registeredPhoneRepository.findByPhoneNumber(student.getPhoneNumber())
                 .orElseThrow(() -> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.PHONE_NOT_FOUND));
-        boolean participated = registeredPhone.isTodayAlreadyChecked();
-        if (participated) {
-            return PointRewardResponse.from(null, PointType.NO_POINT_CHANGE.getPointChange(), participated);
+        Point point = findPointService.findByStudent(student);
+        int totalMissionPoint = getTotalMissionPoint(point);
+        return PointMissionResponse.from(registeredPhone, totalMissionPoint);
+    }
+
+    public PointMissionRewardResponse checkAttendanceAndReward(StudentInfo studentInfo) {
+        Student student = findStudentService.findByStudentId(studentInfo.id());
+        RegisteredPhone registeredPhone = registeredPhoneRepository.findByPhoneNumber(student.getPhoneNumber())
+                .orElseThrow(() -> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.PHONE_NOT_FOUND));
+        if (registeredPhone.isTodayAttended()) {
+            return PointMissionRewardResponse.from(null, PointType.NO_POINT_CHANGE.getPointChange());
         }
-        Point point = updatePointService.updatePoint(student, PointType.EVENT_REWARD);
+        Point point = updatePointService.updatePoint(student, PointType.MISSION_VISIT_REWARD);
         registeredPhone.updateLastAttendanceDateToToday();
         notificationService.sendDailyAttendanceNotification(point, student);
-        return PointRewardResponse.from(point.getCurrentPoint(), PointType.EVENT_REWARD.getPointChange(), participated);
+        return PointMissionRewardResponse.from(point.getCurrentPoint(), PointType.MISSION_VISIT_REWARD.getPointChange());
+    }
+
+    public int getTotalMissionPoint(Point point) {
+        return pointStatusRepository.findAllByPointOrderByCreatedDateDesc(point).stream()
+                .filter(ps -> ps.getPointType().getChangeType() == PointChangeType.MISSION)
+                .mapToInt(PointStatus::getChangedPoint)
+                .sum();
     }
 }

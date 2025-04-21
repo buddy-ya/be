@@ -59,7 +59,7 @@ public class RegisteredPhone extends CreatedTime {
         this.hasWithdrawn = hasWithdrawn;
     }
 
-    public boolean isTodayAlreadyChecked() {
+    public boolean isTodayAttended() {
         LocalDate today = LocalDate.now();
         return lastAttendanceDate != null && lastAttendanceDate.isEqual(today);
     }
