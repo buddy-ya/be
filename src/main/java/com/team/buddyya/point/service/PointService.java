@@ -92,7 +92,6 @@ public class PointService {
         }
         Point point = updatePointService.updatePoint(student, PointType.MISSION_VISIT_REWARD);
         registeredPhone.updateLastAttendanceDateToToday();
-        notificationService.sendDailyAttendanceNotification(point, student);
         return PointMissionRewardResponse.from(point.getCurrentPoint(), PointType.MISSION_VISIT_REWARD.getPointChange());
     }
 
