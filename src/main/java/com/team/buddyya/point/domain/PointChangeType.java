@@ -7,6 +7,7 @@ public enum PointChangeType {
 
     EARN("earn"),
     DEDUCT("deduct"),
+    MISSION("mission"),
     NONE("none");
 
     private final String displayName;
