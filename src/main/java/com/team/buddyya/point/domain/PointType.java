@@ -18,6 +18,7 @@ public enum PointType {
     NO_POINT_CHANGE("no_point_change", 0, PointChangeType.NONE),
     REJECTED_CHAT_REQUEST("rejected_chat_request", 15, PointChangeType.EARN),
     CHATROOM_NO_RESPONSE_REFUND("chatroom_no_response_refund", 35, PointChangeType.EARN),
+    MISSION_CERTIFICATION_REWARD("mission_certification_reward", 100, PointChangeType.MISSION),
     MISSION_VISIT_REWARD("mission_visit_reward", 10, PointChangeType.MISSION),
     EVENT_REWARD("event_reward", 10, PointChangeType.EARN);
 
