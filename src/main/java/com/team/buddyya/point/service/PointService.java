@@ -80,7 +80,7 @@ public class PointService {
                 .orElseThrow(() -> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.PHONE_NOT_FOUND));
         Point point = findPointService.findByStudent(student);
         int totalMissionPoint = getTotalMissionPoint(point);
-        return PointMissionResponse.from(registeredPhone, totalMissionPoint);
+        return PointMissionResponse.from(student, registeredPhone, totalMissionPoint);
     }
 
     public PointMissionRewardResponse checkAttendanceAndReward(StudentInfo studentInfo) {
