@@ -6,8 +6,12 @@ import com.team.buddyya.admin.dto.response.AdminChatMessageResponse;
 import com.team.buddyya.admin.dto.response.AdminReportResponse;
 import com.team.buddyya.admin.dto.response.StudentIdCardResponse;
 import com.team.buddyya.admin.dto.response.StudentVerificationResponse;
+import com.team.buddyya.certification.domain.RegisteredPhone;
 import com.team.buddyya.certification.domain.StudentIdCard;
 import com.team.buddyya.certification.exception.CertificateException;
+import com.team.buddyya.certification.exception.PhoneAuthenticationException;
+import com.team.buddyya.certification.exception.PhoneAuthenticationExceptionType;
+import com.team.buddyya.certification.repository.RegisteredPhoneRepository;
 import com.team.buddyya.certification.repository.StudentIdCardRepository;
 import com.team.buddyya.chatting.domain.Chat;
 import com.team.buddyya.chatting.domain.Chatroom;
@@ -20,6 +24,7 @@ import com.team.buddyya.common.service.S3UploadService;
 import com.team.buddyya.notification.service.NotificationService;
 import com.team.buddyya.point.domain.Point;
 import com.team.buddyya.point.domain.PointType;
+import com.team.buddyya.point.service.FindPointService;
 import com.team.buddyya.point.service.UpdatePointService;
 import com.team.buddyya.report.domain.Report;
 import com.team.buddyya.report.domain.ReportImage;
@@ -62,6 +67,8 @@ public class AdminService {
     private final ReportImageRepository reportImageRepository;
     private final ChatroomRepository chatroomRepository;
     private final ChatRepository chatRepository;
+    private final RegisteredPhoneRepository registeredPhoneRepository;
+    private final FindPointService findPointService;
 
     @Transactional(readOnly = true)
     public List<StudentIdCardResponse> getStudentIdCards() {
@@ -76,24 +83,32 @@ public class AdminService {
                 .orElseThrow(() -> new CertificateException(STUDENT_ID_CARD_NOT_FOUND));
         Student student = Optional.ofNullable(studentIdCard.getStudent())
                 .orElseThrow(() -> new StudentException(STUDENT_NOT_FOUND));
+        Point point = findPointService.findByStudent(student);
         if (request.isApproved()) {
-            return approveStudentIdCard(studentIdCard, student);
+            return approveStudentIdCard(studentIdCard, point, student);
         }
-        return rejectStudentIdCard(request, studentIdCard, student);
+        return rejectStudentIdCard(request, point, studentIdCard, student);
     }
 
-    private StudentVerificationResponse approveStudentIdCard(StudentIdCard studentIdCard, Student student) {
+    private StudentVerificationResponse approveStudentIdCard(StudentIdCard studentIdCard, Point point, Student student) {
         s3UploadService.deleteFile(STUDENT_ID_CARD.getDirectoryName(), studentIdCard.getImageUrl());
         studentIdCardRepository.delete(studentIdCard);
         studentService.updateStudentCertification(student);
-        notificationService.sendAuthorizationNotification(student, true);
-        return new StudentVerificationResponse(VERIFICATION_COMPLETED_MESSAGE);
+        RegisteredPhone registeredPhone = findRegisteredPhone(student.getPhoneNumber());
+        if (!registeredPhone.getHasCertificated()) {
+            Point updatedPoint = updatePointService.updatePoint(student, PointType.MISSION_CERTIFICATION_REWARD);
+            registeredPhone.updateHasCertificated();
+            notificationService.sendAuthorizationNotification(student, updatedPoint,true);
+            return StudentVerificationResponse.from(point, PointType.MISSION_CERTIFICATION_REWARD);
+        }
+        notificationService.sendAuthorizationNotification(student, point,true);
+        return StudentVerificationResponse.from(point, PointType.NO_POINT_CHANGE);
     }
 
-    private StudentVerificationResponse rejectStudentIdCard(StudentVerificationRequest request, StudentIdCard studentIdCard, Student student) {
+    private StudentVerificationResponse rejectStudentIdCard(StudentVerificationRequest request,Point point, StudentIdCard studentIdCard, Student student) {
         studentIdCard.updateRejectionReason(request.rejectionReason());
-        notificationService.sendAuthorizationNotification(student, false);
-        return new StudentVerificationResponse(REQUEST_REJECTED_MESSAGE);
+        notificationService.sendAuthorizationNotification(student, point, false);
+        return StudentVerificationResponse.from(point, PointType.NO_POINT_CHANGE);
     }
 
     @Transactional(readOnly = true)
@@ -145,6 +160,18 @@ public class AdminService {
             Student reportUser = findStudentService.findByStudentId(reportUserId);
             Point point = updatePointService.updatePoint(reportUser, PointType.CHATROOM_NO_RESPONSE_REFUND);
             notificationService.sendRefundNotification(point, reportUser);
+        }
+    }
+
+    private RegisteredPhone findRegisteredPhone(String phoneNumber) {
+        return registeredPhoneRepository.findByPhoneNumber(phoneNumber)
+                .orElseThrow(() -> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.PHONE_NOT_FOUND));
+    }
+
+    private void rewardIfFirstTime(RegisteredPhone registeredPhone, Student student) {
+        if (!registeredPhone.getHasCertificated()) {
+            Point point = updatePointService.updatePoint(student, PointType.MISSION_CERTIFICATION_REWARD);
+            registeredPhone.updateHasCertificated();
         }
     }
 }

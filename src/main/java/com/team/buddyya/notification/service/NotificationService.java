@@ -245,12 +245,13 @@ public class NotificationService {
         return isKorean ? FEED_TITLE_KR : FEED_TITLE_EN;
     }
 
-    public void sendAuthorizationNotification(Student student, boolean isSuccess) {
+    public void sendAuthorizationNotification(Student student, Point point, boolean isSuccess) {
         try {
             String token = getTokenByUserId(student.getId());
             Map<String, Object> data = new HashMap<>();
             data.put("type", "AUTHORIZATION");
             data.put("isCertificated", isSuccess);
+            data.put("point",point.getCurrentPoint());
             boolean isKorean = student.getIsKorean();
             RequestNotification notification = createAuthorizationNotification(isKorean, isSuccess, token, data);
             sendToExpo(notification);
