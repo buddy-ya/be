@@ -26,13 +26,13 @@ public class PointController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping
+    @GetMapping("/missions")
     public ResponseEntity<PointMissionResponse> getUserMissionInfo(@AuthenticationPrincipal CustomUserDetails userDetails){
         PointMissionResponse response = pointService.getUserMissionInfo(userDetails.getStudentInfo());
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping
+    @PostMapping("/attendances")
     public ResponseEntity<PointMissionRewardResponse> rewardVisitPoint(@AuthenticationPrincipal CustomUserDetails userDetails){
         PointMissionRewardResponse response = pointService.checkAttendanceAndReward(userDetails.getStudentInfo());
         return ResponseEntity.ok(response);
