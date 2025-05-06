@@ -98,14 +98,14 @@ public class AdminService {
         if (!registeredPhone.getHasCertificated()) {
             Point updatedPoint = updatePointService.updatePoint(student, PointType.MISSION_CERTIFICATION_REWARD);
             registeredPhone.updateHasCertificated();
-            notificationService.sendAuthorizationNotification(student, updatedPoint,true);
+            notificationService.sendAuthorizationNotification(student, updatedPoint, true);
             return StudentVerificationResponse.from(point, PointType.MISSION_CERTIFICATION_REWARD);
         }
-        notificationService.sendAuthorizationNotification(student, point,true);
+        notificationService.sendAuthorizationNotification(student, point, true);
         return StudentVerificationResponse.from(point, PointType.NO_POINT_CHANGE);
     }
 
-    private StudentVerificationResponse rejectStudentIdCard(StudentVerificationRequest request,Point point, StudentIdCard studentIdCard, Student student) {
+    private StudentVerificationResponse rejectStudentIdCard(StudentVerificationRequest request, Point point, StudentIdCard studentIdCard, Student student) {
         studentIdCard.updateRejectionReason(request.rejectionReason());
         notificationService.sendAuthorizationNotification(student, point, false);
         return StudentVerificationResponse.from(point, PointType.NO_POINT_CHANGE);
