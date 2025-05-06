@@ -1,4 +1,4 @@
-package com.team.buddyya.point.dto;
+package com.team.buddyya.mission.dto;
 
 public record PointMissionRewardResponse(
         Integer currentPoint,

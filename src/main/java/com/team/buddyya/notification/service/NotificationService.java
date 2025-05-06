@@ -120,12 +120,12 @@ public class NotificationService {
         expoTokenRepository.save(Token);
     }
 
-    public void sendMatchSuccessNotification(Student student, Long roomId){
-        try{
+    public void sendMatchSuccessNotification(Student student, Long roomId) {
+        try {
             String token = getTokenByUserId(student.getId());
             Map<String, Object> data = Map.of(
                     "roomId", roomId,
-                    "wasPending",false,
+                    "wasPending", false,
                     "type", "MATCH"
             );
             boolean isKorean = student.getIsKorean();
@@ -142,8 +142,8 @@ public class NotificationService {
         }
     }
 
-    public void sendPendingMatchSuccessNotification(Student student, Student buddy, Chatroom chatroom, MatchRequest matchRequest, Point point, boolean isExited, MatchingProfile matchingProfile){
-        try{
+    public void sendPendingMatchSuccessNotification(Student student, Student buddy, Chatroom chatroom, MatchRequest matchRequest, Point point, boolean isExited, MatchingProfile matchingProfile) {
+        try {
             String token = getTokenByUserId(student.getId());
             Map<String, Object> data = Map.ofEntries(
                     Map.entry("id", matchRequest.getId()),
@@ -163,7 +163,7 @@ public class NotificationService {
                     Map.entry("introduction", matchingProfile.getIntroduction()),
                     Map.entry("buddyActivity", matchingProfile.getBuddyActivity()),
                     Map.entry("isExited", isExited),
-                    Map.entry("wasPending",true),
+                    Map.entry("wasPending", true),
                     Map.entry("type", "MATCH")
             );
             boolean isKorean = student.getIsKorean();
@@ -181,17 +181,17 @@ public class NotificationService {
     }
 
     private String getMatchSuccessNotificationTitle(boolean isKorean) {
-        return isKorean ? MATCH_SUCCESS_TITLE_KR: MATCH_SUCCESS_TITLE_EN;
+        return isKorean ? MATCH_SUCCESS_TITLE_KR : MATCH_SUCCESS_TITLE_EN;
     }
 
     private String getMatchSuccessNotificationBody(boolean isKorean) {
-        return isKorean ? MATCH_SUCCESS_BODY_KR: MATCH_SUCCESS_BODY_EN;
+        return isKorean ? MATCH_SUCCESS_BODY_KR : MATCH_SUCCESS_BODY_EN;
     }
 
-    public void sendCommentReplyNotification(Long writerId, Feed feed, Comment parent, String commentContent){
+    public void sendCommentReplyNotification(Long writerId, Feed feed, Comment parent, String commentContent) {
         boolean isWriterParent = parent.isParent(writerId);
         boolean isParentFeedOwner = parent.isParent(feed.getStudent().getId());
-        if(!isWriterParent && !isParentFeedOwner) {
+        if (!isWriterParent && !isParentFeedOwner) {
             try {
                 Student recipient = parent.getStudent();
                 String token = getTokenByUserId(recipient.getId());
@@ -214,12 +214,12 @@ public class NotificationService {
     }
 
     private String getCommentReplyNotificationTitle(boolean isKorean) {
-        return isKorean ? FEED_REPLY_TITLE_KR: FEED_REPLY_TITLE_EN;
+        return isKorean ? FEED_REPLY_TITLE_KR : FEED_REPLY_TITLE_EN;
     }
 
     public void sendCommentNotification(Long writerId, Feed feed, String commentContent) {
         boolean isFeedOwner = feed.isFeedOwner(writerId);
-        if(!isFeedOwner) {
+        if (!isFeedOwner) {
             try {
                 Student recipient = feed.getStudent();
                 String token = getTokenByUserId(recipient.getId());
@@ -245,12 +245,13 @@ public class NotificationService {
         return isKorean ? FEED_TITLE_KR : FEED_TITLE_EN;
     }
 
-    public void sendAuthorizationNotification(Student student, boolean isSuccess) {
+    public void sendAuthorizationNotification(Student student, Point point, boolean isSuccess) {
         try {
             String token = getTokenByUserId(student.getId());
             Map<String, Object> data = new HashMap<>();
             data.put("type", "AUTHORIZATION");
             data.put("isCertificated", isSuccess);
+            data.put("point", point.getCurrentPoint());
             boolean isKorean = student.getIsKorean();
             RequestNotification notification = createAuthorizationNotification(isKorean, isSuccess, token, data);
             sendToExpo(notification);
@@ -331,8 +332,8 @@ public class NotificationService {
                 : senderName + CHAT_REQUEST_BODY_EN;
     }
 
-    public void sendChatAcceptNotification(Student student, String senderName, Long roomId){
-        try{
+    public void sendChatAcceptNotification(Student student, String senderName, Long roomId) {
+        try {
             String token = getTokenByUserId(student.getId());
             Map<String, Object> data = Map.of(
                     "roomId", roomId,
