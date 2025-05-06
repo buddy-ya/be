@@ -1,7 +1,6 @@
-package com.team.buddyya.point.dto;
+package com.team.buddyya.mission.dto;
 
 import com.team.buddyya.certification.domain.RegisteredPhone;
-import com.team.buddyya.student.domain.Student;
 
 public record PointMissionResponse(
         boolean hasCertificated,
