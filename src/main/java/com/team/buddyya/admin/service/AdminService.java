@@ -99,7 +99,7 @@ public class AdminService {
             Point updatedPoint = updatePointService.updatePoint(student, PointType.MISSION_CERTIFICATION_REWARD);
             registeredPhone.updateHasCertificated();
             notificationService.sendAuthorizationNotification(student, updatedPoint, true);
-            return StudentVerificationResponse.from(point, PointType.MISSION_CERTIFICATION_REWARD);
+            return StudentVerificationResponse.from(updatedPoint, PointType.MISSION_CERTIFICATION_REWARD);
         }
         notificationService.sendAuthorizationNotification(student, point, true);
         return StudentVerificationResponse.from(point, PointType.NO_POINT_CHANGE);
