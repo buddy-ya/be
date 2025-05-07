@@ -5,6 +5,8 @@ import com.team.buddyya.certification.domain.RegisteredPhone;
 import com.team.buddyya.certification.exception.PhoneAuthenticationException;
 import com.team.buddyya.certification.exception.PhoneAuthenticationExceptionType;
 import com.team.buddyya.certification.repository.RegisteredPhoneRepository;
+import com.team.buddyya.mission.exception.MissionException;
+import com.team.buddyya.mission.exception.MissionExceptionType;
 import com.team.buddyya.point.domain.Point;
 import com.team.buddyya.point.domain.PointChangeType;
 import com.team.buddyya.point.domain.PointStatus;
@@ -45,11 +47,12 @@ public class MissionService {
         RegisteredPhone registeredPhone = registeredPhoneRepository.findByPhoneNumber(student.getPhoneNumber())
                 .orElseThrow(() -> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.PHONE_NOT_FOUND));
         if (registeredPhone.isTodayAttended()) {
-            return PointMissionRewardResponse.from(null, PointType.NO_POINT_CHANGE.getPointChange());
+            throw new MissionException(MissionExceptionType.TODAY_ALREADY_ATTENDED);
         }
         Point point = updatePointService.updatePoint(student, PointType.MISSION_VISIT_REWARD);
+        int totalMissionPoint = getTotalMissionPoint(point);
         registeredPhone.updateLastAttendanceDateToToday();
-        return PointMissionRewardResponse.from(point.getCurrentPoint(), PointType.MISSION_VISIT_REWARD.getPointChange());
+        return PointMissionRewardResponse.from(point, PointType.MISSION_VISIT_REWARD.getPointChange(), totalMissionPoint);
     }
 
     public int getTotalMissionPoint(Point point) {
