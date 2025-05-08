@@ -36,7 +36,7 @@ public class PointService {
         RegisteredPhone registeredPhone = registeredPhoneRepository.findByPhoneNumber(student.getPhoneNumber())
                 .orElseThrow(() -> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.PHONE_NOT_FOUND));
         boolean hasWithdrawn = registeredPhone.getHasWithdrawn();
-        PointType pointType = hasWithdrawn ? PointType.NO_POINT_CHANGE : PointType.SIGNUP;
+        PointType pointType = hasWithdrawn ? PointType.NO_POINT_CHANGE : PointType.NEW_SIGNUP;
         Point point = createAndSavePoint(student, pointType, hasWithdrawn);
         return point;
     }
