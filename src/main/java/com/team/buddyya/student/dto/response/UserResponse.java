@@ -78,7 +78,7 @@ public record UserResponse(
                 student.getUniversity().getUniversityName(),
                 student.getGender().getDisplayName(),
                 getChatroomProfileImage(student),
-                null,
+                student.getIsCertificated(),
                 null,
                 null,
                 isDefaultUserProfileImage(student),
