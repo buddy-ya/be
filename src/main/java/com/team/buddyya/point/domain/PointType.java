@@ -9,7 +9,7 @@ import java.util.Arrays;
 @Getter
 public enum PointType {
 
-    NEW_SIGNUP("signup", 50, PointChangeType.EARN),
+    NEW_SIGNUP("new_signup", 50, PointChangeType.EARN),
     SIGNUP("signup", 100, PointChangeType.EARN),
     UNIVERSITY_AUTH("university_auth", 1, PointChangeType.EARN),
     INVITATION_EVENT("invitation_event", 100, PointChangeType.EARN),
