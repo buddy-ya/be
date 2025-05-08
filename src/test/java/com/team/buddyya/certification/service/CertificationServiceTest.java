@@ -3,7 +3,6 @@ package com.team.buddyya.certification.service;
 import com.team.buddyya.auth.domain.StudentInfo;
 import com.team.buddyya.certification.domain.StudentIdCard;
 import com.team.buddyya.certification.dto.request.SendStudentIdCardRequest;
-import com.team.buddyya.certification.dto.response.CertificationResponse;
 import com.team.buddyya.certification.exception.CertificateException;
 import com.team.buddyya.certification.exception.CertificateExceptionType;
 import com.team.buddyya.certification.repository.StudentIdCardRepository;
@@ -63,10 +62,9 @@ public class CertificationServiceTest {
         when(studentIdCardRepository.findByStudent(student)).thenReturn(Optional.empty());
 
         //when
-        CertificationResponse response = certificationService.uploadStudentIdCard(info, new SendStudentIdCardRequest(file));
+        certificationService.uploadStudentIdCard(info, new SendStudentIdCardRequest(file));
 
         //then
-        assertThat(response.success()).isTrue();
         verify(studentIdCardRepository).save(argThat(card ->
                 card.getImageUrl().equals("uploaded-url") &&
                         card.getStudent() == student
@@ -85,10 +83,9 @@ public class CertificationServiceTest {
         when(studentIdCardRepository.findByStudent(student)).thenReturn(Optional.of(existing));
 
         //when
-        CertificationResponse response = certificationService.uploadStudentIdCard(info, new SendStudentIdCardRequest(file));
+        certificationService.uploadStudentIdCard(info, new SendStudentIdCardRequest(file));
 
         //then
-        assertThat(response.success()).isTrue();
         verify(s3UploadService).deleteFile(anyString(), eq("old-url"));
         assertThat(existing.getImageUrl()).isEqualTo("new-url");
     }
