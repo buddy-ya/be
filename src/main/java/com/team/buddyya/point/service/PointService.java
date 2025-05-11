@@ -31,6 +31,7 @@ public class PointService {
     private final FindPointService findPointService;
     private final FindStudentService findStudentService;
     private final RegisteredPhoneRepository registeredPhoneRepository;
+    private final UpdatePointService updatePointService;
 
     public Point createPoint(Student student) {
         RegisteredPhone registeredPhone = registeredPhoneRepository.findByPhoneNumber(student.getPhoneNumber())
@@ -38,6 +39,9 @@ public class PointService {
         boolean hasWithdrawn = registeredPhone.getHasWithdrawn();
         PointType pointType = hasWithdrawn ? PointType.NO_POINT_CHANGE : PointType.NEW_SIGNUP;
         Point point = createAndSavePoint(student, pointType, hasWithdrawn);
+        if (!hasWithdrawn) {
+            return rewardFestivalPoint(student);
+        }
         return point;
     }
 
@@ -66,5 +70,9 @@ public class PointService {
                 .map(PointResponse::from)
                 .collect(Collectors.toList());
         return PointListResponse.from(point, pointResponses);
+    }
+
+    private Point rewardFestivalPoint(Student student) {
+        return updatePointService.updatePoint(student, PointType.FESTIVAL_REWARD);
     }
 }
