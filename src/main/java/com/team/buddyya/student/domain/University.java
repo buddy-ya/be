@@ -27,5 +27,6 @@ public class University {
     @Builder
     public University(String universityName) {
         this.universityName = universityName;
+        isActive = true;
     }
 }
