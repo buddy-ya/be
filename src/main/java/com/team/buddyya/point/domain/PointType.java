@@ -21,6 +21,7 @@ public enum PointType {
     CHATROOM_NO_RESPONSE_REFUND("chatroom_no_response_refund", 35, PointChangeType.EARN),
     MISSION_CERTIFICATION_REWARD("mission_certification_reward", 100, PointChangeType.MISSION),
     MISSION_VISIT_REWARD("mission_visit_reward", 10, PointChangeType.MISSION),
+    FESTIVAL_REWARD("festival_reward", 50, PointChangeType.EARN),
     EVENT_REWARD("event_reward", 10, PointChangeType.EARN);
 
     private final String displayName;
