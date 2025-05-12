@@ -31,7 +31,6 @@ public class OnBoardingService {
     private final PointService pointService;
     private final MatchingProfileRepository matchingProfileRepository;
     private final AuthTokenRepository authTokenRepository;
-    private final InvitationService invitationService;
     private final JwtUtils jwtUtils;
 
     public UserResponse onboard(OnBoardingRequest request) {

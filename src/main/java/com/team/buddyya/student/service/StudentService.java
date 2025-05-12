@@ -12,13 +12,10 @@ import com.team.buddyya.chatting.domain.ChatroomStudent;
 import com.team.buddyya.common.service.S3UploadService;
 import com.team.buddyya.match.repository.MatchRequestRepository;
 import com.team.buddyya.notification.repository.ExpoTokenRepository;
-import com.team.buddyya.notification.service.NotificationService;
 import com.team.buddyya.point.domain.Point;
-import com.team.buddyya.point.domain.PointType;
 import com.team.buddyya.point.repository.PointRepository;
 import com.team.buddyya.point.repository.PointStatusRepository;
 import com.team.buddyya.point.service.FindPointService;
-import com.team.buddyya.point.service.UpdatePointService;
 import com.team.buddyya.student.domain.*;
 import com.team.buddyya.student.dto.request.MyPageUpdateRequest;
 import com.team.buddyya.student.dto.request.OnBoardingRequest;
@@ -35,7 +32,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import static com.team.buddyya.common.domain.S3DirectoryName.PROFILE_IMAGE;

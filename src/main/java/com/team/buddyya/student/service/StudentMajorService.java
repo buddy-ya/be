@@ -29,9 +29,7 @@ public class StudentMajorService {
                     .student(student)
                     .major(major)
                     .build();
-
             studentMajor.setStudent(student);
-
             studentMajorRepository.save(studentMajor);
         });
     }
