@@ -49,7 +49,7 @@ class OnBoardingServiceTest {
         when(student.getIsKorean()).thenReturn(false);
         when(student.checkAndUpdateBanStatus()).thenReturn(false);
         when(student.getRole()).thenReturn(Role.STUDENT);
-        when(student.getUniversity()).thenReturn(University.builder().universityName("sju").isActive(true).build());
+        when(student.getUniversity()).thenReturn(University.builder().universityName("sju").build());
         when(student.getGender()).thenReturn(Gender.MALE);
         when(student.getProfileImage()).thenReturn(ProfileImage.builder().url(UserProfileDefaultImage.USER_PROFILE_DEFAULT_IMAGE.getUrl()).build());
     }

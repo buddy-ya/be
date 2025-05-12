@@ -26,7 +26,6 @@ class StudentRepositoryTest {
         University university = universityRepository.save(
                 University.builder()
                         .universityName("sju")
-                        .isActive(true)
                         .build()
         );
         CharacterProfileImage randomImage = CharacterProfileImage.getRandomProfileImage();

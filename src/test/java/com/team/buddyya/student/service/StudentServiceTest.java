@@ -47,7 +47,7 @@ class StudentServiceTest {
                 List.of("humanities"), List.of("ko"), List.of("kpop")
         );
 
-        University mockUniversity = University.builder().universityName("sju").isActive(true).build();
+        University mockUniversity = University.builder().universityName("sju").build();
         when(universityRepository.findByUniversityName("sju")).thenReturn(Optional.of(mockUniversity));
 
         Student mockStudent = Student.builder()

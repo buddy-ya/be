@@ -25,8 +25,8 @@ public class University {
     private Boolean isActive;
 
     @Builder
-    public University(String universityName, Boolean isActive) {
+    public University(String universityName) {
         this.universityName = universityName;
-        this.isActive = isActive;
+        isActive = true;
     }
 }

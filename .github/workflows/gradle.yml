@@ -1,0 +1,67 @@
+name: Java CI/CD with GitHub Build and EC2 Deploy
+
+on:
+  push:
+    branches:
+      - dev
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ✅ Checkout code
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.SUBMODULE_TOKEN }}
+          submodules: true
+
+      - name: ☕ Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: 🔐 Grant execute permission to gradlew
+        run: chmod +x ./gradlew
+
+      - name: 🛠️ Build with Gradle (with tests)
+        run: ./gradlew clean build
+
+      - name: 📦 Copy JAR to EC2
+        if: github.event_name == 'push'
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          overwrite: true
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_KEY }}
+          source: "build/libs/buddyya-0.0.1-SNAPSHOT.jar"
+          target: "/home/ec2-user/be/"
+
+      - name: 🚀 SSH into EC2 and restart app
+        if: github.event_name == 'push'
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            echo "🧹 Kill existing app (port 8080)"
+            pid=$(lsof -t -i:8080)
+            if [ -n "$pid" ]; then
+              kill -9 $pid
+            else
+              echo "No app running on port 8080."
+            fi
+            
+            echo "🚀 Start new Spring Boot app"
+            export $(cat ~/be/.env | xargs)
+            nohup java -jar ~/be/build/libs/buddyya-0.0.1-SNAPSHOT.jar \
+              --spring.profiles.active=dev > ~/be/nohup.out 2>&1 &
+            
+            echo "📄 Show last 30 lines of nohup"
+            tail -n 30 ~/be/nohup.out
