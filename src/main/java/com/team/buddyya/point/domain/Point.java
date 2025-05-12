@@ -7,7 +7,6 @@ import com.team.buddyya.student.domain.Student;
 import jakarta.persistence.*;
 import lombok.*;
 
-import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
