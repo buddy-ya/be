@@ -15,7 +15,9 @@ public enum FeedExceptionType implements BaseExceptionType {
     COMMENT_NOT_FOUND(4006, HttpStatus.NOT_FOUND, "Comment not found."),
     NOT_COMMENT_OWNER(4007, HttpStatus.FORBIDDEN, "You are not the owner of this comment."),
     COMMENT_NOT_LIKED(4003, HttpStatus.NOT_FOUND, "This comment has not been liked."),
-    COMMENT_DEPTH_LIMIT(4008, HttpStatus.FORBIDDEN, "Nested replies beyond this depth are not allowed.");
+    COMMENT_DEPTH_LIMIT(4008, HttpStatus.FORBIDDEN, "Nested replies beyond this depth are not allowed."),
+    STUDENT_NOT_OWNER(4009, HttpStatus.BAD_REQUEST, "You cannot access owner function");
+
 
     private final int errorCode;
     private final HttpStatus httpStatus;

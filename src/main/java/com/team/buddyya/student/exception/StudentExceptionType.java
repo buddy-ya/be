@@ -15,7 +15,8 @@ public enum StudentExceptionType implements BaseExceptionType {
     INVALID_GENDER_VALUE(2000, HttpStatus.BAD_REQUEST, "Invalid gender value."),
     INVALID_DEFAULT_IMAGE_KEY(2000, HttpStatus.BAD_REQUEST, "Invalid profile image key."),
     INVALID_NAME_UPDATE_REQUEST(2001, HttpStatus.BAD_REQUEST, "Only one value is required for name update."),
-    INVALID_INTRODUCTION_UPDATE_REQUEST(2001, HttpStatus.BAD_REQUEST, "Only one value is required for introduction update."),
+    INVALID_INTRODUCTION_UPDATE_REQUEST(2001, HttpStatus.BAD_REQUEST,
+            "Only one value is required for introduction update."),
     INVALID_ACTIVITY_UPDATE_REQUEST(2001, HttpStatus.BAD_REQUEST, "Only one value is required for activity update."),
     UNSUPPORTED_UPDATE_KEY(2002, HttpStatus.BAD_REQUEST, "Unsupported update key."),
     INVALID_INTRODUCTION_LENGTH(2003, HttpStatus.BAD_REQUEST, "Introduction must be at least 10 characters long."),
@@ -24,7 +25,8 @@ public enum StudentExceptionType implements BaseExceptionType {
     ALREADY_BLOCKED(2011, HttpStatus.CONFLICT, "User is already blocked."),
     INVITATION_CODE_NOT_FOUND(2012, HttpStatus.NOT_FOUND, "Invitation code not found."),
     INVALID_INVITATION_CODE(2013, HttpStatus.BAD_REQUEST, "This Invitation code is not valid."),
-    INVITATION_EVENT_ALREADY_PARTICIPATED(2014, HttpStatus.BAD_REQUEST, "You have already joined the invitation event."),
+    INVITATION_EVENT_ALREADY_PARTICIPATED(2014, HttpStatus.BAD_REQUEST,
+            "You have already joined the invitation event."),
     SELF_INVITATION_CODE(2015, HttpStatus.BAD_REQUEST, "You cannot use your own invitation code.");
 
     private final int errorCode;
