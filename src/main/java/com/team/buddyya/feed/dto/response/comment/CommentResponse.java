@@ -2,9 +2,7 @@ package com.team.buddyya.feed.dto.response.comment;
 
 import com.team.buddyya.feed.domain.Comment;
 import com.team.buddyya.feed.repository.CommentLikeRepository;
-import com.team.buddyya.student.domain.Student;
-import com.team.buddyya.student.domain.UserProfileDefaultImage;
-import com.team.buddyya.student.repository.BlockRepository;
+import com.team.buddyya.student.domain.Role;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -24,20 +22,25 @@ public record CommentResponse(
         boolean isFeedOwner,
         boolean isCommentOwner,
         boolean isBlocked,
-        boolean isProfileImageUpload,
+        boolean isCertificated,
         boolean isStudentDeleted,
         List<CommentResponse> replies
 ) {
 
+    private static final String BUDDYYA_PROFILE_IMAGE =
+            "https://buddyya.s3.ap-northeast-2.amazonaws.com/default-profile-image/buddyya_icon.png";
+
     public static CommentResponse from(Comment comment, Long feedOwnerId, Long currentUserId,
                                        CommentLikeRepository commentLikeRepository, Set<Long> blockedStudentIds) {
+        String profileImageUrl = comment.getStudent().getRole() == Role.OWNER ? BUDDYYA_PROFILE_IMAGE
+                : comment.getStudent().getCharacterProfileImage();
         boolean isFeedOwner = feedOwnerId.equals(comment.getStudent().getId());
         boolean isCommentOwner = currentUserId.equals(comment.getStudent().getId());
-        boolean isProfileImageUpload = UserProfileDefaultImage.isProfileImageUpload(comment.getStudent());
         boolean isLiked = commentLikeRepository.existsByCommentAndStudentId(comment, currentUserId);
         boolean isBlocked = blockedStudentIds.contains(comment.getStudent().getId());
         List<CommentResponse> replies = comment.getChildren().stream()
-                .map(reply -> CommentResponse.from(reply, feedOwnerId, currentUserId, commentLikeRepository, blockedStudentIds))
+                .map(reply -> CommentResponse.from(reply, feedOwnerId, currentUserId, commentLikeRepository,
+                        blockedStudentIds))
                 .toList();
         return new CommentResponse(
                 comment.getId(),
@@ -46,7 +49,7 @@ public record CommentResponse(
                 comment.getStudent().getName(),
                 comment.getStudent().getCountry(),
                 comment.getStudent().getUniversity().getUniversityName(),
-                comment.getStudent().getCharacterProfileImage(),
+                profileImageUrl,
                 comment.getLikeCount(),
                 comment.getCreatedDate(),
                 comment.isDeleted(),
@@ -54,7 +57,7 @@ public record CommentResponse(
                 isFeedOwner,
                 isCommentOwner,
                 isBlocked,
-                isProfileImageUpload,
+                comment.getStudent().getIsCertificated(),
                 comment.getStudent().getIsDeleted(),
                 replies
         );

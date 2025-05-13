@@ -20,6 +20,7 @@ import com.team.buddyya.feed.repository.FeedLikeRepository;
 import com.team.buddyya.feed.repository.FeedRepository;
 import com.team.buddyya.report.domain.ReportType;
 import com.team.buddyya.report.repository.ReportRepository;
+import com.team.buddyya.student.domain.Role;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.domain.University;
 import com.team.buddyya.student.exception.StudentException;
@@ -185,6 +186,15 @@ public class FeedService {
             feedImageService.deleteS3FeedImages(feed);
         }
         feedRepository.delete(feed);
+    }
+
+    public void togglePin(StudentInfo studentInfo, Long feedId) {
+        Feed feed = findFeedByFeedId(feedId);
+        Student student = findStudentByStudentId(studentInfo.id());
+        if (student.getRole() != Role.OWNER) {
+            throw new FeedException(FeedExceptionType.STUDENT_NOT_OWNER);
+        }
+        feed.togglePin();
     }
 
     private List<FeedResponse> filterBlockedFeeds(List<Feed> feeds, Set<Long> blockedStudentIds,

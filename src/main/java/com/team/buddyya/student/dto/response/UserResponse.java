@@ -1,15 +1,14 @@
 package com.team.buddyya.student.dto.response;
 
+import static com.team.buddyya.student.domain.UserProfileDefaultImage.getChatroomProfileImage;
+import static com.team.buddyya.student.domain.UserProfileDefaultImage.isDefaultUserProfileImage;
+
 import com.team.buddyya.point.domain.Point;
 import com.team.buddyya.student.domain.MatchingProfile;
 import com.team.buddyya.student.domain.Student;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static com.team.buddyya.student.domain.UserProfileDefaultImage.getChatroomProfileImage;
-import static com.team.buddyya.student.domain.UserProfileDefaultImage.isDefaultUserProfileImage;
 
 public record UserResponse(
         Long id,
@@ -36,10 +35,13 @@ public record UserResponse(
         String refreshToken,
         String introduction,
         String buddyActivity,
-        Boolean isMatchingProfileCompleted
+        Boolean isMatchingProfileCompleted,
+        Boolean isMatchingActive,
+        Boolean isFeedActive
 ) {
 
-    public static UserResponse fromUserInfo(Student student, boolean isStudentIdCardRequested, Point point, Integer totalUnreadCount, MatchingProfile matchingProfile) {
+    public static UserResponse fromUserInfo(Student student, boolean isStudentIdCardRequested, Point point,
+                                            Integer totalUnreadCount, MatchingProfile matchingProfile) {
         return new UserResponse(
                 student.getId(),
                 student.getRole().name(),
@@ -65,7 +67,9 @@ public record UserResponse(
                 null,
                 matchingProfile.getIntroduction(),
                 matchingProfile.getBuddyActivity(),
-                matchingProfile.isCompleted()
+                matchingProfile.isCompleted(),
+                student.getUniversity().getIsMatchingActive(),
+                student.getUniversity().getIsFeedActive()
         );
     }
 
@@ -95,11 +99,14 @@ public record UserResponse(
                 null,
                 matchingProfile.getIntroduction(),
                 matchingProfile.getBuddyActivity(),
-                matchingProfile.isCompleted()
+                matchingProfile.isCompleted(),
+                null,
+                null
         );
     }
 
-    public static UserResponse fromOnboard(Student student, Boolean isStudentIdCardRequested, String accessToken, String refreshToken, Point point) {
+    public static UserResponse fromOnboard(Student student, Boolean isStudentIdCardRequested, String accessToken,
+                                           String refreshToken, Point point) {
         return new UserResponse(
                 student.getId(),
                 student.getRole().name(),
@@ -125,11 +132,14 @@ public record UserResponse(
                 refreshToken,
                 null,
                 null,
-                null
+                null,
+                student.getUniversity().getIsMatchingActive(),
+                student.getUniversity().getIsFeedActive()
         );
     }
 
-    public static UserResponse fromCheckMembership(Student student, Boolean isStudentIdCardRequested, String status, String accessToken, String refreshToken, Point point) {
+    public static UserResponse fromCheckMembership(Student student, Boolean isStudentIdCardRequested, String status,
+                                                   String accessToken, String refreshToken, Point point) {
         return new UserResponse(
                 student.getId(),
                 student.getRole().name(),
@@ -155,7 +165,9 @@ public record UserResponse(
                 refreshToken,
                 null,
                 null,
-                null
+                null,
+                student.getUniversity().getIsMatchingActive(),
+                student.getUniversity().getIsFeedActive()
         );
     }
 
@@ -177,6 +189,8 @@ public record UserResponse(
                 null,
                 status,
                 false,
+                null,
+                null,
                 null,
                 null,
                 null,
