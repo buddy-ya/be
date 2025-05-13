@@ -1,0 +1,3 @@
+ALTER TABLE university
+    ADD COLUMN matchActive BIT(1) NOT NULL DEFAULT 1,
+    ADD COLUMN feedActive  BIT(1) NOT NULL DEFAULT 0;

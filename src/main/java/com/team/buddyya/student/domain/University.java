@@ -28,10 +28,10 @@ public class University {
     @Column(name = "active", nullable = false)
     private Boolean isActive;
 
-    @Column(name = "match", nullable = false)
+    @Column(name = "matchActive", nullable = false)
     private Boolean isMatchingActive;
 
-    @Column(name = "feed", nullable = false)
+    @Column(name = "feedActive", nullable = false)
     private Boolean isFeedActive;
 
     @Builder
