@@ -3,7 +3,6 @@ package com.team.buddyya.feed.dto.response.feed;
 import com.team.buddyya.feed.domain.Feed;
 import com.team.buddyya.feed.domain.FeedImage;
 import com.team.buddyya.feed.domain.FeedUserAction;
-import com.team.buddyya.student.domain.UserProfileDefaultImage;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -25,15 +24,13 @@ public record FeedResponse(
         boolean isFeedOwner,
         boolean isLiked,
         boolean isBookmarked,
-        boolean isProfileImageUpload,
+        boolean isCertificated,
         boolean isProfileVisible,
         boolean isStudentDeleted,
         LocalDateTime createdDate
 ) {
 
     public static FeedResponse from(Feed feed, FeedUserAction userAction) {
-        boolean isProfileImageUpload = UserProfileDefaultImage.isProfileImageUpload(feed.getStudent());
-
         return new FeedResponse(
                 feed.getId(),
                 feed.getStudent().getId(),
@@ -54,7 +51,7 @@ public record FeedResponse(
                 userAction.isFeedOwner(),
                 userAction.isLiked(),
                 userAction.isBookmarked(),
-                isProfileImageUpload,
+                feed.getStudent().getIsCertificated(),
                 feed.isProfileVisible(),
                 feed.getStudent().getIsDeleted(),
                 feed.getCreatedDate()

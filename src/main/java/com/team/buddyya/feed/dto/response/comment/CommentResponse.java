@@ -2,9 +2,6 @@ package com.team.buddyya.feed.dto.response.comment;
 
 import com.team.buddyya.feed.domain.Comment;
 import com.team.buddyya.feed.repository.CommentLikeRepository;
-import com.team.buddyya.student.domain.Student;
-import com.team.buddyya.student.domain.UserProfileDefaultImage;
-import com.team.buddyya.student.repository.BlockRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -24,7 +21,7 @@ public record CommentResponse(
         boolean isFeedOwner,
         boolean isCommentOwner,
         boolean isBlocked,
-        boolean isProfileImageUpload,
+        boolean isCertificated,
         boolean isStudentDeleted,
         List<CommentResponse> replies
 ) {
@@ -33,11 +30,11 @@ public record CommentResponse(
                                        CommentLikeRepository commentLikeRepository, Set<Long> blockedStudentIds) {
         boolean isFeedOwner = feedOwnerId.equals(comment.getStudent().getId());
         boolean isCommentOwner = currentUserId.equals(comment.getStudent().getId());
-        boolean isProfileImageUpload = UserProfileDefaultImage.isProfileImageUpload(comment.getStudent());
         boolean isLiked = commentLikeRepository.existsByCommentAndStudentId(comment, currentUserId);
         boolean isBlocked = blockedStudentIds.contains(comment.getStudent().getId());
         List<CommentResponse> replies = comment.getChildren().stream()
-                .map(reply -> CommentResponse.from(reply, feedOwnerId, currentUserId, commentLikeRepository, blockedStudentIds))
+                .map(reply -> CommentResponse.from(reply, feedOwnerId, currentUserId, commentLikeRepository,
+                        blockedStudentIds))
                 .toList();
         return new CommentResponse(
                 comment.getId(),
@@ -54,7 +51,7 @@ public record CommentResponse(
                 isFeedOwner,
                 isCommentOwner,
                 isBlocked,
-                isProfileImageUpload,
+                comment.getStudent().getIsCertificated(),
                 comment.getStudent().getIsDeleted(),
                 replies
         );
