@@ -190,8 +190,7 @@ public class FeedService {
 
     public void togglePin(StudentInfo studentInfo, Long feedId) {
         Feed feed = findFeedByFeedId(feedId);
-        Student student = findStudentByStudentId(studentInfo.id());
-        if (student.getRole() != Role.OWNER) {
+        if (studentInfo.role() != Role.OWNER) {
             throw new FeedException(FeedExceptionType.STUDENT_NOT_OWNER);
         }
         feed.togglePin();

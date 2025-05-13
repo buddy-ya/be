@@ -1,0 +1,3 @@
+ALTER TABLE student
+    MODIFY COLUMN role
+    ENUM('ADMIN', 'STUDENT', 'OWNER') NOT NULL;
