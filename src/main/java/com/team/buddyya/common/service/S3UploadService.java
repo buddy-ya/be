@@ -20,6 +20,7 @@ public class S3UploadService {
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
+
     @Value("${cloud.aws.s3.url}")
     private String defaultUrl;
 
@@ -44,8 +45,19 @@ public class S3UploadService {
     }
 
     private String generateFileName(MultipartFile file) {
-        String fileName = UUID.randomUUID().toString() + "-" + file.getOriginalFilename();
-        return fileName.replaceAll("[\\s,]", "_");
+        String extension = getFileExtension(file.getOriginalFilename());
+        return UUID.randomUUID().toString() + (extension.isEmpty() ? "" : "." + extension);
+    }
+
+    private String getFileExtension(String originalName) {
+        if (originalName == null) {
+            return "";
+        }
+        int dotIndex = originalName.lastIndexOf('.');
+        if (dotIndex == -1 || dotIndex == originalName.length() - 1) {
+            return "";
+        }
+        return originalName.substring(dotIndex + 1).toLowerCase();
     }
 
     public void deleteFile(String dir, String fileUrl) {
