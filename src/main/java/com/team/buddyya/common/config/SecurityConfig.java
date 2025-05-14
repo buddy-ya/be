@@ -1,6 +1,10 @@
 package com.team.buddyya.common.config;
 
-import com.team.buddyya.auth.jwt.*;
+import com.team.buddyya.auth.jwt.CustomAccessDeniedHandler;
+import com.team.buddyya.auth.jwt.CustomAuthenticationEntryPoint;
+import com.team.buddyya.auth.jwt.JwtAuthFilter;
+import com.team.buddyya.auth.jwt.JwtExceptionFilter;
+import com.team.buddyya.auth.jwt.JwtUtils;
 import com.team.buddyya.auth.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -45,9 +49,10 @@ public class SecurityConfig {
                         .requestMatchers("/ws/**", "/ws/chat/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/phone-auth/**", "/users/universities",
                                 "/auth/reissue", "/auth/test").permitAll()
-                        .requestMatchers("/auth/fail", "/admin/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers("/auth/fail", "/admin/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_OWNER")
                         .requestMatchers("/users", "/auth/success", "/certification/**", "/feeds/**", "/chatrooms/**",
-                                "/report", "/chat-requests/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_STUDENT")
+                                "/report", "/chat-requests/**")
+                        .hasAnyAuthority("ROLE_OWNER", "ROLE_ADMIN", "ROLE_STUDENT")
                         .anyRequest().authenticated()
                 );
         return http.build();

@@ -3,7 +3,7 @@ package com.team.buddyya.feed.dto.response.feed;
 import com.team.buddyya.feed.domain.Feed;
 import com.team.buddyya.feed.domain.FeedImage;
 import com.team.buddyya.feed.domain.FeedUserAction;
-import com.team.buddyya.student.domain.UserProfileDefaultImage;
+import com.team.buddyya.student.domain.Role;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -25,15 +25,19 @@ public record FeedResponse(
         boolean isFeedOwner,
         boolean isLiked,
         boolean isBookmarked,
-        boolean isProfileImageUpload,
+        boolean isPinned,
+        boolean isCertificated,
         boolean isProfileVisible,
         boolean isStudentDeleted,
         LocalDateTime createdDate
 ) {
 
-    public static FeedResponse from(Feed feed, FeedUserAction userAction) {
-        boolean isProfileImageUpload = UserProfileDefaultImage.isProfileImageUpload(feed.getStudent());
+    private static final String BUDDYYA_PROFILE_IMAGE =
+            "https://buddyya.s3.ap-northeast-2.amazonaws.com/default-profile-image/buddyya_icon.png";
 
+    public static FeedResponse from(Feed feed, FeedUserAction userAction) {
+        String profileImageUrl = feed.getStudent().getRole() == Role.OWNER ? BUDDYYA_PROFILE_IMAGE
+                : feed.getStudent().getCharacterProfileImage();
         return new FeedResponse(
                 feed.getId(),
                 feed.getStudent().getId(),
@@ -44,7 +48,7 @@ public record FeedResponse(
                 feed.getTitle(),
                 feed.getContent(),
                 feed.getStudent().getUniversity().getUniversityName(),
-                feed.getStudent().getCharacterProfileImage(),
+                profileImageUrl,
                 feed.getImages().stream()
                         .map(FeedImage::getUrl)
                         .toList(),
@@ -54,7 +58,8 @@ public record FeedResponse(
                 userAction.isFeedOwner(),
                 userAction.isLiked(),
                 userAction.isBookmarked(),
-                isProfileImageUpload,
+                feed.isPinned(),
+                feed.getStudent().getIsCertificated(),
                 feed.isProfileVisible(),
                 feed.getStudent().getIsDeleted(),
                 feed.getCreatedDate()

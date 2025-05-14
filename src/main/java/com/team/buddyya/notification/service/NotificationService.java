@@ -95,12 +95,6 @@ public class NotificationService {
     private static final String REFUND_POINTS_BODY_KR = "채팅 상대방의 미응답을 확인하여 포인트를 환급해드렸어요.";
     private static final String REFUND_POINTS_BODY_EN = "We confirmed no response from your chat partner and refunded your points.";
 
-    private static final String ATTENDANCE_REWARD_TITLE_KR = "출석 완료!";
-    private static final String ATTENDANCE_REWARD_TITLE_EN = "Checked In!";
-
-    private static final String ATTENDANCE_REWARD_BODY_KR = "매일 출석하면 포인트가 쌓여요. 오늘도 +15포인트 적립!";
-    private static final String ATTENDANCE_REWARD_BODY_EN = "You’ve earned 10 points for checking in today. Come back daily for more!";
-
     @Value("${EXPO.API.URL}")
     private String expoApiUrl;
 
@@ -126,12 +120,12 @@ public class NotificationService {
         expoTokenRepository.save(Token);
     }
 
-    public void sendMatchSuccessNotification(Student student, Long roomId){
-        try{
+    public void sendMatchSuccessNotification(Student student, Long roomId) {
+        try {
             String token = getTokenByUserId(student.getId());
             Map<String, Object> data = Map.of(
                     "roomId", roomId,
-                    "wasPending",false,
+                    "wasPending", false,
                     "type", "MATCH"
             );
             boolean isKorean = student.getIsKorean();
@@ -148,8 +142,8 @@ public class NotificationService {
         }
     }
 
-    public void sendPendingMatchSuccessNotification(Student student, Student buddy, Chatroom chatroom, MatchRequest matchRequest, Point point, boolean isExited, MatchingProfile matchingProfile){
-        try{
+    public void sendPendingMatchSuccessNotification(Student student, Student buddy, Chatroom chatroom, MatchRequest matchRequest, Point point, boolean isExited, MatchingProfile matchingProfile) {
+        try {
             String token = getTokenByUserId(student.getId());
             Map<String, Object> data = Map.ofEntries(
                     Map.entry("id", matchRequest.getId()),
@@ -169,7 +163,7 @@ public class NotificationService {
                     Map.entry("introduction", matchingProfile.getIntroduction()),
                     Map.entry("buddyActivity", matchingProfile.getBuddyActivity()),
                     Map.entry("isExited", isExited),
-                    Map.entry("wasPending",true),
+                    Map.entry("wasPending", true),
                     Map.entry("type", "MATCH")
             );
             boolean isKorean = student.getIsKorean();
@@ -187,17 +181,17 @@ public class NotificationService {
     }
 
     private String getMatchSuccessNotificationTitle(boolean isKorean) {
-        return isKorean ? MATCH_SUCCESS_TITLE_KR: MATCH_SUCCESS_TITLE_EN;
+        return isKorean ? MATCH_SUCCESS_TITLE_KR : MATCH_SUCCESS_TITLE_EN;
     }
 
     private String getMatchSuccessNotificationBody(boolean isKorean) {
-        return isKorean ? MATCH_SUCCESS_BODY_KR: MATCH_SUCCESS_BODY_EN;
+        return isKorean ? MATCH_SUCCESS_BODY_KR : MATCH_SUCCESS_BODY_EN;
     }
 
-    public void sendCommentReplyNotification(Long writerId, Feed feed, Comment parent, String commentContent){
+    public void sendCommentReplyNotification(Long writerId, Feed feed, Comment parent, String commentContent) {
         boolean isWriterParent = parent.isParent(writerId);
         boolean isParentFeedOwner = parent.isParent(feed.getStudent().getId());
-        if(!isWriterParent && !isParentFeedOwner) {
+        if (!isWriterParent && !isParentFeedOwner) {
             try {
                 Student recipient = parent.getStudent();
                 String token = getTokenByUserId(recipient.getId());
@@ -220,12 +214,12 @@ public class NotificationService {
     }
 
     private String getCommentReplyNotificationTitle(boolean isKorean) {
-        return isKorean ? FEED_REPLY_TITLE_KR: FEED_REPLY_TITLE_EN;
+        return isKorean ? FEED_REPLY_TITLE_KR : FEED_REPLY_TITLE_EN;
     }
 
     public void sendCommentNotification(Long writerId, Feed feed, String commentContent) {
         boolean isFeedOwner = feed.isFeedOwner(writerId);
-        if(!isFeedOwner) {
+        if (!isFeedOwner) {
             try {
                 Student recipient = feed.getStudent();
                 String token = getTokenByUserId(recipient.getId());
@@ -251,12 +245,13 @@ public class NotificationService {
         return isKorean ? FEED_TITLE_KR : FEED_TITLE_EN;
     }
 
-    public void sendAuthorizationNotification(Student student, boolean isSuccess) {
+    public void sendAuthorizationNotification(Student student, Point point, boolean isSuccess) {
         try {
             String token = getTokenByUserId(student.getId());
             Map<String, Object> data = new HashMap<>();
             data.put("type", "AUTHORIZATION");
             data.put("isCertificated", isSuccess);
+            data.put("point", point.getCurrentPoint());
             boolean isKorean = student.getIsKorean();
             RequestNotification notification = createAuthorizationNotification(isKorean, isSuccess, token, data);
             sendToExpo(notification);
@@ -337,8 +332,8 @@ public class NotificationService {
                 : senderName + CHAT_REQUEST_BODY_EN;
     }
 
-    public void sendChatAcceptNotification(Student student, String senderName, Long roomId){
-        try{
+    public void sendChatAcceptNotification(Student student, String senderName, Long roomId) {
+        try {
             String token = getTokenByUserId(student.getId());
             Map<String, Object> data = Map.of(
                     "roomId", roomId,
@@ -407,28 +402,6 @@ public class NotificationService {
             );
         } catch (NotificationException e) {
             log.warn("무응답 포인트 환급 알림 전송 실패: {}", e.exceptionType().errorMessage());
-        }
-    }
-
-    public void sendDailyAttendanceNotification(Point point, Student student) {
-        try {
-            String token = getTokenByUserId(student.getId());
-            boolean isKorean = student.getIsKorean();
-            String title = isKorean ? ATTENDANCE_REWARD_TITLE_KR : ATTENDANCE_REWARD_TITLE_EN;
-            String body = isKorean ? ATTENDANCE_REWARD_BODY_KR : ATTENDANCE_REWARD_BODY_EN;
-            Map<String, Object> data = Map.of(
-                    "type", "POINT",
-                    "point", point.getCurrentPoint()
-            );
-            sendToExpo(RequestNotification.builder()
-                    .to(token)
-                    .title(title)
-                    .body(body)
-                    .data(data)
-                    .build()
-            );
-        } catch (NotificationException e) {
-            log.warn("출석 이벤트 알림 전송 실패: {}", e.exceptionType().errorMessage());
         }
     }
 

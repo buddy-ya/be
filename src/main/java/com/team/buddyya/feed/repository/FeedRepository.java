@@ -24,6 +24,9 @@ public interface FeedRepository extends JpaRepository<Feed, Long> {
             Pageable pageable
     );
 
-    Page<Feed> findByLikeCountGreaterThanEqual(int likeCount, Pageable pageable);
-
+    Page<Feed> findByLikeCountGreaterThanEqualAndUniversity(
+            int likeCount,
+            University university,
+            Pageable pageable
+    );
 }

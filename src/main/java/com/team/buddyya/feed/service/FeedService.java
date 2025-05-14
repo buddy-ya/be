@@ -1,7 +1,5 @@
 package com.team.buddyya.feed.service;
 
-import static com.team.buddyya.student.domain.Role.ADMIN;
-
 import com.team.buddyya.auth.domain.StudentInfo;
 import com.team.buddyya.feed.domain.Bookmark;
 import com.team.buddyya.feed.domain.Category;
@@ -20,6 +18,7 @@ import com.team.buddyya.feed.repository.FeedLikeRepository;
 import com.team.buddyya.feed.repository.FeedRepository;
 import com.team.buddyya.report.domain.ReportType;
 import com.team.buddyya.report.repository.ReportRepository;
+import com.team.buddyya.student.domain.Role;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.domain.University;
 import com.team.buddyya.student.exception.StudentException;
@@ -85,11 +84,20 @@ public class FeedService {
     }
 
     @Transactional(readOnly = true)
-    public FeedListResponse getPopularFeeds(StudentInfo studentInfo, Pageable pageable) {
-        Page<Feed> feeds = feedRepository.findByLikeCountGreaterThanEqual(LIKE_COUNT_THRESHOLD, pageable);
-        List<FeedResponse> response = feeds.getContent().stream()
-                .map(feed -> createFeedResponse(feed, studentInfo.id()))
-                .toList();
+    public FeedListResponse getPopularFeeds(
+            StudentInfo studentInfo,
+            Pageable pageable,
+            FeedListRequest request
+    ) {
+        University university = findUniversityByUniversityName(request.university());
+        Page<Feed> feeds = feedRepository
+                .findByLikeCountGreaterThanEqualAndUniversity(
+                        LIKE_COUNT_THRESHOLD,
+                        university,
+                        pageable
+                );
+        Set<Long> blocked = blockRepository.findBlockedStudentIdByBlockerId(studentInfo.id());
+        List<FeedResponse> response = filterBlockedFeeds(feeds.getContent(), blocked, studentInfo.id());
         return FeedListResponse.from(response, feeds);
     }
 
@@ -187,6 +195,14 @@ public class FeedService {
         feedRepository.delete(feed);
     }
 
+    public void togglePin(StudentInfo studentInfo, Long feedId) {
+        Feed feed = findFeedByFeedId(feedId);
+        if (studentInfo.role() != Role.OWNER) {
+            throw new FeedException(FeedExceptionType.STUDENT_NOT_OWNER);
+        }
+        feed.togglePin();
+    }
+
     private List<FeedResponse> filterBlockedFeeds(List<Feed> feeds, Set<Long> blockedStudentIds,
                                                   Long currentStudentId) {
         return feeds.stream()
@@ -196,7 +212,7 @@ public class FeedService {
     }
 
     private void validateFeedOwner(StudentInfo studentInfo, Feed feed) {
-        if (!studentInfo.id().equals(feed.getStudent().getId()) && !studentInfo.role().equals(ADMIN)) {
+        if (!studentInfo.id().equals(feed.getStudent().getId()) && !(studentInfo.role() == Role.OWNER)) {
             throw new FeedException(FeedExceptionType.NOT_FEED_OWNER);
         }
     }

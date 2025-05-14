@@ -29,26 +29,27 @@ public class CertificationController {
     private final EmailSendService emailSendService;
 
     @PostMapping("/email/send")
-    public ResponseEntity<CertificationResponse> sendEmail(@AuthenticationPrincipal CustomUserDetails userDetails,
+    public ResponseEntity<Void> sendEmail(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                            @RequestBody EmailCertificationRequest emailCertificationRequest) {
 
         String generatedCode = emailSendService.sendEmail(userDetails.getStudentInfo(), emailCertificationRequest);
-        CertificationResponse response = certificationService.saveCode(emailCertificationRequest.email(), generatedCode);
-        return ResponseEntity.ok(response);
+        certificationService.saveCode(emailCertificationRequest.email(), generatedCode);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/email/verify-code")
     public ResponseEntity<CertificationResponse> emailCodeCertificate(
             @AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody EmailCodeRequest codeRequest) {
-        return ResponseEntity.ok(certificationService.certificateEmailCode(userDetails.getStudentInfo(), codeRequest));
+        CertificationResponse response = certificationService.certificateEmailCode(userDetails.getStudentInfo(), codeRequest);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/student-id-card")
-    public ResponseEntity<CertificationResponse> sendStudentIdCard(
+    public ResponseEntity<Void> sendStudentIdCard(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @ModelAttribute SendStudentIdCardRequest sendStudentIdCardRequest) {
-        return ResponseEntity.ok(
-                certificationService.uploadStudentIdCard(userDetails.getStudentInfo(), sendStudentIdCardRequest));
+        certificationService.uploadStudentIdCard(userDetails.getStudentInfo(), sendStudentIdCardRequest);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/student-id-card")

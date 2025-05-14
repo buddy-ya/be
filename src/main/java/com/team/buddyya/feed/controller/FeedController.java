@@ -38,9 +38,25 @@ public class FeedController {
 
     @GetMapping
     public ResponseEntity<FeedListResponse> getFeeds(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                                     @PageableDefault(size = 10, sort = "createdDate", direction = Direction.DESC) Pageable pageable,
+                                                     @PageableDefault(size = 10, sort = {"pinned",
+                                                             "createdDate"}, direction = Direction.DESC) Pageable pageable,
                                                      @ModelAttribute FeedListRequest request) {
         FeedListResponse response = feedService.getFeeds(userDetails.getStudentInfo(), pageable, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/popular")
+    public ResponseEntity<FeedListResponse> getPopularFeeds(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PageableDefault(size = 10, sort = {"createdDate",
+            }, direction = Direction.DESC) Pageable pageable,
+            @ModelAttribute FeedListRequest request
+    ) {
+        FeedListResponse response = feedService.getPopularFeeds(
+                userDetails.getStudentInfo(),
+                pageable,
+                request
+        );
         return ResponseEntity.ok(response);
     }
 
@@ -91,10 +107,12 @@ public class FeedController {
         return ResponseEntity.ok(bookmarkService.toggleBookmark(userDetails.getStudentInfo(), feedId));
     }
 
-    @GetMapping("/popular")
-    public ResponseEntity<FeedListResponse> getPopularFeeds(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                                            @PageableDefault(size = 10, sort = "createdDate", direction = Direction.DESC) Pageable pageable) {
-        FeedListResponse response = feedService.getPopularFeeds(userDetails.getStudentInfo(), pageable);
-        return ResponseEntity.ok(response);
+    @PutMapping("/{feedId}/pin")
+    public ResponseEntity<Void> togglePin(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long feedId
+    ) {
+        feedService.togglePin(userDetails.getStudentInfo(), feedId);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -36,6 +36,9 @@ public class RegisteredPhone extends CreatedTime {
     @Column(name = "has_withdrawn", nullable = false)
     private Boolean hasWithdrawn;
 
+    @Column(name = "has_certificated", nullable = false)
+    private Boolean hasCertificated;
+
     @Column(name = "last_attendance_date")
     private LocalDate lastAttendanceDate;
 
@@ -46,6 +49,7 @@ public class RegisteredPhone extends CreatedTime {
         this.invitationCode = invitationCode;
         this.invitationEventParticipated = false;
         this.hasWithdrawn = false;
+        this.hasCertificated = false;
         lastAttendanceDate = null;
     }
 
@@ -59,12 +63,16 @@ public class RegisteredPhone extends CreatedTime {
         this.hasWithdrawn = hasWithdrawn;
     }
 
-    public boolean isTodayAlreadyChecked() {
+    public boolean isTodayAttended() {
         LocalDate today = LocalDate.now();
         return lastAttendanceDate != null && lastAttendanceDate.isEqual(today);
     }
 
     public void updateLastAttendanceDateToToday() {
         this.lastAttendanceDate = LocalDate.now();
+    }
+
+    public void updateHasCertificated() {
+        this.hasCertificated = true;
     }
 }

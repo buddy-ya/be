@@ -50,6 +50,9 @@ public class Feed extends BaseTime {
     @Column(name = "is_profile_visible", nullable = false)
     private boolean isProfileVisible;
 
+    @Column(name = "pinned", nullable = false)
+    private boolean pinned;
+
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "student_id", nullable = false)
     private Student student;
@@ -86,6 +89,7 @@ public class Feed extends BaseTime {
         this.likeCount = 0;
         this.commentCount = 0;
         this.viewCount = 0;
+        this.pinned = false;
     }
 
     public void updateFeed(String title, String content, Category category, boolean isProfileVisible) {
@@ -117,6 +121,10 @@ public class Feed extends BaseTime {
 
     public void uploadFeedImages(List<FeedImage> images) {
         this.images = images;
+    }
+
+    public void togglePin() {
+        this.pinned = !this.pinned;
     }
 
     public boolean isFeedOwner(Long studentId) {
