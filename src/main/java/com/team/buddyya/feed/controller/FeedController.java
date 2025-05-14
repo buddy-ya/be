@@ -48,8 +48,8 @@ public class FeedController {
     @GetMapping("/popular")
     public ResponseEntity<FeedListResponse> getPopularFeeds(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @PageableDefault(size = 10, sort = {"likeCount",
-                    "createdDate"}, direction = Direction.DESC) Pageable pageable,
+            @PageableDefault(size = 10, sort = {"createdDate",
+            }, direction = Direction.DESC) Pageable pageable,
             @ModelAttribute FeedListRequest request
     ) {
         FeedListResponse response = feedService.getPopularFeeds(
