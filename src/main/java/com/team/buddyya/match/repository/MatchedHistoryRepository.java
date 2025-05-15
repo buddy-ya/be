@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
 
@@ -16,4 +17,6 @@ public interface MatchedHistoryRepository extends JpaRepository<MatchedHistory, 
 
     @Query("SELECT m FROM MatchedHistory m WHERE m.student.id = :studentId ORDER BY m.id DESC LIMIT 1")
     Optional<MatchedHistory> findMostRecentMatchedHistoryByStudentId(Long studentId);
+
+    int countByStudentIdAndCreatedDateBetween(Long studentId, LocalDateTime start, LocalDateTime end);
 }
