@@ -192,15 +192,11 @@ public class BasicMatchService implements MatchService {
                                       UniversityType requesterPreference,
                                       Long requesterUniversityId,
                                       Long matchRequestUniversityId) {
-        if (requesterPreference == UniversityType.SAME_UNIVERSITY &&
-                matchRequestPreference == UniversityType.SAME_UNIVERSITY) {
-            return requesterUniversityId.equals(matchRequestUniversityId);
-        }
         if (requesterPreference == UniversityType.DIFFERENT_UNIVERSITY &&
                 matchRequestPreference == UniversityType.DIFFERENT_UNIVERSITY) {
-            return !requesterUniversityId.equals(matchRequestUniversityId);
+            return true;
         }
-        return false;
+        return requesterUniversityId.equals(matchRequestUniversityId);
     }
 
     private boolean isGenderMatch(GenderType matchRequestPreference,
