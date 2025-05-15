@@ -11,7 +11,7 @@ public enum MatchExceptionType implements BaseExceptionType {
     MATCH_PROFILE_NOT_FOUND(6003, HttpStatus.NOT_FOUND, "Matching profile not found."),
     MATCH_PROFILE_NOT_COMPLETED(6004, HttpStatus.BAD_REQUEST, "Matching profile is not completed."),
     MATCH_HISTORY_NOT_FOUND(6005, HttpStatus.NOT_FOUND, "Recent matched history not found."),
-    MATCH_REQUEST_TIME_INVALID(6006, HttpStatus.BAD_REQUEST, "You can only request a match once per day.");
+    MATCH_REQUEST_TIME_INVALID(6006, HttpStatus.BAD_REQUEST, "You can only request a match twice per day.");
 
     private final int errorCode;
     private final HttpStatus httpStatus;
