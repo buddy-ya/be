@@ -48,6 +48,7 @@ import static com.team.buddyya.chatting.domain.ChatroomType.MATCHING;
 public class BasicMatchService implements MatchService {
 
     private static final Long CHINESE_LANGUAGE_ID = 3L;
+    private static final int MAX_MATCHES_PER_DAY = 2;
 
     private final MatchRequestRepository matchRequestRepository;
     private final MatchedHistoryRepository matchedHistoryRepository;
@@ -259,19 +260,17 @@ public class BasicMatchService implements MatchService {
     }
 
     private void validateMatchRequestTime(Student student) {
-        Optional<MatchedHistory> recentMatchedHistory =
-                matchedHistoryRepository.findMostRecentMatchedHistoryByStudentId(student.getId());
-        if (recentMatchedHistory.isPresent()) {
-            LocalDateTime matchedAt = recentMatchedHistory.get().getCreatedDate();
-            LocalDate today = LocalDate.now();
-            LocalDate matchedDate = matchedAt.toLocalDate();
-            if (matchedDate.isEqual(today)) {
-                throw new MatchException(MatchExceptionType.MATCH_REQUEST_TIME_INVALID);
-            }
+        LocalDate today = LocalDate.now();
+        LocalDateTime startOfDay = today.atStartOfDay();
+        LocalDateTime endOfDay = today.plusDays(1).atStartOfDay();
+        int todayMatchCount = matchedHistoryRepository
+                .countByStudentIdAndCreatedDateBetween(student.getId(), startOfDay, endOfDay);
+        if (todayMatchCount >= MAX_MATCHES_PER_DAY) {
+            throw new MatchException(MatchExceptionType.MATCH_REQUEST_TIME_INVALID);
         }
     }
 
-    public boolean checkChineseAvailability(Student student){
+    public boolean checkChineseAvailability(Student student) {
         return studentLanguageRepository.existsByStudentAndLanguage_Id(student, CHINESE_LANGUAGE_ID);
     }
 }
