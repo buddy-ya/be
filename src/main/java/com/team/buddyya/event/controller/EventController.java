@@ -25,5 +25,4 @@ public class EventController {
         CouponResponse response = eventService.useCoupon(userDetails.getStudentInfo(), request);
         return ResponseEntity.ok(response);
     }
-
 }
