@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team.buddyya.chatting.domain.Chatroom;
 import com.team.buddyya.feed.domain.Comment;
 import com.team.buddyya.feed.domain.Feed;
+import com.team.buddyya.feed.exception.FeedException;
+import com.team.buddyya.feed.exception.FeedExceptionType;
+import com.team.buddyya.feed.repository.FeedRepository;
 import com.team.buddyya.match.domain.MatchRequest;
 import com.team.buddyya.notification.domain.ExpoToken;
 import com.team.buddyya.notification.domain.RequestNotification;
@@ -42,10 +45,13 @@ public class NotificationService {
 
     private final ExpoTokenRepository expoTokenRepository;
     private final FindStudentService findStudentService;
+    private final FeedRepository feedRepository;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
     private static final String TOKEN_SAVE_SUCCESS_MESSAGE = "토큰이 성공적으로 저장되었습니다.";
+
+    private static final String BROADCAST_TITLE_EN = "Important notification from Buddyya";
 
     private static final String FEED_REPLY_TITLE_KR = "새로운 대댓글이 달렸어요!";
     private static final String FEED_REPLY_TITLE_EN = "A new reply has been added!";
@@ -215,6 +221,34 @@ public class NotificationService {
 
     private String getCommentReplyNotificationTitle(boolean isKorean) {
         return isKorean ? FEED_REPLY_TITLE_KR : FEED_REPLY_TITLE_EN;
+    }
+
+    public void sendNotificationToAllUser(long feedId) {
+        Feed feed = feedRepository.findById(feedId)
+                .orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND));
+        String body = feed.getTitle();
+        Map<String, Object> data = Map.of(
+                "feedId", feed.getId(),
+                "type", "FEED"
+        );
+        List<ExpoToken> tokens = expoTokenRepository.findAll();
+        for (ExpoToken expoToken : tokens) {
+            try {
+                String token = expoToken.getToken();
+                if (token == null || token.isBlank()) continue;
+                RequestNotification notification = RequestNotification.builder()
+                        .to(token)
+                        .title(BROADCAST_TITLE_EN)
+                        .body(body)
+                        .data(data)
+                        .build();
+                sendToExpo(notification);
+            } catch (NotificationException e) {
+                log.warn("전체 유저 알림 전송 실패 - studentId: {}, error: {}",
+                        expoToken.getStudent().getId(),
+                        e.exceptionType().errorMessage());
+            }
+        }
     }
 
     public void sendCommentNotification(Long writerId, Feed feed, String commentContent) {
