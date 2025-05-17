@@ -10,6 +10,7 @@ import com.team.buddyya.feed.repository.FeedRepository;
 import com.team.buddyya.match.domain.MatchRequest;
 import com.team.buddyya.notification.domain.ExpoToken;
 import com.team.buddyya.notification.domain.RequestNotification;
+import com.team.buddyya.notification.dto.request.PushToAllUsersRequest;
 import com.team.buddyya.notification.dto.response.SaveTokenResponse;
 import com.team.buddyya.notification.exception.NotificationException;
 import com.team.buddyya.notification.exception.NotificationExceptionType;
@@ -50,8 +51,6 @@ public class NotificationService {
     private final ObjectMapper objectMapper;
 
     private static final String TOKEN_SAVE_SUCCESS_MESSAGE = "토큰이 성공적으로 저장되었습니다.";
-
-    private static final String BROADCAST_TITLE_EN = "Important notification from Buddyya";
 
     private static final String FEED_REPLY_TITLE_KR = "새로운 대댓글이 달렸어요!";
     private static final String FEED_REPLY_TITLE_EN = "A new reply has been added!";
@@ -223,10 +222,11 @@ public class NotificationService {
         return isKorean ? FEED_REPLY_TITLE_KR : FEED_REPLY_TITLE_EN;
     }
 
-    public void sendNotificationToAllUser(long feedId) {
-        Feed feed = feedRepository.findById(feedId)
+    public void sendNotificationToAllUser(PushToAllUsersRequest request) {
+        Feed feed = feedRepository.findById(request.feedId())
                 .orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND));
-        String body = feed.getTitle();
+        String title = request.title();
+        String body = request.body();
         Map<String, Object> data = Map.of(
                 "feedId", feed.getId(),
                 "type", "FEED"
@@ -238,7 +238,7 @@ public class NotificationService {
                 if (token == null || token.isBlank()) continue;
                 RequestNotification notification = RequestNotification.builder()
                         .to(token)
-                        .title(BROADCAST_TITLE_EN)
+                        .title(title)
                         .body(body)
                         .data(data)
                         .build();

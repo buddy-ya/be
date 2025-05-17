@@ -25,7 +25,7 @@ public class NotificationController {
 
     @PostMapping("/send-to-all")
     public ResponseEntity<Void> sendNotificationToAllUser(@RequestBody PushToAllUsersRequest request) {
-        notificationService.sendNotificationToAllUser(request.feedId());
+        notificationService.sendNotificationToAllUser(request);
         return ResponseEntity.noContent().build();
     }
 }
