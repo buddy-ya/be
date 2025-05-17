@@ -242,6 +242,6 @@ public class FeedService {
     private Sort getSortBy(Category category) {
         return category.getName().equals("POPULAR")
                 ? Sort.by(Sort.Direction.DESC, "likeCount", "createdDate")
-                : Sort.by(Sort.Direction.DESC, "createdDate");
+                : Sort.by(Sort.Direction.DESC, "pinned", "createdDate");
     }
 }
