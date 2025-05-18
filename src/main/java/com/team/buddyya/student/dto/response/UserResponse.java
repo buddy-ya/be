@@ -139,7 +139,8 @@ public record UserResponse(
     }
 
     public static UserResponse fromCheckMembership(Student student, Boolean isStudentIdCardRequested, String status,
-                                                   String accessToken, String refreshToken, Point point) {
+                                                   String accessToken, String refreshToken, Point point,
+                                                   MatchingProfile matchingProfile) {
         return new UserResponse(
                 student.getId(),
                 student.getRole().name(),
@@ -163,9 +164,9 @@ public record UserResponse(
                 null,
                 accessToken,
                 refreshToken,
-                null,
-                null,
-                null,
+                matchingProfile.getIntroduction(),
+                matchingProfile.getBuddyActivity(),
+                matchingProfile.isCompleted(),
                 student.getUniversity().getIsMatchingActive(),
                 student.getUniversity().getIsFeedActive()
         );
