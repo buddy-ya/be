@@ -9,18 +9,25 @@ import com.team.buddyya.certification.dto.response.SendCodeResponse;
 import com.team.buddyya.certification.dto.response.TestAccountResponse;
 import com.team.buddyya.certification.exception.PhoneAuthenticationException;
 import com.team.buddyya.certification.exception.PhoneAuthenticationExceptionType;
-import com.team.buddyya.certification.repository.*;
+import com.team.buddyya.certification.repository.AdminAccountRepository;
+import com.team.buddyya.certification.repository.PhoneInfoRepository;
+import com.team.buddyya.certification.repository.RegisteredPhoneRepository;
+import com.team.buddyya.certification.repository.StudentIdCardRepository;
+import com.team.buddyya.certification.repository.TestAccountRepository;
 import com.team.buddyya.point.domain.Point;
 import com.team.buddyya.point.service.FindPointService;
+import com.team.buddyya.student.domain.MatchingProfile;
 import com.team.buddyya.student.domain.Student;
 import com.team.buddyya.student.dto.response.UserResponse;
+import com.team.buddyya.student.exception.StudentException;
+import com.team.buddyya.student.exception.StudentExceptionType;
+import com.team.buddyya.student.repository.MatchingProfileRepository;
 import com.team.buddyya.student.repository.StudentRepository;
 import com.team.buddyya.student.service.InvitationService;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +44,7 @@ public class PhoneAuthenticationService {
     private final TestAccountRepository testAccountRepository;
     private final FindPointService findPointService;
     private final AdminAccountRepository adminAccountRepository;
+    private final MatchingProfileRepository matchingProfileRepository;
     private final InvitationService invitationService;
     private final JwtUtils jwtUtils;
 
@@ -68,7 +76,9 @@ public class PhoneAuthenticationService {
             student.getAvatar().setLoggedOut(false);
             boolean isStudentIdCardRequested = studentIdCardRepository.findByStudent(student).isPresent();
             Point point = findPointService.findByStudent(student);
-            return UserResponse.fromCheckMembership(student, isStudentIdCardRequested, EXISTING_MEMBER, accessToken, refreshToken, point);
+            MatchingProfile matchingProfile = getMatchingProfile(student);
+            return UserResponse.fromCheckMembership(student, isStudentIdCardRequested, EXISTING_MEMBER, accessToken,
+                    refreshToken, point, matchingProfile);
         }
         return UserResponse.fromCheckMembership(NEW_MEMBER);
     }
@@ -106,7 +116,13 @@ public class PhoneAuthenticationService {
             return;
         }
         PhoneInfo phoneInfo = phoneInfoRepository.findPhoneInfoByUdId(udId)
-                .orElseThrow(() -> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.PHONE_INFO_NOT_FOUND));
+                .orElseThrow(
+                        () -> new PhoneAuthenticationException(PhoneAuthenticationExceptionType.PHONE_INFO_NOT_FOUND));
         phoneInfo.resetMessageSendCount();
+    }
+
+    private MatchingProfile getMatchingProfile(Student student) {
+        return matchingProfileRepository.findByStudent(student)
+                .orElseThrow(() -> new StudentException(StudentExceptionType.MATCHING_PROFILE_NOT_FOUND));
     }
 }
