@@ -54,9 +54,9 @@ public class FeedInsertJobConfig {
     @Bean
     public JdbcBatchItemWriter<FeedJobDTO> feedItemWriter() {
         String sql =
-                "INSERT INTO feed (title, content, is_profile_visible, student_id, category_id, university_id, like_count, comment_count, view_count, pinned, created_at, updated_at) "
+                "INSERT INTO feed (title, content, is_profile_visible, student_id, category_id, university_id, like_count, comment_count, view_count, pinned, created_date, updated_date) "
                         +
-                        "VALUES (:title, :content, :isProfileVisible, :studentId, :categoryId, :universityId, 0, 0, 0, false, NOW(), NOW())";
+                        "VALUES (:title, :content, :profileVisible, :studentId, :categoryId, :universityId, 0, 0, 0, false, NOW(), NOW())";
         return new JdbcBatchItemWriterBuilder<FeedJobDTO>()
                 .dataSource(dataSource)
                 .sql(sql)

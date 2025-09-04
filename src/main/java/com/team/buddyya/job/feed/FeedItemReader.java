@@ -54,7 +54,7 @@ public class FeedItemReader implements ItemReader<FeedJobDTO> {
         return FeedJobDTO.builder()
                 .title("피드 제목 " + (currentCount + 1))
                 .content("피드 내용입니다. " + (currentCount + 1) + "번째 글입니다. 무작위 텍스트...")
-                .isProfileVisible(random.nextBoolean())
+                .profileVisible(random.nextBoolean())
                 .studentId(randomStudent.getId())
                 .categoryId(randomCategory.getId())
                 .universityId(randomUniversity.getId())

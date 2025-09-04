@@ -8,7 +8,7 @@ import lombok.Getter;
 public class FeedJobDTO {
     private String title;
     private String content;
-    private boolean isProfileVisible;
+    private boolean profileVisible;
     private Long studentId;
     private Long categoryId;
     private Long universityId;

@@ -1,6 +1,7 @@
 package com.team.buddyya.job;
 
 import com.team.buddyya.job.feed.FeedInsertJobConfig;
+import com.team.buddyya.job.feed.comment.CommentInsertJobConfig;
 import com.team.buddyya.job.student.StudentInsertJobConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
@@ -13,7 +14,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 
 @Profile("local")
-@Import({StudentInsertJobConfig.class, FeedInsertJobConfig.class})
+@Import({StudentInsertJobConfig.class, FeedInsertJobConfig.class, CommentInsertJobConfig.class})
 @Configuration
 @RequiredArgsConstructor
 public class SeedDataJobConfig {
@@ -21,12 +22,14 @@ public class SeedDataJobConfig {
     private final JobRepository jobRepository;
     private final Step studentInsertStep;
     private final Step feedInsertStep;
+    private final Step commentInsertStep;
 
     @Bean
     public Job seedDataJob() {
         return new JobBuilder("seedDataJob", jobRepository)
                 .start(studentInsertStep)
                 .next(feedInsertStep)
+                .next(commentInsertStep)
                 .build();
     }
 }
