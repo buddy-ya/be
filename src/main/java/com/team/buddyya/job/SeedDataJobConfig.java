@@ -19,6 +19,10 @@ import org.springframework.context.annotation.Profile;
 @RequiredArgsConstructor
 public class SeedDataJobConfig {
 
+    public static final int STUDENT_COUNT = 100_000;
+    public static final int FEED_COUNT = 1_000_000;
+    public static final int COMMENT_COUNT = 100_000;
+
     private final JobRepository jobRepository;
     private final Step studentInsertStep;
     private final Step feedInsertStep;

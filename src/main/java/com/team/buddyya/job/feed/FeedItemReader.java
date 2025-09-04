@@ -1,63 +1,60 @@
 package com.team.buddyya.job.feed;
 
-import com.team.buddyya.feed.domain.Category;
-import com.team.buddyya.feed.repository.CategoryRepository;
-import com.team.buddyya.student.domain.Student;
-import com.team.buddyya.student.domain.University;
-import com.team.buddyya.student.repository.StudentRepository;
-import com.team.buddyya.student.repository.UniversityRepository;
-import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.jdbc.core.JdbcTemplate;
 
-@Slf4j
 public class FeedItemReader implements ItemReader<FeedJobDTO> {
 
-    private final StudentRepository studentRepository;
-    private final CategoryRepository categoryRepository;
-    private final UniversityRepository universityRepository;
-    private final AtomicInteger counter = new AtomicInteger(0);
+    private final JdbcTemplate jdbcTemplate;
     private final int totalCount;
-    private final Random random = new Random();
+    private final AtomicInteger counter = new AtomicInteger(0);
 
-    private List<Student> students;
-    private List<Category> categories;
-    private List<University> universities;
+    private Long minStudentId;
+    private Long maxStudentId;
+    private Long minUniversityId;
+    private Long maxUniversityId;
 
-    public FeedItemReader(StudentRepository studentRepository, CategoryRepository categoryRepository,
-                          UniversityRepository universityRepository, int totalCount) {
-        this.studentRepository = studentRepository;
-        this.categoryRepository = categoryRepository;
-        this.universityRepository = universityRepository;
+    public FeedItemReader(JdbcTemplate jdbcTemplate, int totalCount) {
+        this.jdbcTemplate = jdbcTemplate;
         this.totalCount = totalCount;
     }
 
     @Override
-    public FeedJobDTO read() {
-        if (students == null) {
-            students = studentRepository.findAll();
-            categories = categoryRepository.findAll();
-            universities = universityRepository.findAll();
-            if (students.isEmpty() || categories.isEmpty() || universities.isEmpty()) {
-                throw new IllegalStateException("Prerequisite data (Student, Category, or University) is missing.");
+    public FeedJobDTO read() throws Exception {
+        if (minStudentId == null) {
+            // Student, University 테이블의 데이터 존재 여부 및 ID 범위 초기화
+            if (jdbcTemplate.queryForObject("SELECT COUNT(1) FROM student", Long.class) == 0) {
+                throw new IllegalStateException("Prerequisite data (Student) is missing.");
             }
+            this.minStudentId = jdbcTemplate.queryForObject("SELECT MIN(id) FROM student", Long.class);
+            this.maxStudentId = jdbcTemplate.queryForObject("SELECT MAX(id) FROM student", Long.class);
+            if (jdbcTemplate.queryForObject("SELECT COUNT(1) FROM university", Long.class) == 0) {
+                throw new IllegalStateException("Prerequisite data (University) is missing.");
+            }
+            this.minUniversityId = jdbcTemplate.queryForObject("SELECT MIN(id) FROM university", Long.class);
+            this.maxUniversityId = jdbcTemplate.queryForObject("SELECT MAX(id) FROM university", Long.class);
         }
-        int currentCount = counter.getAndIncrement();
-        if (currentCount >= totalCount) {
+
+        if (counter.get() >= totalCount) {
             return null;
         }
-        Student randomStudent = students.get(random.nextInt(students.size()));
-        Category randomCategory = categories.get(random.nextInt(categories.size()));
-        University randomUniversity = universities.get(random.nextInt(universities.size()));
+
+        int currentCount = counter.incrementAndGet();
+        long randomStudentId = ThreadLocalRandom.current().nextLong(minStudentId, maxStudentId + 1);
+        long randomUniversityId = ThreadLocalRandom.current().nextLong(minUniversityId, maxUniversityId + 1);
+        // Category는 데이터가 적다고 가정하고 SQL로 랜덤 조회, 많아진다면 동일하게 MIN/MAX 방식으로 변경
+        Long randomCategoryId = jdbcTemplate.queryForObject("SELECT id FROM category ORDER BY RAND() LIMIT 1",
+                Long.class);
+
         return FeedJobDTO.builder()
-                .title("피드 제목 " + (currentCount + 1))
-                .content("피드 내용입니다. " + (currentCount + 1) + "번째 글입니다. 무작위 텍스트...")
-                .profileVisible(random.nextBoolean())
-                .studentId(randomStudent.getId())
-                .categoryId(randomCategory.getId())
-                .universityId(randomUniversity.getId())
+                .title("피드 제목 " + currentCount)
+                .content("피드 내용입니다. " + currentCount)
+                .profileVisible(ThreadLocalRandom.current().nextBoolean())
+                .studentId(randomStudentId)
+                .categoryId(randomCategoryId)
+                .universityId(randomUniversityId)
                 .build();
     }
 }
