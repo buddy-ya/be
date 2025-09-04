@@ -24,7 +24,6 @@ public class StudentInsertJobConfig {
     private final PlatformTransactionManager platformTransactionManager;
     private final DataSource dataSource;
     private static final int CHUNK_SIZE = 1000;
-    // private final UniversityRepository universityRepository; // 의존성 제거
 
     @Bean
     public Step studentInsertStep(ItemReader<StudentJobDTO> studentItemReader,

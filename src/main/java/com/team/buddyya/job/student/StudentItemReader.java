@@ -29,15 +29,12 @@ public class StudentItemReader implements ItemReader<StudentJobDTO> {
             this.minUniversityId = jdbcTemplate.queryForObject("SELECT MIN(id) FROM university", Long.class);
             this.maxUniversityId = jdbcTemplate.queryForObject("SELECT MAX(id) FROM university", Long.class);
         }
-
         if (counter.get() >= totalCount) {
             return null;
         }
-
         int index = counter.incrementAndGet();
         long randomUniversityId = ThreadLocalRandom.current().nextLong(minUniversityId, maxUniversityId + 1);
         String gender = (index % 2 == 0) ? "MALE" : "FEMALE";
-
         return StudentJobDTO.builder()
                 .phoneNumber("010" + String.format("%08d", index))
                 .name("student" + index)

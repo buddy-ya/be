@@ -42,7 +42,7 @@ public class CommentInsertJobConfig {
 
     @Bean
     public JdbcBatchItemWriter<CommentJobDTO> commentItemWriter() {
-        String sql = "INSERT INTO comment (student_id, feed_id, parent_id, content, like_count, deleted, created_at, updated_at) VALUES (:studentId, :feedId, :parentId, :content, 0, false, NOW(), NOW())";
+        String sql = "INSERT INTO comment (student_id, feed_id, parent_id, content, like_count, deleted, created_date, updated_date) VALUES (:studentId, :feedId, :parentId, :content, 0, false, NOW(), NOW())";
         return new JdbcBatchItemWriterBuilder<CommentJobDTO>()
                 .dataSource(dataSource)
                 .sql(sql)

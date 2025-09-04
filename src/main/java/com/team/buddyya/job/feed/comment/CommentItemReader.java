@@ -24,21 +24,17 @@ public class CommentItemReader implements ItemReader<CommentJobDTO> {
     @Override
     public CommentJobDTO read() throws Exception {
         if (minFeedId == null) {
-            // Student, Feed 테이블의 ID 범위 초기화
             this.minStudentId = jdbcTemplate.queryForObject("SELECT MIN(id) FROM student", Long.class);
             this.maxStudentId = jdbcTemplate.queryForObject("SELECT MAX(id) FROM student", Long.class);
             this.minFeedId = jdbcTemplate.queryForObject("SELECT MIN(id) FROM feed", Long.class);
             this.maxFeedId = jdbcTemplate.queryForObject("SELECT MAX(id) FROM feed", Long.class);
         }
-
         if (counter.get() >= totalCount) {
             return null;
         }
-
         int currentCount = counter.incrementAndGet();
         long randomStudentId = ThreadLocalRandom.current().nextLong(minStudentId, maxStudentId + 1);
         long randomFeedId = ThreadLocalRandom.current().nextLong(minFeedId, maxFeedId + 1);
-
         return CommentJobDTO.builder()
                 .studentId(randomStudentId)
                 .feedId(randomFeedId)
