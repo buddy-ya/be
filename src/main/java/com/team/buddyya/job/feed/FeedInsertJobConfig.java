@@ -1,5 +1,7 @@
-package com.team.buddyya.job.student;
+package com.team.buddyya.job.feed;
 
+import com.team.buddyya.feed.repository.CategoryRepository;
+import com.team.buddyya.student.repository.StudentRepository;
 import com.team.buddyya.student.repository.UniversityRepository;
 import javax.sql.DataSource;
 import lombok.RequiredArgsConstructor;
@@ -18,41 +20,44 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @RequiredArgsConstructor
-public class StudentInsertJobConfig {
+public class FeedInsertJobConfig {
 
-    private static final int CHUNK_SIZE = 1000;
     private final JobRepository jobRepository;
     private final PlatformTransactionManager platformTransactionManager;
     private final DataSource dataSource;
+    private final StudentRepository studentRepository;
+    private final CategoryRepository categoryRepository;
     private final UniversityRepository universityRepository;
 
+    private static final int CHUNK_SIZE = 1000;
+
     @Bean
-    public Step studentInsertStep(
-            ItemReader<StudentJobDTO> studentItemReader,
-            JdbcBatchItemWriter<StudentJobDTO> studentItemWriter
+    public Step feedInsertStep(
+            ItemReader<FeedJobDTO> feedItemReader,
+            JdbcBatchItemWriter<FeedJobDTO> feedItemWriter
     ) {
-        return new StepBuilder("studentInsertStep", jobRepository)
-                .<StudentJobDTO, StudentJobDTO>chunk(CHUNK_SIZE, platformTransactionManager)
-                .reader(studentItemReader)
-                .writer(studentItemWriter)
+        return new StepBuilder("feedInsertStep", jobRepository)
+                .<FeedJobDTO, FeedJobDTO>chunk(CHUNK_SIZE, platformTransactionManager)
+                .reader(feedItemReader)
+                .writer(feedItemWriter)
                 .build();
     }
 
     @Bean
     @StepScope
-    public ItemReader<StudentJobDTO> studentItemReader(
-            @Value("#{jobParameters['count'] ?: 10000}") int totalCount
+    public ItemReader<FeedJobDTO> feedItemReader(
+            @Value("#{jobParameters['count'] ?: 100000}") int totalCount
     ) {
-        return new StudentItemReader(universityRepository, totalCount);
+        return new FeedItemReader(studentRepository, categoryRepository, universityRepository, totalCount);
     }
 
     @Bean
-    public JdbcBatchItemWriter<StudentJobDTO> studentItemWriter() {
+    public JdbcBatchItemWriter<FeedJobDTO> feedItemWriter() {
         String sql =
-                "INSERT INTO student (phone_number, name, country, certificated, korean, deleted, university_id, role, gender, character_profile_image, banned, created_date, updated_date) "
+                "INSERT INTO feed (title, content, is_profile_visible, student_id, category_id, university_id, like_count, comment_count, view_count, pinned, created_at, updated_at) "
                         +
-                        "VALUES (:phoneNumber, :name, :country, :isCertificated, :isKorean, :isDeleted, :universityId, :role, :gender, :characterProfileImage, :isBanned, NOW(), NOW())";
-        return new JdbcBatchItemWriterBuilder<StudentJobDTO>()
+                        "VALUES (:title, :content, :isProfileVisible, :studentId, :categoryId, :universityId, 0, 0, 0, false, NOW(), NOW())";
+        return new JdbcBatchItemWriterBuilder<FeedJobDTO>()
                 .dataSource(dataSource)
                 .sql(sql)
                 .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
