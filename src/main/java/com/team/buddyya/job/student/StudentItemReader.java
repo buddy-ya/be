@@ -22,7 +22,6 @@ public class StudentItemReader implements ItemReader<StudentJobDTO> {
     @Override
     public StudentJobDTO read() {
         if (minUniversityId == null) {
-            // University 테이블의 데이터 존재 여부 및 ID 범위 초기화
             if (jdbcTemplate.queryForObject("SELECT COUNT(1) FROM university", Long.class) == 0) {
                 throw new IllegalStateException("Prerequisite data (University) is missing.");
             }
@@ -35,6 +34,10 @@ public class StudentItemReader implements ItemReader<StudentJobDTO> {
         int index = counter.incrementAndGet();
         long randomUniversityId = ThreadLocalRandom.current().nextLong(minUniversityId, maxUniversityId + 1);
         String gender = (index % 2 == 0) ? "MALE" : "FEMALE";
+        int profileImageIndex = ThreadLocalRandom.current().nextInt(1, 9);
+        String profileImageUrl = String.format(
+                "https://buddyya.s3.ap-northeast-2.amazonaws.com/default-profile-image/image__%d.png",
+                profileImageIndex);
         return StudentJobDTO.builder()
                 .phoneNumber("010" + String.format("%08d", index))
                 .name("student" + index)
