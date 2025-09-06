@@ -47,6 +47,7 @@ public class BookmarkInsertJobConfig {
                 .dataSource(dataSource)
                 .sql(sql)
                 .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
+                .assertUpdates(false)
                 .build();
     }
 }

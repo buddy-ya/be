@@ -47,6 +47,7 @@ public class FeedLikeInsertJobConfig {
                 .dataSource(dataSource)
                 .sql(sql)
                 .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
+                .assertUpdates(false)
                 .build();
     }
 }
