@@ -54,6 +54,7 @@ public class Feed extends BaseTime {
     @Column(name = "pinned", nullable = false)
     private boolean pinned;
 
+    @BatchSize(size = 100)
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "student_id", nullable = false)
     private Student student;

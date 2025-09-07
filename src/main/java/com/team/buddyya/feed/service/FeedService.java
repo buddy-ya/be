@@ -75,13 +75,18 @@ public class FeedService {
 
     @Transactional(readOnly = true)
     public FeedListResponse getFeeds(StudentInfo studentInfo, Pageable pageable, FeedListRequest request) {
-        String keyword = request.keyword();
         Student student = findStudentByStudentId(studentInfo.id());
-        Page<Feed> feeds = (keyword == null || keyword.isBlank())
+        Page<Feed> feeds = (request.keyword() == null || request.keyword().isBlank())
                 ? getFeedsByUniversityAndCategory(request, pageable)
-                : getFeedsByKeyword(student, keyword, pageable);
+                : getFeedsByKeyword(student, request.keyword(), pageable);
         Set<Long> blockedStudentIds = blockRepository.findBlockedStudentIdByBlockerId(studentInfo.id());
-        List<FeedResponse> response = filterBlockedFeeds(feeds.getContent(), blockedStudentIds, studentInfo.id());
+        List<Long> feedIds = feeds.getContent().stream()
+                .map(Feed::getId)
+                .toList();
+        Set<Long> likedFeedIds = feedLikeRepository.findFeedIdsByStudentIdAndFeedIdsIn(studentInfo.id(), feedIds);
+        Set<Long> bookmarkedFeedIds = bookmarkRepository.findFeedIdsByStudentIdAndFeedIdsIn(studentInfo.id(), feedIds);
+        List<FeedResponse> response = filterBlockedFeeds(feeds.getContent(), blockedStudentIds, student, likedFeedIds,
+                bookmarkedFeedIds);
         return FeedListResponse.from(response, feeds);
     }
 
@@ -91,15 +96,18 @@ public class FeedService {
             Pageable pageable,
             FeedListRequest request
     ) {
+        Student student = findStudentByStudentId(studentInfo.id());
         University university = findUniversityByUniversityName(request.university());
-        Page<Feed> feeds = feedRepository
-                .findByLikeCountGreaterThanEqualAndUniversity(
-                        LIKE_COUNT_THRESHOLD,
-                        university,
-                        pageable
-                );
+        Page<Feed> feeds = feedRepository.findByLikeCountGreaterThanEqualAndUniversity(LIKE_COUNT_THRESHOLD, university,
+                pageable);
         Set<Long> blocked = blockRepository.findBlockedStudentIdByBlockerId(studentInfo.id());
-        List<FeedResponse> response = filterBlockedFeeds(feeds.getContent(), blocked, studentInfo.id());
+        List<Long> feedIds = feeds.getContent().stream()
+                .map(Feed::getId)
+                .toList();
+        Set<Long> likedFeedIds = feedLikeRepository.findFeedIdsByStudentIdAndFeedIdsIn(studentInfo.id(), feedIds);
+        Set<Long> bookmarkedFeedIds = bookmarkRepository.findFeedIdsByStudentIdAndFeedIdsIn(studentInfo.id(), feedIds);
+        List<FeedResponse> response = filterBlockedFeeds(feeds.getContent(), blocked, student, likedFeedIds,
+                bookmarkedFeedIds);
         return FeedListResponse.from(response, feeds);
     }
 
@@ -125,7 +133,7 @@ public class FeedService {
         Student student = findStudentByStudentId(studentInfo.id());
         Page<Feed> feeds = feedRepository.findAllByStudent(student, customPageable);
         List<FeedResponse> response = feeds.getContent().stream()
-                .map(feed -> createFeedResponse(feed, studentInfo.id()))
+                .map(feed -> createFeedResponse(feed, student))
                 .toList();
         return FeedListResponse.from(response, feeds);
     }
@@ -136,7 +144,15 @@ public class FeedService {
         Page<Bookmark> bookmarks = bookmarkRepository.findAllByStudent(student, pageable);
         Page<Feed> feeds = bookmarks.map(Bookmark::getFeed);
         Set<Long> blockedStudentIds = blockRepository.findBlockedStudentIdByBlockerId(studentInfo.id());
-        List<FeedResponse> response = filterBlockedFeeds(feeds.getContent(), blockedStudentIds, studentInfo.id());
+        List<Long> feedIds = feeds.getContent().stream()
+                .map(Feed::getId)
+                .toList();
+
+        Set<Long> likedFeedIds = feedLikeRepository.findFeedIdsByStudentIdAndFeedIdsIn(studentInfo.id(), feedIds);
+        Set<Long> bookmarkedFeedIds = bookmarkRepository.findFeedIdsByStudentIdAndFeedIdsIn(studentInfo.id(), feedIds);
+
+        List<FeedResponse> response = filterBlockedFeeds(feeds.getContent(), blockedStudentIds, student, likedFeedIds,
+                bookmarkedFeedIds);
         return FeedListResponse.from(response, feeds);
     }
 
@@ -157,19 +173,10 @@ public class FeedService {
     }
 
     public FeedResponse getFeed(StudentInfo studentInfo, Long feedId) {
-        log.info("========== [DEBUG] START: getFeed (Feed ID: {}) ==========", feedId);
-
-        log.info("--- [DEBUG] 1. findFeedByFeedId 호출 ---");
+        Student student = findStudentByStudentId(studentInfo.id());
         Feed feed = findFeedByFeedId(feedId);
-        log.info("--- [DEBUG] 1. findFeedByFeedId 완료 ---");
-
-        feed.increaseViewCount(); // Dirty Checking으로 인해 트랜잭션 커밋 시 UPDATE 쿼리 발생
-
-        log.info("--- [DEBUG] 2. createFeedResponse 호출 시작 (추가 쿼리 발생 구간) ---");
-        FeedResponse response = createFeedResponse(feed, studentInfo.id());
-        log.info("--- [DEBUG] 2. createFeedResponse 호출 완료 ---");
-
-        log.info("========== [DEBUG] END: getFeed (Feed ID: {}) ==========", feedId);
+        feed.increaseViewCount();
+        FeedResponse response = createFeedResponse(feed, student);
         return response;
     }
 
@@ -217,12 +224,20 @@ public class FeedService {
     }
 
     private List<FeedResponse> filterBlockedFeeds(List<Feed> feeds, Set<Long> blockedStudentIds,
-                                                  Long currentStudentId) {
+                                                  Student currentStudent, Set<Long> likedFeedIds,
+                                                  Set<Long> bookmarkedFeedIds) {
         return feeds.stream()
                 .filter(feed -> !blockedStudentIds.contains(feed.getStudent().getId()))
-                .map(feed -> createFeedResponse(feed, currentStudentId))
+                .map(feed -> {
+                    boolean isFeedOwner = feed.isFeedOwner(currentStudent.getId());
+                    boolean isLiked = likedFeedIds.contains(feed.getId());
+                    boolean isBookmarked = bookmarkedFeedIds.contains(feed.getId());
+                    FeedUserAction userAction = FeedUserAction.from(isFeedOwner, isLiked, isBookmarked);
+                    return FeedResponse.from(feed, userAction);
+                })
                 .toList();
     }
+
 
     private void validateFeedOwner(StudentInfo studentInfo, Feed feed) {
         if (!studentInfo.id().equals(feed.getStudent().getId()) && !(studentInfo.role() == Role.OWNER)) {
@@ -230,9 +245,8 @@ public class FeedService {
         }
     }
 
-    private FeedResponse createFeedResponse(Feed feed, Long studentId) {
-        Student student = findStudentByStudentId(studentId);
-        FeedUserAction userAction = getUserAction(student, feed);
+    private FeedResponse createFeedResponse(Feed feed, Student currentStudent) {
+        FeedUserAction userAction = getUserAction(currentStudent, feed);
         return FeedResponse.from(feed, userAction);
     }
 
