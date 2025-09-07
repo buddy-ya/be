@@ -29,6 +29,7 @@ import com.team.buddyya.student.service.FindStudentService;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -37,6 +38,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -155,9 +157,20 @@ public class FeedService {
     }
 
     public FeedResponse getFeed(StudentInfo studentInfo, Long feedId) {
+        log.info("========== [DEBUG] START: getFeed (Feed ID: {}) ==========", feedId);
+
+        log.info("--- [DEBUG] 1. findFeedByFeedId 호출 ---");
         Feed feed = findFeedByFeedId(feedId);
-        feed.increaseViewCount();
-        return createFeedResponse(feed, studentInfo.id());
+        log.info("--- [DEBUG] 1. findFeedByFeedId 완료 ---");
+
+        feed.increaseViewCount(); // Dirty Checking으로 인해 트랜잭션 커밋 시 UPDATE 쿼리 발생
+
+        log.info("--- [DEBUG] 2. createFeedResponse 호출 시작 (추가 쿼리 발생 구간) ---");
+        FeedResponse response = createFeedResponse(feed, studentInfo.id());
+        log.info("--- [DEBUG] 2. createFeedResponse 호출 완료 ---");
+
+        log.info("========== [DEBUG] END: getFeed (Feed ID: {}) ==========", feedId);
+        return response;
     }
 
     public void createFeed(StudentInfo studentInfo, FeedCreateRequest request) {
