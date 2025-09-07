@@ -23,6 +23,10 @@ public interface FeedRepository extends JpaRepository<Feed, Long> {
     })
     Optional<Feed> findById(Long id);
 
+    @EntityGraph(attributePaths = {
+            "category",
+            "university",
+    })
     Page<Feed> findAllByUniversityAndCategory(University university, Category category, Pageable pageable);
 
     Page<Feed> findAllByStudent(Student student, Pageable pageable);
