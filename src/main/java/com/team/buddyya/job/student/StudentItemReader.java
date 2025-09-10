@@ -38,6 +38,7 @@ public class StudentItemReader implements ItemReader<StudentJobDTO> {
         String profileImageUrl = String.format(
                 "https://buddyya.s3.ap-northeast-2.amazonaws.com/default-profile-image/image__%d.png",
                 profileImageIndex);
+
         return StudentJobDTO.builder()
                 .phoneNumber("010" + String.format("%08d", index))
                 .name("student" + index)
@@ -48,7 +49,7 @@ public class StudentItemReader implements ItemReader<StudentJobDTO> {
                 .universityId(randomUniversityId)
                 .role("STUDENT")
                 .gender(gender)
-                .characterProfileImage("default_image_url_" + (index % 8))
+                .characterProfileImage(profileImageUrl)
                 .isBanned(false)
                 .build();
     }
