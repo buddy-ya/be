@@ -27,8 +27,7 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
                 .where(
                         cursorCondition(lastFeed),
                         eqUniversity(request.university()),
-                        eqCategory(request.category()),
-                        containsKeyword(request.keyword())
+                        eqCategory(request.category())
                 )
                 .orderBy(feed.pinned.desc(), feed.createdDate.desc(), feed.id.desc())
                 .limit(pageSize + 1)
@@ -40,7 +39,7 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
         if (lastFeed == null) {
             return null;
         }
-        BooleanExpression pinnedExpression = feed.pinned.coalesce(false);
+        BooleanExpression pinnedExpression = feed.pinned;
         boolean lastPinned = lastFeed.isPinned();
         LocalDateTime lastCreatedAt = lastFeed.getCreatedDate();
         Long lastId = lastFeed.getId();
@@ -53,7 +52,7 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
     }
 
     private BooleanExpression eqUniversity(String university) {
-        if (university == null || university.isBlank() || university.equalsIgnoreCase("all")) {
+        if (university == null || university.isBlank()) {
             return null;
         }
         return feed.university.universityName.eq(university);
@@ -64,14 +63,6 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
             return null;
         }
         return feed.category.name.eq(category);
-    }
-
-    private BooleanExpression containsKeyword(String keyword) {
-        if (keyword == null || keyword.isBlank()) {
-            return null;
-        }
-        return feed.title.containsIgnoreCase(keyword)
-                .or(feed.content.containsIgnoreCase(keyword));
     }
 
     private Slice<Feed> toSlice(List<Feed> feeds, int pageSize) {
