@@ -107,10 +107,15 @@ public class FeedService {
         Category category = categoryService.getCategory(request.category());
         Pageable customPageable = PageRequest.of(
                 pageable.getPageNumber(),
-                pageable.getPageSize(),
-                getSortBy(category)
+                pageable.getPageSize()
         );
-        return feedRepository.findAllByUniversityAndCategory(university, category, customPageable);
+        Page<Feed> feeds;
+        if (category.getName().equals("POPULAR")) {
+            feeds = feedRepository.findPopularFeedsByUnivAndCategory(university, category, customPageable);
+        } else {
+            feeds = feedRepository.findFeedsByUnivAndCategory(university, category, customPageable);
+        }
+        return feeds;
     }
 
     @Transactional(readOnly = true)

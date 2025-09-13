@@ -1,0 +1,2 @@
+CREATE INDEX idx_feed_uni_cat_order
+    ON feed (university_id, category_id, pinned DESC, created_date DESC);
