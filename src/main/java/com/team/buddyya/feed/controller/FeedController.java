@@ -2,6 +2,7 @@ package com.team.buddyya.feed.controller;
 
 import com.team.buddyya.auth.domain.CustomUserDetails;
 import com.team.buddyya.feed.dto.request.feed.FeedCreateRequest;
+import com.team.buddyya.feed.dto.request.feed.FeedCursorListRequest;
 import com.team.buddyya.feed.dto.request.feed.FeedListRequest;
 import com.team.buddyya.feed.dto.request.feed.FeedUpdateRequest;
 import com.team.buddyya.feed.dto.response.BookmarkResponse;
@@ -42,6 +43,17 @@ public class FeedController {
                                                              "createdDate"}, direction = Direction.DESC) Pageable pageable,
                                                      @ModelAttribute FeedListRequest request) {
         FeedListResponse response = feedService.getFeeds(userDetails.getStudentInfo(), pageable, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/cursor")
+    public ResponseEntity<FeedListResponse> getFeedsByCursor(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @ModelAttribute FeedCursorListRequest request) {
+        FeedListResponse response = feedService.getFeedsByCursor(
+                userDetails.getStudentInfo(),
+                request
+        );
         return ResponseEntity.ok(response);
     }
 
