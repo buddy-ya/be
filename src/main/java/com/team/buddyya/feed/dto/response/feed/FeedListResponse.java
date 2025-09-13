@@ -24,7 +24,7 @@ public record FeedListResponse(
     public static <T> FeedListResponse from(List<FeedResponse> feeds, Slice<T> sliceInfo) {
         return new FeedListResponse(
                 feeds,
-                sliceInfo.getNumber(),
+                -1,
                 -1,
                 sliceInfo.hasNext()
         );
