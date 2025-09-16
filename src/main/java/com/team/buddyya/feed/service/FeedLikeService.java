@@ -13,7 +13,6 @@ import com.team.buddyya.student.service.FindStudentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -36,8 +35,7 @@ public class FeedLikeService {
                 .orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_LIKED));
     }
 
-    @Transactional(isolation = Isolation.SERIALIZABLE)
-    public LikeResponse toggleLike(StudentInfo studentInfo, Long feedId) {
+    public synchronized LikeResponse toggleLike(StudentInfo studentInfo, Long feedId) {
         Feed feed = feedRepository.findById(feedId)
                 .orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND));
         Student student = findStudentService.findByStudentId(studentInfo.id());
