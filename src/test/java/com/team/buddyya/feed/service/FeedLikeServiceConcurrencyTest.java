@@ -238,6 +238,41 @@ public class FeedLikeServiceConcurrencyTest {
         assertThat(actualLikeRows).isEqualTo(finalLikeCount);
     }
 
+    @Test
+    void 비관적_락_적용시_동시성_문제가_해결된다() throws InterruptedException {
+        // given
+        int userCount = 100;
+        ExecutorService executorService = Executors.newFixedThreadPool(32);
+        CountDownLatch latch = new CountDownLatch(userCount);
+
+        // when
+        for (Student liker : likerStudents) {
+            executorService.submit(() -> {
+                try {
+                    StudentInfo studentInfo = new StudentInfo(liker.getId(), liker.getRole(), true);
+                    feedLikeService.toggleLike(studentInfo, savedFeed.getId());
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+
+        latch.await();
+
+        // then
+        long actualLikeRows = feedLikeRepository.countByFeed(savedFeed);
+        Feed finalFeed = feedRepository.findById(savedFeed.getId()).orElseThrow();
+        int finalLikeCount = finalFeed.getLikeCount();
+
+        System.out.println("==============================================");
+        System.out.println("[Pessimistic Lock] 실제 생성된 FeedLike 레코드 수: " + actualLikeRows);
+        System.out.println("[Pessimistic Lock] Feed 엔티티에 기록된 최종 likeCount: " + finalLikeCount);
+        System.out.println("==============================================");
+
+        assertThat(actualLikeRows).isEqualTo(userCount);
+        assertThat(finalLikeCount).isEqualTo(userCount);
+    }
+
     private Student createAndSaveStudent(String phoneNumber, String name, University university) {
         Student student = Student.builder()
                 .phoneNumber(phoneNumber)

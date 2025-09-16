@@ -36,7 +36,7 @@ public class FeedLikeService {
     }
 
     public LikeResponse toggleLike(StudentInfo studentInfo, Long feedId) {
-        Feed feed = feedRepository.findById(feedId)
+        Feed feed = feedRepository.findByIdForUpdate(feedId)
                 .orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND));
         Student student = findStudentService.findByStudentId(studentInfo.id());
         boolean isLiked = existsByStudentAndFeed(student, feed);
