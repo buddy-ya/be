@@ -200,6 +200,44 @@ public class FeedLikeServiceConcurrencyTest {
         assertThat(finalLikeCount).isEqualTo(userCount);
     }
 
+    @Test
+    void 낙관적_락_적용시_쓰기_충돌이_발생하면_예외가_발생한다() throws InterruptedException {
+        // given
+        int userCount = 100;
+        ExecutorService executorService = Executors.newFixedThreadPool(32);
+        CountDownLatch latch = new CountDownLatch(userCount);
+
+        // when
+        for (Student liker : likerStudents) {
+            executorService.submit(() -> {
+                try {
+                    StudentInfo studentInfo = new StudentInfo(liker.getId(), liker.getRole(), true);
+                    feedLikeService.toggleLike(studentInfo, savedFeed.getId());
+                } catch (Exception e) {
+                    System.out.println("충돌 감지: " + e.getMessage());
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+
+        latch.await();
+
+        // then
+        long actualLikeRows = feedLikeRepository.countByFeed(savedFeed);
+        Feed finalFeed = feedRepository.findById(savedFeed.getId()).orElseThrow();
+        int finalLikeCount = finalFeed.getLikeCount();
+
+        System.out.println("==============================================");
+        System.out.println("[Optimistic Lock] 실제 생성된 FeedLike 레코드 수: " + actualLikeRows);
+        System.out.println("[Optimistic Lock] Feed 엔티티에 기록된 최종 likeCount: " + finalLikeCount);
+        System.out.println("==============================================");
+
+        assertThat(actualLikeRows).isNotEqualTo(userCount);
+        assertThat(finalLikeCount).isNotEqualTo(userCount);
+        assertThat(actualLikeRows).isEqualTo(finalLikeCount);
+    }
+
     private Student createAndSaveStudent(String phoneNumber, String name, University university) {
         Student student = Student.builder()
                 .phoneNumber(phoneNumber)

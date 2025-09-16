@@ -16,6 +16,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Builder;
@@ -32,6 +33,9 @@ public class Feed extends BaseTime {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
+
+    @Version
+    private Long version;
 
     @Column(length = 255, nullable = false)
     private String title;

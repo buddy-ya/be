@@ -35,7 +35,7 @@ public class FeedLikeService {
                 .orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_LIKED));
     }
 
-    public synchronized LikeResponse toggleLike(StudentInfo studentInfo, Long feedId) {
+    public LikeResponse toggleLike(StudentInfo studentInfo, Long feedId) {
         Feed feed = feedRepository.findById(feedId)
                 .orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND));
         Student student = findStudentService.findByStudentId(studentInfo.id());
