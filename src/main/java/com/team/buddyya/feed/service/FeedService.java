@@ -92,7 +92,7 @@ public class FeedService {
 
     @Transactional(readOnly = true)
     public FeedListResponse getFeedsByCursor(StudentInfo studentInfo, FeedCursorListRequest request) {
-        final Feed lastFeed = request.lastId() != null ?
+        Feed lastFeed = request.lastId() != null ?
                 feedRepository.findById(request.lastId())
                         .orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND))
                 : null;
@@ -180,7 +180,7 @@ public class FeedService {
                 })
                 .toList();
     }
-    
+
     @Transactional(readOnly = true)
     Page<Feed> getFeedsByKeyword(Student student, String keyword, Pageable pageable) {
         University openUniversity = findUniversityByUniversityName("all");
