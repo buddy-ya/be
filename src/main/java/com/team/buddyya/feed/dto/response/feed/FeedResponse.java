@@ -3,6 +3,7 @@ package com.team.buddyya.feed.dto.response.feed;
 import com.team.buddyya.feed.domain.Feed;
 import com.team.buddyya.feed.domain.FeedImage;
 import com.team.buddyya.feed.domain.FeedUserAction;
+import com.team.buddyya.feed.dto.projection.FeedAuthorInfo;
 import com.team.buddyya.student.domain.Role;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,19 +36,19 @@ public record FeedResponse(
     private static final String BUDDYYA_PROFILE_IMAGE =
             "https://buddyya.s3.ap-northeast-2.amazonaws.com/default-profile-image/buddyya_icon.png";
 
-    public static FeedResponse from(Feed feed, FeedUserAction userAction) {
-        String profileImageUrl = feed.getStudent().getRole() == Role.OWNER ? BUDDYYA_PROFILE_IMAGE
-                : feed.getStudent().getCharacterProfileImage();
+    public static FeedResponse from(Feed feed, FeedUserAction userAction, FeedAuthorInfo authorInfo) {
+        String profileImageUrl = authorInfo.role() == Role.OWNER ? BUDDYYA_PROFILE_IMAGE
+                : authorInfo.characterProfileImage();
         return new FeedResponse(
                 feed.getId(),
-                feed.getStudent().getId(),
+                authorInfo.id(),
                 feed.getUniversity().getUniversityName(),
                 feed.getCategory().getName(),
-                feed.getStudent().getName(),
-                feed.getStudent().getCountry(),
+                authorInfo.name(),
+                authorInfo.country(),
                 feed.getTitle(),
                 feed.getContent(),
-                feed.getStudent().getUniversity().getUniversityName(),
+                authorInfo.universityName(),
                 profileImageUrl,
                 feed.getImages().stream()
                         .map(FeedImage::getUrl)
@@ -59,9 +60,9 @@ public record FeedResponse(
                 userAction.isLiked(),
                 userAction.isBookmarked(),
                 feed.isPinned(),
-                feed.getStudent().getIsCertificated(),
+                authorInfo.isCertificated(),
                 feed.isProfileVisible(),
-                feed.getStudent().getIsDeleted(),
+                authorInfo.isDeleted(),
                 feed.getCreatedDate()
         );
     }
