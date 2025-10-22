@@ -1,15 +1,8 @@
-  <br>
-<!-- <div align="center" style="display: flex; justify-content: center;">
-  <img src="https://thinkable-durian-178.notion.site/image/attachment%3Ab90af2d2-ad64-4057-95b5-f2e3fd804773%3Aandroid.png?table=block&id=271badc2-aadc-801b-890f-f1154ca0ebb5&spaceId=e97503bc-8704-4c0a-addd-1a6b9efb4226&width=1420&userId=&cache=v2" width="400"/>
-  <img src="https://thinkable-durian-178.notion.site/image/attachment%3Aa37c82b9-b2a0-415d-af37-585f7f5bf227%3Aandroid-2.png?table=block&id=271badc2-aadc-808b-ab36-f01f374248ac&spaceId=e97503bc-8704-4c0a-addd-1a6b9efb4226&width=1420&userId=&cache=v2" width="400"/>
-</div> -->
-
-
-
+<br>
 <br>
 <br>
 <div align="center">
-  <img src="https://thinkable-durian-178.notion.site/image/attachment%3Ad5ac55ba-6a6c-49bb-891c-2c91e970bf09%3A%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA_2025-09-18_%E1%84%8B%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%AB_1.35.23.png?table=block&id=271badc2-aadc-80c0-97c4-f8160ec5dc6b&spaceId=e97503bc-8704-4c0a-addd-1a6b9efb4226&width=720&userId=&cache=v2" width="200" style="border-radius: 16px;"/>
+  <img src="./assets/buddyya_icon.png" width="200" style="border-radius: 16px;"/>
 <h1>버디야</h1>
 우리 학교 외국인 친구와 버디가 되는 가장 쉬운 방법
   <br>
@@ -32,7 +25,8 @@
 
 <br>
 
-<h2>프로젝트 소개</h2>
+## 프로젝트 소개
+
 버디야는 매칭 및 채팅, 커뮤니티 피드 기능을 제공하며, 수도권 대학에 재학중인 유학생과 한국인 학생 간의 교류를 도모합니다.
 
 <br>
@@ -63,7 +57,7 @@
 
 <br>
 <div align="center">
-    <img src="https://buddyya.s3.ap-northeast-2.amazonaws.com/assets/%E1%84%91%E1%85%B5%E1%84%83%E1%85%B3+%E1%84%8D%E1%85%A1%E1%86%AF.gif" alt="커뮤니티 피드 GIF" width="250" />
+    <img src="./assets/feed.gif" alt="커뮤니티 피드 GIF" width="250" />
 </div>
 
 ---
@@ -77,7 +71,7 @@
 
 <br>
 <div align="center">
-    <img src="https://buddyya.s3.ap-northeast-2.amazonaws.com/assets/%E1%84%86%E1%85%A2%E1%84%8E%E1%85%B5%E1%86%BC+%E1%84%8D%E1%85%A1%E1%86%AF.gif" alt="버디 매칭 GIF" width="250" />
+    <img src="./assets/match.gif" alt="버디 매칭 GIF" width="250" />
 </div>
 
 ---
@@ -91,7 +85,7 @@
 
 <br>
 <div align="center">
-    <img src="https://buddyya.s3.ap-northeast-2.amazonaws.com/assets/%E1%84%8E%E1%85%A2%E1%84%90%E1%85%B5%E1%86%BC+%E1%84%8D%E1%85%A1%E1%86%AF.gif" alt="1:1 채팅 GIF" width="250" />
+    <img src="./assets/chat.gif" alt="1:1 채팅 GIF" width="250" />
 </div>
 
 <br>
@@ -102,7 +96,7 @@
 ## 🛠 아키택처
 
 <div align="center">
-    <img src="https://thinkable-durian-178.notion.site/image/attachment%3A109a3a94-1657-4b5b-b709-2233cef995fd%3A%E1%84%87%E1%85%A5%E1%84%83%E1%85%B5%E1%84%8B%E1%85%A3_%E1%84%8B%E1%85%A1%E1%84%8F%E1%85%B5%E1%84%90%E1%85%A6%E1%86%A8%E1%84%8E%E1%85%A5.png?table=block&id=27cbadc2-aadc-80d2-be57-d8092bc9b2ac&spaceId=e97503bc-8704-4c0a-addd-1a6b9efb4226&width=1420&userId=&cache=v2" alt="아키텍처" width="" />
+    <img src="./assets/architecture.png" alt="아키텍처" width="" />
 </div>
 
 <br>
