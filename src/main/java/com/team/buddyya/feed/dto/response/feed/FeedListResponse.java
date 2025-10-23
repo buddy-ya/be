@@ -3,6 +3,7 @@ package com.team.buddyya.feed.dto.response.feed;
 import com.team.buddyya.feed.domain.Feed;
 import java.util.List;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Slice;
 
 public record FeedListResponse(
         List<FeedResponse> feeds,
@@ -17,6 +18,15 @@ public record FeedListResponse(
                 feedInfo.getNumber(),
                 feedInfo.getTotalPages(),
                 feedInfo.hasNext()
+        );
+    }
+
+    public static <T> FeedListResponse from(List<FeedResponse> feeds, Slice<T> sliceInfo) {
+        return new FeedListResponse(
+                feeds,
+                -1,
+                -1,
+                sliceInfo.hasNext()
         );
     }
 }
