@@ -24,19 +24,17 @@ public class BookmarkService {
     private final FindStudentService findStudentService;
     private final FeedRepository feedRepository;
 
-    @Transactional(readOnly = true)
-    boolean existsByStudentAndFeed(Student student, Feed feed) {
+    private boolean existsByStudentAndFeed(Student student, Feed feed) {
         return bookmarkRepository.existsByStudentAndFeed(student, feed);
     }
 
-    @Transactional(readOnly = true)
-    Bookmark findByStudentAndFeed(Student student, Feed feed) {
+    private Bookmark findByStudentAndFeed(Student student, Feed feed) {
         return bookmarkRepository.findByStudentAndFeed(student, feed)
                 .orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_BOOKMARKED));
     }
 
     public BookmarkResponse toggleBookmark(StudentInfo studentInfo, Long feedId) {
-        Feed feed = feedRepository.findById(feedId)
+        Feed feed = feedRepository.findByIdForUpdate(feedId)
                 .orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND));
         Student student = findStudentService.findByStudentId(studentInfo.id());
         boolean isBookmarked = existsByStudentAndFeed(student, feed);

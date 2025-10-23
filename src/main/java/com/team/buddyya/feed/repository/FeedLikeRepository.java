@@ -21,4 +21,6 @@ public interface FeedLikeRepository extends JpaRepository<FeedLike, Long> {
     @Query("SELECT fl.feed.id FROM FeedLike fl WHERE fl.student.id = :studentId AND fl.feed.id IN :feedIds")
     Set<Long> findFeedIdsByStudentIdAndFeedIdsIn(@Param("studentId") Long studentId,
                                                  @Param("feedIds") List<Long> feedIds);
+
+    Long countByFeed(Feed feed);
 }

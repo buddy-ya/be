@@ -24,19 +24,17 @@ public class FeedLikeService {
     private final FindStudentService findStudentService;
     private final FeedRepository feedRepository;
 
-    @Transactional(readOnly = true)
-    boolean existsByStudentAndFeed(Student student, Feed feed) {
+    private boolean existsByStudentAndFeed(Student student, Feed feed) {
         return feedLikeRepository.existsByStudentAndFeed(student, feed);
     }
 
-    @Transactional(readOnly = true)
-    FeedLike findLikeByStudentAndFeed(Student student, Feed feed) {
+    private FeedLike findLikeByStudentAndFeed(Student student, Feed feed) {
         return feedLikeRepository.findByStudentAndFeed(student, feed)
                 .orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_LIKED));
     }
 
     public LikeResponse toggleLike(StudentInfo studentInfo, Long feedId) {
-        Feed feed = feedRepository.findById(feedId)
+        Feed feed = feedRepository.findByIdForUpdate(feedId)
                 .orElseThrow(() -> new FeedException(FeedExceptionType.FEED_NOT_FOUND));
         Student student = findStudentService.findByStudentId(studentInfo.id());
         boolean isLiked = existsByStudentAndFeed(student, feed);
